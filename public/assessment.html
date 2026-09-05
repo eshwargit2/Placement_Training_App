@@ -24,8 +24,9 @@
         <div id="assessmentTimer" class="assessment-timer-badge">20:00</div>
       </div>
 
-      <div class="notice" style="margin-top:20px;">
-        <b>⏱️ 20-minute timer:</b> The timer starts immediately when this assessment opens. When time reaches zero, the assessment is automatically submitted and you are returned to the dashboard.
+      <div class="notice" style="margin-top:20px; display:flex; align-items:center; gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span><b>20-minute timer:</b> The timer starts immediately when this assessment opens. When time reaches zero, the assessment is automatically submitted and you are returned to the dashboard.</span>
       </div>
 
       <form id="assessmentForm" onsubmit="event.preventDefault(); submitAssessment(false);">
@@ -38,8 +39,9 @@
         <div id="codingContainer"></div>
 
         <div style="margin-top:36px; text-align:center; padding:24px; background:#f8fafc; border-radius:16px; border:1px solid var(--line);">
-          <button type="submit" class="hero-btn-primary" style="padding:16px 44px; font-size:16px;">
-            🚀 Submit Assessment
+          <button type="submit" class="hero-btn-primary" style="padding:16px 44px; font-size:16px; display:inline-flex; align-items:center; gap:8px;">
+            <span>Submit Assessment</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
       </form>

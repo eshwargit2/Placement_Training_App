@@ -69,10 +69,11 @@ function renderHeader(activePage) {
   let actionsHtml = "";
   if (user && role) {
     const dashHref = role === "trainer" ? "trainer.html" : "dashboard.html";
+    const showDashboardBtn = activePage !== "dashboard" && activePage !== "trainer";
     actionsHtml = `
       <span>${esc(user.name || user.username)} ${role ? `· ${role}` : ""}</span>
       <a href="index.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Home</a>
-      <a href="${dashHref}" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Dashboard</a>
+      ${showDashboardBtn ? `<a href="${dashHref}" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Dashboard</a>` : ""}
       <button class="ghost" style="padding:6px 12px;font-size:12px" onclick="logout()">Logout</button>
     `;
   } else {
@@ -84,8 +85,9 @@ function renderHeader(activePage) {
 
   headerEl.innerHTML = `
     <div class="top">
-      <a href="index.html" style="color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;">
-        <b><span>🎓</span> VMKVEC Placement Training · CSE</b>
+      <a href="index.html" style="color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        <b>VMKVEC Placement Training · CSE</b>
       </a>
       <div class="actions">
         ${actionsHtml}
