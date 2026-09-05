@@ -12,6 +12,8 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+const os = require('os');
+
 // ==========================================================================
 // FIREBASE DATABASE INITIALIZATION (VERCEL ENV & LOCAL FILE SUPPORT)
 // ==========================================================================
@@ -23,8 +25,11 @@ function getFirebaseCredentials() {
   // Option 1: Direct JSON string in Vercel Environment Variables
   if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
     try {
-      const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON.trim();
-      // Handle base64 encoded or raw string
+      let raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON.trim();
+      // Remove wrapping single or double quotes if present
+      if ((raw.startsWith("'") && raw.endsWith("'")) || (raw.startsWith('"') && raw.endsWith('"'))) {
+        raw = raw.slice(1, -1).trim();
+      }
       if (raw.startsWith('{')) {
         return JSON.parse(raw);
       } else {
@@ -46,13 +51,17 @@ function getFirebaseCredentials() {
   }
 
   // Option 3: Local JSON File on Disk (Local Development)
-  if (process.env.FIREBASE_SERVICE_ACCOUNT && fs.existsSync(path.resolve(__dirname, process.env.FIREBASE_SERVICE_ACCOUNT))) {
-    return require(path.resolve(__dirname, process.env.FIREBASE_SERVICE_ACCOUNT));
+  try {
+    if (process.env.FIREBASE_SERVICE_ACCOUNT && fs.existsSync(path.resolve(__dirname, process.env.FIREBASE_SERVICE_ACCOUNT))) {
+      return require(path.resolve(__dirname, process.env.FIREBASE_SERVICE_ACCOUNT));
+    }
+    const files = fs.readdirSync(__dirname);
+    const matched = files.find(f => f.includes('firebase-adminsdk') && f.endsWith('.json'));
+    if (matched) return require(path.join(__dirname, matched));
+    if (fs.existsSync(path.join(__dirname, 'serviceAccountKey.json'))) return require(path.join(__dirname, 'serviceAccountKey.json'));
+  } catch (err) {
+    // Ignore read directory errors in read-only serverless environments
   }
-  const files = fs.readdirSync(__dirname);
-  const matched = files.find(f => f.includes('firebase-adminsdk') && f.endsWith('.json'));
-  if (matched) return require(path.join(__dirname, matched));
-  if (fs.existsSync(path.join(__dirname, 'serviceAccountKey.json'))) return require(path.join(__dirname, 'serviceAccountKey.json'));
 
   return null;
 }
@@ -80,15 +89,20 @@ try {
   console.warn('⚠️ Firebase Admin initialization error, using local database store:', err.message);
 }
 
-// Local Storage Helper
-const DATA_DIR = path.join(__dirname, 'data');
+// Local Storage Helper (Using os.tmpdir() for Serverless Environments)
+const isServerless = !!process.env.VERCEL;
+const DATA_DIR = isServerless ? os.tmpdir() : path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'assessments.json');
 
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf-8');
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf-8');
+  }
+} catch (e) {
+  console.warn('Storage directory initialization notice:', e.message);
 }
 
 function getLocalAssessments() {
@@ -101,12 +115,31 @@ function getLocalAssessments() {
 }
 
 function saveLocalAssessments(arr) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(arr, null, 2), 'utf-8');
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(arr, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn('Local save notice:', e.message);
+  }
 }
 
 // ==========================================================================
 // API ROUTES
 // ==========================================================================
+
+// Root Route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'VMKVEC Placement Training Backend API is running.',
+    status: 'online',
+    databaseMode,
+    endpoints: [
+      '/api/health',
+      '/api/assessments',
+      '/api/admin/assessments',
+      '/api/admin/students'
+    ]
+  });
+});
 
 // 1. Health Check
 app.get('/api/health', (req, res) => {
