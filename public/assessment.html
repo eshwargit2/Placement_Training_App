@@ -194,15 +194,16 @@
       const prior = state.attempts.filter(a => a.studentId === state.user.id && a.day === day).length + 1;
       const attemptId = "A" + Date.now();
 
-      state.attempts.push({
+      const assessmentRecord = {
         id: attemptId,
         studentId: state.user.id,
-        studentName: state.user.name,
-        username: state.user.username,
-        department: state.user.department,
-        year: state.user.year,
-        rollNumber: state.user.rollNumber,
+        studentName: state.user.name || "Student " + state.user.id,
+        username: state.user.username || "",
+        department: state.user.department || "CSE",
+        year: state.user.year || "4th Year",
+        rollNumber: state.user.rollNumber || "",
         day,
+        topic,
         attemptNumber: prior,
         score,
         total,
@@ -222,7 +223,9 @@
         program2Prompt: CODING_BANK[day][1],
         program3Prompt: CODING_BANK[day][2],
         mcqDetails
-      });
+      };
+
+      state.attempts.push(assessmentRecord);
 
       state.submissions.push({
         id: Date.now(), attemptId, studentId: state.user.id, day, topic, problem: 1,
@@ -243,7 +246,8 @@
       save();
       sessionStorage.removeItem(sessionKey);
       clearInterval(window.assessmentInterval);
-      alert(`Assessment ${timedOut ? "time expired and was closed" : "submitted"}. Score: ${score}/${total} (${percentage}%).`);
+
+      alert(`Assessment ${timedOut ? "time expired and was closed" : "submitted"}. Score: ${score}/${total} (${percentage}%).\n\nYour result is stored locally. You can upload it to the Database from your Dashboard.`);
       window.location.href = "dashboard.html";
     }
   </script>

@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Assessment Panel · VMKVEC Placement Training</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
+  <style>
+    .admin-hero {
+      background: linear-gradient(135deg, #0b1329 0%, #1e1b4b 60%, #0f172a 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 24px 28px;
+      color: #fff;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 36px rgba(15, 23, 42, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .status-badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .status-badge-offline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .view-toggle-tabs {
+      display: flex;
+      gap: 8px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+    }
+    .view-tab-btn {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: #64748b;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .view-tab-btn:hover {
+      background: rgba(255,255,255,0.6);
+      color: #0f172a;
+    }
+    .view-tab-btn.active {
+      background: #fff;
+      color: #2563eb;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .student-card-item {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .student-card-item:hover {
+      border-color: #93c5fd;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.08);
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-container {
+      background: #fff;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+    }
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--line);
+      background: #f8fafc;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .code-box {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      margin: 8px 0 16px;
+      border: 1px solid #334155;
+    }
+    .mcq-review-item {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="mainHeader"></div>
+
+  <main class="wrap">
+    <!-- Admin Hero Banner -->
+    <div class="admin-hero">
+      <div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:rgba(99,102,241,0.2); display:flex; align-items:center; justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h1 style="margin:0; font-size:22px; font-weight:800; color:#fff;">Admin Assessment &amp; Evaluation Panel</h1>
+        </div>
+        <p style="margin:0; color:#cbd5e1; font-size:13.5px;">
+          Central assessment data repository. Inspect candidate MCQ responses, coding solutions, and performance logs in real time.
+        </p>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span id="serverStatusBadge" class="status-badge-offline">
+          <span class="status-dot"></span> Checking Server...
+        </span>
+        <button onclick="fetchAdminData()" class="ghost" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+          Refresh Data
+        </button>
+        <button onclick="exportAdminCSV()" class="hero-btn-primary" style="padding:8px 18px; font-size:13px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Overview Stats Grid -->
+    <div class="grid" id="adminStatsGrid" style="margin-bottom: 24px;">
+      <div class="dash-stat-card-modern">
+        <div class="dash-stat-top">
+          <div class="dash-stat-title">Assessments Stored</div>
+          <div class="dash-stat-icon-wrap dash-stat-icon-blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+        </div>
+        <div class="dash-stat-value" id="statTotalSubmissions">0</div>
+        <div class="muted">Submissions across all days</div>
+      </div>
+
+      <div class="dash-stat-card-modern">
+        <div class="dash-stat-top">
+          <div class="dash-stat-title">Unique Students</div>
+          <div class="dash-stat-icon-wrap dash-stat-icon-green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+        </div>
+        <div class="dash-stat-value" id="statUniqueStudents">0</div>
+        <div class="muted">Participating candidates</div>
+      </div>
+
+      <div class="dash-stat-card-modern">
+        <div class="dash-stat-top">
+          <div class="dash-stat-title">Batch Average Score</div>
+          <div class="dash-stat-icon-wrap dash-stat-icon-purple">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+        </div>
+        <div class="dash-stat-value" id="statAvgScore">0%</div>
+        <div class="muted">Average MCQ assessment score</div>
+      </div>
+
+      <div class="dash-stat-card-modern">
+        <div class="dash-stat-top">
+          <div class="dash-stat-title">Database Status</div>
+          <div class="dash-stat-icon-wrap dash-stat-icon-amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+        </div>
+        <div class="dash-stat-value" style="font-size:18px;" id="statDbMode">Cloud Active</div>
+        <div class="muted" id="statDbStatusText">Real-time database active</div>
+      </div>
+    </div>
+
+    <!-- View Mode Switcher Tabs -->
+    <div class="view-toggle-tabs">
+      <button class="view-tab-btn active" id="tabBtnSubmissions" onclick="setViewMode('submissions')">
+        📋 All Assessment Submissions (<span id="countSubmissionsTab">0</span>)
+      </button>
+      <button class="view-tab-btn" id="tabBtnStudents" onclick="setViewMode('students')">
+        👤 Group by Student Details (<span id="countStudentsTab">0</span>)
+      </button>
+    </div>
+
+    <!-- Filter & Content Card -->
+    <div class="card">
+      <div class="dash-section-header">
+        <div>
+          <h2 style="margin:0 0 4px;" id="panelSectionTitle">Student Assessment Submissions</h2>
+          <p class="muted" style="margin:0;">Inspect individual candidate MCQ results and 3 coding programs stored in the database.</p>
+        </div>
+
+        <div class="dash-filter-controls">
+          <div class="dash-search-box">
+            <span class="dash-search-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" id="adminSearchInput" class="dash-search-input" placeholder="Search student, roll number, topic..." oninput="applyFilters()">
+          </div>
+
+          <select id="dayFilter" onchange="applyFilters()" style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); font-size:13px; background:#fff;">
+            <option value="all">All Days (1 - 33)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- View 1: All Submissions Table -->
+      <div id="submissionsTableView" style="margin-top:16px;">
+        <div id="adminTableContainer"></div>
+      </div>
+
+      <!-- View 2: Students Grouped Cards -->
+      <div id="studentsGroupedView" style="margin-top:16px; display:none;">
+        <div id="studentsListContainer"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Inspection Modal -->
+  <div class="modal-overlay" id="inspectModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div>
+          <h2 style="margin:0; font-size:18px;" id="modalTitle">Candidate Assessment Details</h2>
+          <p class="muted" style="margin:2px 0 0; font-size:13px;" id="modalSubtitle">Details</p>
+        </div>
+        <button onclick="closeInspectModal()" class="ghost" style="padding:6px 12px; font-size:16px; border-radius:8px;">✕</button>
+      </div>
+
+      <div class="modal-body" id="modalBody">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="ghost" onclick="closeInspectModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script>
+    renderHeader("trainer");
+
+    // Populate day filter
+    const daySelect = document.getElementById("dayFilter");
+    for (let i = 1; i <= 33; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `Day ${i} — ${curriculum[i-1] ? curriculum[i-1][0] : ''}`;
+      daySelect.appendChild(opt);
+    }
+
+    let allSubmissions = [];
+    let currentView = 'submissions';
+    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+      ? 'http://localhost:5000'
+      : '';
+
+    function setViewMode(mode) {
+      currentView = mode;
+      document.getElementById("tabBtnSubmissions").classList.toggle("active", mode === 'submissions');
+      document.getElementById("tabBtnStudents").classList.toggle("active", mode === 'students');
+      document.getElementById("submissionsTableView").style.display = mode === 'submissions' ? 'block' : 'none';
+      document.getElementById("studentsGroupedView").style.display = mode === 'students' ? 'block' : 'none';
+      document.getElementById("panelSectionTitle").textContent = mode === 'submissions' 
+        ? "All Student Assessment Submissions" 
+        : "Student Profiles & Individual Assessment Histories";
+      applyFilters();
+    }
+
+    async function fetchAdminData() {
+      const badge = document.getElementById("serverStatusBadge");
+      
+      // 1. Health check
+      try {
+        const healthRes = await fetch(`${API_BASE}/api/health`);
+        const health = await healthRes.json();
+        badge.className = "status-badge-live";
+        badge.innerHTML = `<span class="status-dot"></span> Database Connected`;
+        document.getElementById("statDbMode").textContent = "Cloud Active";
+        document.getElementById("statDbStatusText").textContent = "Synchronized with Central Database";
+      } catch (e) {
+        badge.className = "status-badge-offline";
+        badge.innerHTML = `<span class="status-dot"></span> Server Offline (Port 5000)`;
+        document.getElementById("statDbMode").textContent = "Local State";
+        document.getElementById("statDbStatusText").textContent = "Start backend service on Port 5000";
+      }
+
+      // 2. Fetch assessments
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/assessments`);
+        const data = await res.json();
+        if (data && data.assessments) {
+          allSubmissions = data.assessments;
+        }
+      } catch (err) {
+        console.warn("Could not reach backend API, loading from browser state:", err.message);
+        allSubmissions = state.attempts || [];
+      }
+
+      if (!allSubmissions.length && state.attempts && state.attempts.length) {
+        allSubmissions = state.attempts;
+      }
+
+      updateOverviewStats();
+      applyFilters();
+    }
+
+    function updateOverviewStats() {
+      document.getElementById("statTotalSubmissions").textContent = allSubmissions.length;
+      document.getElementById("countSubmissionsTab").textContent = allSubmissions.length;
+
+      const uniqueIds = new Set(allSubmissions.map(a => a.studentId || a.rollNumber || a.studentName));
+      document.getElementById("statUniqueStudents").textContent = uniqueIds.size;
+      document.getElementById("countStudentsTab").textContent = uniqueIds.size;
+      
+      const avg = allSubmissions.length 
+        ? Math.round(allSubmissions.reduce((acc, a) => acc + Number(a.percentage || 0), 0) / allSubmissions.length)
+        : 0;
+      document.getElementById("statAvgScore").textContent = avg + "%";
+    }
+
+    function applyFilters() {
+      const q = (document.getElementById("adminSearchInput").value || "").toLowerCase().trim();
+      const selectedDay = document.getElementById("dayFilter").value;
+
+      let filtered = allSubmissions.filter(a => {
+        if (selectedDay !== "all" && String(a.day) !== String(selectedDay)) return false;
+        if (q) {
+          const matchName = (a.studentName || "").toLowerCase().includes(q);
+          const matchRoll = (a.rollNumber || "").toLowerCase().includes(q);
+          const matchTopic = (a.topic || (curriculum[a.day-1] ? curriculum[a.day-1][0] : "")).toLowerCase().includes(q);
+          const matchDay = `day ${a.day}`.includes(q);
+          if (!matchName && !matchRoll && !matchTopic && !matchDay) return false;
+        }
+        return true;
+      });
+
+      if (currentView === 'submissions') {
+        renderSubmissionsTable(filtered);
+      } else {
+        renderStudentsGrouped(filtered);
+      }
+    }
+
+    function renderSubmissionsTable(list) {
+      const container = document.getElementById("adminTableContainer");
+      if (!list.length) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:40px 16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:#eff6ff; color:#2563eb; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <p style="margin:0; font-weight:700; color:#1e293b; font-size:15px;">No assessment records found</p>
+            <p class="muted" style="margin:4px 0 0;">When students submit an assessment, their MCQ results and 3 coding programs will appear here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Student Details</th>
+                <th>Day &amp; Topic</th>
+                <th>Attempt</th>
+                <th>MCQ Score</th>
+                <th>Time Spent</th>
+                <th>Submitted Date</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map((item, idx) => {
+                const pct = Number(item.percentage || 0);
+                const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
+                const topicName = item.topic || (curriculum[item.day - 1] ? curriculum[item.day - 1][0] : "Assessment");
+
+                return `
+                  <tr>
+                    <td>
+                      <div style="font-weight:700; color:#0f172a;">${esc(item.studentName || "Student " + item.studentId)}</div>
+                      <small class="muted">Roll: <b>${esc(item.rollNumber || "-")}</b> · ${esc(item.department || "CSE")} · ${esc(item.year || "4th Year")}</small>
+                    </td>
+                    <td>
+                      <b>Day ${item.day}</b>
+                      <div class="muted" style="font-size:12px;">${esc(topicName)}</div>
+                    </td>
+                    <td><span class="badge" style="background:#f1f5f9; color:#475569;">#${item.attemptNumber || 1}</span></td>
+                    <td>
+                      <span class="dash-score-pill ${scoreClass}">
+                        ${item.score}/${item.total || 5} (${pct}%)
+                      </span>
+                    </td>
+                    <td>⏱️ ${Math.ceil((item.completionSeconds || 0) / 60)} min</td>
+                    <td><small class="muted">${esc(item.completedAtDisplay || item.date || "-")}</small></td>
+                    <td style="text-align:right;">
+                      <button onclick="inspectAssessment('${esc(item.id || idx)}')" class="hero-btn-primary" style="padding:6px 14px; font-size:12.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        Inspect Full Submission
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderStudentsGrouped(list) {
+      const container = document.getElementById("studentsListContainer");
+      const grouped = {};
+
+      list.forEach(a => {
+        const key = a.studentId || a.rollNumber || a.studentName || "unknown";
+        if (!grouped[key]) {
+          grouped[key] = {
+            studentId: a.studentId,
+            name: a.studentName || "Student " + a.studentId,
+            rollNumber: a.rollNumber || "-",
+            department: a.department || "CSE",
+            year: a.year || "4th Year",
+            assessments: []
+          };
+        }
+        grouped[key].assessments.push(a);
+      });
+
+      const students = Object.values(grouped);
+      if (!students.length) {
+        container.innerHTML = `<p class="muted" style="text-align:center; padding:30px;">No student records found matching the filter.</p>`;
+        return;
+      }
+
+      container.innerHTML = students.map(s => {
+        const avg = Math.round(s.assessments.reduce((acc, a) => acc + Number(a.percentage || 0), 0) / s.assessments.length);
+        return `
+          <div class="student-card-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+              <div>
+                <h3 style="margin:0 0 4px; font-size:16px; color:#0f172a;">${esc(s.name)}</h3>
+                <div class="muted" style="font-size:13px;">
+                  <b>Roll:</b> ${esc(s.rollNumber)} &nbsp;|&nbsp; 
+                  <b>Dept:</b> ${esc(s.department)} &nbsp;|&nbsp; 
+                  <b>Year:</b> ${esc(s.year)} &nbsp;|&nbsp; 
+                  <b>Student ID:</b> ${esc(s.studentId)}
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <span class="badge" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">${s.assessments.length} Assessment${s.assessments.length > 1 ? 's' : ''}</span>
+                <span class="badge ${avg >= 75 ? 'done' : ''}" style="font-weight:700;">Avg: ${avg}%</span>
+              </div>
+            </div>
+
+            <!-- List of assessments for this student -->
+            <div style="border-top:1px solid #f1f5f9; padding-top:10px;">
+              <b style="font-size:12.5px; color:#475569; text-transform:uppercase;">Submitted Assessments:</b>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                ${s.assessments.map(a => `
+                  <button onclick="inspectAssessment('${esc(a.id)}')" class="ghost" style="padding:6px 12px; font-size:12px; border-radius:8px; text-align:left; display:inline-flex; align-items:center; gap:6px;">
+                    <span><b>Day ${a.day}:</b> ${a.percentage}%</span>
+                    <span style="color:#64748b; font-size:11px;">(${esc(a.completedAtDisplay || a.date || '')})</span>
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function inspectAssessment(id) {
+      const record = allSubmissions.find(a => String(a.id) === String(id) || String(allSubmissions.indexOf(a)) === String(id));
+      if (!record) return;
+
+      document.getElementById("modalTitle").textContent = `${record.studentName || "Student"} — Day ${record.day} Assessment`;
+      document.getElementById("modalSubtitle").textContent = `Roll No: ${record.rollNumber || "-"} · Dept: ${record.department || "CSE"} · Score: ${record.score}/${record.total || 5} (${record.percentage}%) · Time: ${Math.ceil((record.completionSeconds || 0) / 60)} min`;
+
+      const mcqs = record.mcqDetails || [];
+      const mcqHtml = mcqs.length ? mcqs.map((q, idx) => `
+        <div class="mcq-review-item">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <b>Q${q.number || idx + 1}: ${esc(q.question)}</b>
+            <span class="badge ${q.result === 'Correct' ? 'done' : ''}" style="${q.result !== 'Correct' ? 'background:#fee2e2; color:#b91c1c;' : ''}">
+              ${q.result === 'Correct' ? '✓ Correct' : '✗ Incorrect'}
+            </span>
+          </div>
+          <div style="font-size:13px; margin-bottom:4px;">
+            <span class="muted">Student Selected:</span> <b style="color:${q.result === 'Correct' ? '#15803d' : '#b91c1c'}">${esc(q.answer)}</b>
+          </div>
+          <div style="font-size:13px;">
+            <span class="muted">Correct Answer:</span> <b style="color:#15803d;">${esc(q.correct)}</b>
+          </div>
+        </div>
+      `).join("") : "<p class='muted'>No question-by-question MCQ logs available for this attempt.</p>";
+
+      const p1Prompt = record.program1Prompt || (CODING_BANK[record.day] ? CODING_BANK[record.day][0] : "Program 1");
+      const p2Prompt = record.program2Prompt || (CODING_BANK[record.day] ? CODING_BANK[record.day][1] : "Program 2");
+      const p3Prompt = record.program3Prompt || (CODING_BANK[record.day] ? CODING_BANK[record.day][2] : "Program 3");
+
+      document.getElementById("modalBody").innerHTML = `
+        <h3 style="margin-top:0; color:var(--primary); font-size:16px;">1. Conceptual MCQs Review (5 Questions)</h3>
+        ${mcqHtml}
+
+        <h3 style="margin-top:24px; color:var(--primary); font-size:16px;">2. Candidate Coding Submissions (3 Programs)</h3>
+        
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b>Challenge 1: ${esc(p1Prompt)}</b>
+            <button class="ghost" style="padding:4px 10px; font-size:11px;" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(record.program1 || '')}'))">Copy Code</button>
+          </div>
+          <div class="code-box">${esc(record.program1 || '// No code saved for Program 1')}</div>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b>Challenge 2: ${esc(p2Prompt)}</b>
+            <button class="ghost" style="padding:4px 10px; font-size:11px;" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(record.program2 || '')}'))">Copy Code</button>
+          </div>
+          <div class="code-box">${esc(record.program2 || '// No code saved for Program 2')}</div>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b>Challenge 3: ${esc(p3Prompt)}</b>
+            <button class="ghost" style="padding:4px 10px; font-size:11px;" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(record.program3 || '')}'))">Copy Code</button>
+          </div>
+          <div class="code-box">${esc(record.program3 || '// No code saved for Program 3')}</div>
+        </div>
+      `;
+
+      document.getElementById("inspectModal").classList.add("active");
+    }
+
+    function closeInspectModal() {
+      document.getElementById("inspectModal").classList.remove("active");
+    }
+
+    function exportAdminCSV() {
+      if (!allSubmissions.length) {
+        alert("No assessment records to export.");
+        return;
+      }
+      const headers = ["Student ID", "Student Name", "Roll Number", "Department", "Year", "Day", "Topic", "Attempt", "Score", "Total", "Percentage", "Time Seconds", "Date Completed"];
+      const rows = allSubmissions.map(a => [
+        `"${a.studentId || ''}"`,
+        `"${a.studentName || ''}"`,
+        `"${a.rollNumber || ''}"`,
+        `"${a.department || ''}"`,
+        `"${a.year || ''}"`,
+        a.day,
+        `"${(a.topic || (curriculum[a.day-1] ? curriculum[a.day-1][0] : '')).replace(/"/g, '""')}"`,
+        a.attemptNumber || 1,
+        a.score || 0,
+        a.total || 5,
+        a.percentage || 0,
+        a.completionSeconds || 0,
+        `"${a.completedAtDisplay || a.date || ''}"`
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", `VMKVEC_Assessment_Database_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Initial load
+    fetchAdminData();
+  </script>
+</body>
+</html>

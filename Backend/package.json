@@ -1,0 +1,24 @@
+{
+  "name": "placement-training-backend",
+  "version": "1.0.0",
+  "description": "Backend server for VMKVEC Placement Training Portal with Firebase Database integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.1.0"
+  },
+  "keywords": [
+    "placement",
+    "assessment",
+    "firebase",
+    "express"
+  ],
+  "author": "VMKVEC CSE",
+  "license": "ISC"
+}

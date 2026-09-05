@@ -78,12 +78,19 @@
     <!-- Assessment History Log -->
     <div class="card" style="margin-bottom: 24px;">
       <div class="dash-section-header">
-        <h2>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-          </svg>
-          Assessment History &amp; Performance Log
-        </h2>
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            Assessment History &amp; Performance Log
+          </h2>
+          <button id="btnUploadAllAssessments" onclick="uploadAllAssessmentsToDatabase()" class="hero-btn-primary" style="padding:7px 16px; font-size:12.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Upload to Database</span>
+          </button>
+        </div>
+        <div id="syncStatusToast" style="font-size:13px; font-weight:600;"></div>
       </div>
       <div id="assessmentHistoryTable"></div>
     </div>
@@ -250,71 +257,210 @@
 
     // 4. Render Assessment History Table
     const histEl = document.getElementById("assessmentHistoryTable");
-    if (myAttempts.length) {
-      histEl.innerHTML = `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Day & Topic</th>
-                <th>Attempt</th>
-                <th>Score</th>
-                <th>Status</th>
-                <th>Date & Time</th>
-                <th>Time Spent</th>
-                <th>Identified Strong Areas</th>
-                <th>Focus Areas</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${myAttempts.slice().reverse().map((a) => {
-                const pct = Number(a.percentage || 0);
-                const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
-                return `
-                  <tr>
-                    <td><b>Day ${a.day}</b> — ${esc(curriculum[a.day - 1] ? curriculum[a.day - 1][0] : '')}</td>
-                    <td><span class="badge" style="background:#f1f5f9; color:#475569;">#${(byDay[a.day] || []).indexOf(a) + 1}</span></td>
-                    <td>
-                      <span class="dash-score-pill ${scoreClass}">
-                        ${a.score}/${a.total} (${pct}%)
-                      </span>
-                    </td>
-                    <td>
-                      <span class="badge done" style="display:inline-flex; align-items:center; gap:4px;">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Completed
-                      </span>
-                    </td>
-                    <td>${esc(a.completedAtDisplay || a.date || a.completedAt || "-")}</td>
-                    <td>
-                      <span style="display:inline-flex; align-items:center; gap:4px;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        ${Math.ceil((a.completionSeconds || 0) / 60)} min
-                      </span>
-                    </td>
-                    <td>${(a.strongAreas && a.strongAreas.length) ? a.strongAreas.map(s => `<span class="badge done" style="margin:2px;">${esc(s)}</span>`).join(" ") : "<span class='muted'>-</span>"}</td>
-                    <td>${(a.weakAreas && a.weakAreas.length) ? a.weakAreas.map(w => `<span class="badge" style="background:#fee2e2; color:#b91c1c; margin:2px;">${esc(w)}</span>`).join(" ") : "<span class='muted'>None</span>"}</td>
-                  </tr>
-                `;
-              }).join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
-    } else {
-      histEl.innerHTML = `
-        <div style="text-align:center; padding:32px 16px;">
-          <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; background:#eff6ff; color:#2563eb; margin-bottom:12px;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+    
+    function updateUploadButtonVisibility() {
+      const uploadBtn = document.getElementById("btnUploadAllAssessments");
+      if (!uploadBtn) return;
+      const unsyncedCount = myAttempts.filter(a => !a.synced).length;
+      if (unsyncedCount > 0) {
+        uploadBtn.style.display = "inline-flex";
+        uploadBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Upload to Database (${unsyncedCount})</span>
+        `;
+      } else {
+        uploadBtn.style.display = "none";
+      }
+    }
+
+    function renderAssessmentHistory() {
+      updateUploadButtonVisibility();
+
+      if (myAttempts.length) {
+        histEl.innerHTML = `
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Day & Topic</th>
+                  <th>Attempt</th>
+                  <th>Score</th>
+                  <th>Status</th>
+                  <th>Date & Time</th>
+                  <th>Time Spent</th>
+                  <th>Identified Strong</th>
+                  <th>Database Sync</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${myAttempts.slice().reverse().map((a) => {
+                  const pct = Number(a.percentage || 0);
+                  const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
+                  const isSynced = !!a.synced;
+
+                  return `
+                    <tr>
+                      <td><b>Day ${a.day}</b> — ${esc(curriculum[a.day - 1] ? curriculum[a.day - 1][0] : '')}</td>
+                      <td><span class="badge" style="background:#f1f5f9; color:#475569;">#${(byDay[a.day] || []).indexOf(a) + 1}</span></td>
+                      <td>
+                        <span class="dash-score-pill ${scoreClass}">
+                          ${a.score}/${a.total} (${pct}%)
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge done" style="display:inline-flex; align-items:center; gap:4px;">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          Completed
+                        </span>
+                      </td>
+                      <td>${esc(a.completedAtDisplay || a.date || a.completedAt || "-")}</td>
+                      <td>
+                        <span style="display:inline-flex; align-items:center; gap:4px;">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                          ${Math.ceil((a.completionSeconds || 0) / 60)} min
+                        </span>
+                      </td>
+                      <td>${(a.strongAreas && a.strongAreas.length) ? a.strongAreas.map(s => `<span class="badge done" style="margin:2px;">${esc(s)}</span>`).join(" ") : "<span class='muted'>-</span>"}</td>
+                      <td>
+                        ${isSynced ? `
+                          <span class="badge done" style="display:inline-flex; align-items:center; gap:5px; font-weight:700;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Synced
+                          </span>
+                        ` : `
+                          <button onclick="uploadSingleAttempt('${esc(a.id)}')" id="btnSync_${esc(a.id)}" class="ghost" style="padding:5px 12px; font-size:12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload
+                          </button>
+                        `}
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
           </div>
-          <p style="margin:0; font-weight:700; color:#1e293b; font-size:16px;">No assessments attempted yet</p>
-          <p class="muted" style="margin:4px 0 16px;">Pick any module from the 33-day roadmap below to take your first timed test.</p>
-          <a href="assessment.html?day=1" class="hero-btn-primary" style="text-decoration:none; padding:10px 20px; font-size:13.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
-            <span>Start Day 1 Assessment</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-      `;
+        `;
+      } else {
+        histEl.innerHTML = `
+          <div style="text-align:center; padding:32px 16px;">
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; background:#eff6ff; color:#2563eb; margin-bottom:12px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            </div>
+            <p style="margin:0; font-weight:700; color:#1e293b; font-size:16px;">No assessments attempted yet</p>
+            <p class="muted" style="margin:4px 0 16px;">Pick any module from the 33-day roadmap below to take your first timed test.</p>
+            <a href="assessment.html?day=1" class="hero-btn-primary" style="text-decoration:none; padding:10px 20px; font-size:13.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+              <span>Start Day 1 Assessment</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        `;
+      }
+    }
+
+    renderAssessmentHistory();
+
+    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+      ? 'http://localhost:5000'
+      : '';
+
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById("syncStatusToast");
+      if (!toast) return;
+      toast.style.color = isSuccess ? "#059669" : "#dc2626";
+      toast.innerHTML = msg;
+      setTimeout(() => { toast.innerHTML = ""; }, 5000);
+    }
+
+    async function uploadSingleAttempt(attemptId) {
+      const attempt = myAttempts.find(a => String(a.id) === String(attemptId));
+      if (!attempt) return;
+
+      const btn = document.getElementById(`btnSync_${attemptId}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `Uploading...`;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/assessments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(attempt)
+        });
+        const data = await res.json();
+        if (data.success) {
+          attempt.synced = true;
+          // Update global state item as well
+          const stateAttempt = state.attempts.find(a => String(a.id) === String(attemptId));
+          if (stateAttempt) stateAttempt.synced = true;
+          save();
+
+          renderAssessmentHistory();
+          showToast(`✓ Day ${attempt.day} assessment successfully uploaded to database!`, true);
+        } else {
+          throw new Error(data.error || "Upload failed");
+        }
+      } catch (err) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Retry`;
+        }
+        showToast(`⚠️ Server offline or error. Ensure backend is running on Port 5000.`, false);
+        alert(`Could not upload to backend server on Port 5000: ${err.message}\n\nPlease verify that 'node server.js' is running in the Backend folder.`);
+      }
+    }
+
+    async function uploadAllAssessmentsToDatabase() {
+      const unsyncedAttempts = myAttempts.filter(a => !a.synced);
+      if (!unsyncedAttempts.length) {
+        showToast("✓ All assessment records are already synced!", true);
+        updateUploadButtonVisibility();
+        return;
+      }
+
+      const uploadBtn = document.getElementById("btnUploadAllAssessments");
+      if (uploadBtn) {
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = `Uploading ${unsyncedAttempts.length} records...`;
+      }
+
+      let uploadedCount = 0;
+      let failedCount = 0;
+
+      for (const attempt of unsyncedAttempts) {
+        try {
+          const res = await fetch(`${API_BASE}/api/assessments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(attempt)
+          });
+          const data = await res.json();
+          if (data.success) {
+            attempt.synced = true;
+            const stateAttempt = state.attempts.find(a => String(a.id) === String(attempt.id));
+            if (stateAttempt) stateAttempt.synced = true;
+            uploadedCount++;
+          } else {
+            failedCount++;
+          }
+        } catch (e) {
+          failedCount++;
+        }
+      }
+
+      save();
+      renderAssessmentHistory();
+
+      if (uploadBtn) {
+        uploadBtn.disabled = false;
+      }
+
+      if (failedCount === 0) {
+        showToast(`✓ All ${uploadedCount} assessment records uploaded to database!`, true);
+      } else {
+        showToast(`⚠️ Synced ${uploadedCount} records. (${failedCount} failed — check if backend is running on Port 5000)`, false);
+      }
     }
 
     // 5. Interactive Roadmap with Filtering & Search

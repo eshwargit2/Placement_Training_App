@@ -70,10 +70,12 @@ function renderHeader(activePage) {
   if (user && role) {
     const dashHref = role === "trainer" ? "trainer.html" : "dashboard.html";
     const showDashboardBtn = activePage !== "dashboard" && activePage !== "trainer";
+    const adminBtn = role === "trainer" ? `<a href="admin.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;background:rgba(99,102,241,0.15);color:#4f46e5;border:1px solid rgba(99,102,241,0.25);font-weight:600;">Admin Panel</a>` : "";
     actionsHtml = `
       <span>${esc(user.name || user.username)} ${role ? `· ${role}` : ""}</span>
       <a href="index.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Home</a>
       ${showDashboardBtn ? `<a href="${dashHref}" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Dashboard</a>` : ""}
+      ${adminBtn}
       <button class="ghost" style="padding:6px 12px;font-size:12px" onclick="logout()">Logout</button>
     `;
   } else {
