@@ -360,9 +360,7 @@
 
     renderAssessmentHistory();
 
-    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
-      ? 'http://localhost:5000'
-      : '';
+    const API_BASE = 'https://placement-server-iota.vercel.app';
 
     function showToast(msg, isSuccess = true) {
       const toast = document.getElementById("syncStatusToast");
@@ -406,8 +404,8 @@
           btn.disabled = false;
           btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Retry`;
         }
-        showToast(`⚠️ Server offline or error. Ensure backend is running on Port 5000.`, false);
-        alert(`Could not upload to backend server on Port 5000: ${err.message}\n\nPlease verify that 'node server.js' is running in the Backend folder.`);
+        showToast(`⚠️ Upload failed: Could not connect to backend server.`, false);
+        alert(`Could not upload to backend server: ${err.message}\n\nPlease verify backend connectivity at ${API_BASE}`);
       }
     }
 
@@ -459,7 +457,7 @@
       if (failedCount === 0) {
         showToast(`✓ All ${uploadedCount} assessment records uploaded to database!`, true);
       } else {
-        showToast(`⚠️ Synced ${uploadedCount} records. (${failedCount} failed — check if backend is running on Port 5000)`, false);
+        showToast(`⚠️ Synced ${uploadedCount} records. (${failedCount} failed — check backend server)`, false);
       }
     }
 

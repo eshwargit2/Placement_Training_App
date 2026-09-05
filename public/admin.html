@@ -332,9 +332,7 @@
 
     let allSubmissions = [];
     let currentView = 'submissions';
-    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
-      ? 'http://localhost:5000'
-      : '';
+    const API_BASE = 'https://placement-server-iota.vercel.app';
 
     function setViewMode(mode) {
       currentView = mode;
@@ -361,9 +359,9 @@
         document.getElementById("statDbStatusText").textContent = "Synchronized with Central Database";
       } catch (e) {
         badge.className = "status-badge-offline";
-        badge.innerHTML = `<span class="status-dot"></span> Server Offline (Port 5000)`;
+        badge.innerHTML = `<span class="status-dot"></span> Server Offline / Connecting...`;
         document.getElementById("statDbMode").textContent = "Local State";
-        document.getElementById("statDbStatusText").textContent = "Start backend service on Port 5000";
+        document.getElementById("statDbStatusText").textContent = "Connecting to Central Database";
       }
 
       // 2. Fetch assessments
