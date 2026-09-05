@@ -8,6 +8,12 @@
   <link rel="icon" href="logo.jpg" type="image/x-icon">
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
   <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
+  <script>
+    (function() {
+      const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
 </head>
 <body>
   <div id="mainHeader"></div>

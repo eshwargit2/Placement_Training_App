@@ -49,6 +49,62 @@ function normalizeStudents() {
 
 normalizeStudents();
 
+// ==========================================================================
+// THEME MANAGEMENT (LIGHT / DARK)
+// ==========================================================================
+function getTheme() {
+  return localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+
+function applyTheme(theme) {
+  const t = theme === "dark" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", t);
+  if (document.body) {
+    if (t === "dark") {
+      document.body.classList.add("dark-theme");
+    } else {
+      document.body.classList.remove("dark-theme");
+    }
+  }
+  try {
+    localStorage.setItem("appTheme", t);
+  } catch(e) {}
+  updateThemeToggleButtons(t);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || getTheme();
+  const next = current === "dark" ? "light" : "dark";
+  applyTheme(next);
+}
+
+function updateThemeToggleButtons(theme) {
+  const isDark = theme === "dark";
+  document.querySelectorAll(".theme-toggle-btn").forEach(btn => {
+    btn.innerHTML = `
+      <span class="theme-toggle-icon">
+        ${isDark ? 
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' : 
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+        }
+      </span>
+      <span class="theme-toggle-label">${isDark ? "Light" : "Dark"}</span>
+    `;
+    btn.setAttribute("title", isDark ? "Switch to Light Mode" : "Switch to Dark Mode");
+  });
+}
+
+// Immediate theme execution
+(function() {
+  const t = getTheme();
+  document.documentElement.setAttribute("data-theme", t);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => applyTheme(t));
+  } else {
+    applyTheme(t);
+  }
+})();
+
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, c => ({
     "&": "&amp;",
@@ -65,22 +121,40 @@ function renderHeader(activePage) {
 
   const user = state.user;
   const role = state.role;
+  const currentTheme = document.documentElement.getAttribute("data-theme") || getTheme();
+  const isDark = currentTheme === "dark";
+
+  const themeToggleHtml = `
+    <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="${isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}">
+      <span class="theme-toggle-icon">
+        ${isDark ? 
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' : 
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+        }
+      </span>
+      <span class="theme-toggle-label">${isDark ? "Light" : "Dark"}</span>
+    </button>
+  `;
 
   let actionsHtml = "";
   if (user && role) {
-    const dashHref = role === "trainer" ? "trainer.html" : "dashboard.html";
-    const showDashboardBtn = activePage !== "dashboard" && activePage !== "trainer";
-    const adminBtn = role === "trainer" ? `<a href="admin.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;background:rgba(99,102,241,0.15);color:#4f46e5;border:1px solid rgba(99,102,241,0.25);font-weight:600;">Admin Panel</a>` : "";
+    const dashHref = role === "trainer" ? "admin.html" : "dashboard.html";
+    const showDashboardBtn = activePage !== "dashboard" && activePage !== "admin" && activePage !== "trainer" && activePage !== "profile";
+    const adminBtn = role === "trainer" ? `<a href="admin.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3);font-weight:600;">Admin Panel</a>` : "";
+    const showUserLabel = activePage !== "dashboard";
+    const userLabelHtml = showUserLabel ? `<span>${esc(user.name || user.username)} ${role ? `· ${role}` : ""}</span>` : "";
     actionsHtml = `
-      <span>${esc(user.name || user.username)} ${role ? `· ${role}` : ""}</span>
+      ${userLabelHtml}
       <a href="index.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Home</a>
       ${showDashboardBtn ? `<a href="${dashHref}" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Dashboard</a>` : ""}
       ${adminBtn}
+      ${themeToggleHtml}
       <button class="ghost" style="padding:6px 12px;font-size:12px" onclick="logout()">Logout</button>
     `;
   } else {
     actionsHtml = `
       <a href="index.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;">Home</a>
+      ${themeToggleHtml}
       <a href="login.html" style="padding:6px 14px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;" class="hero-nav-btn">Portal Login</a>
     `;
   }
@@ -105,7 +179,7 @@ function requireAuth(allowedRole) {
   }
   if (allowedRole && state.role !== allowedRole) {
     alert("Unauthorized access. Redirecting...");
-    window.location.href = state.role === "trainer" ? "trainer.html" : "dashboard.html";
+    window.location.href = state.role === "trainer" ? "admin.html" : "dashboard.html";
     return false;
   }
   if (state.role === "student" && !state.user.profileCompleted && !window.location.pathname.includes("profile.html")) {

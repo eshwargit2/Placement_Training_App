@@ -8,6 +8,12 @@
   <link rel="icon" href="logo.jpg" type="image/x-icon">
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
   <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
+  <script>
+    (function() {
+      const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
   <style>
     .admin-hero {
       background: linear-gradient(135deg, #0b1329 0%, #1e1b4b 60%, #0f172a 100%);
@@ -296,7 +302,7 @@
             <input type="text" id="adminSearchInput" class="dash-search-input" placeholder="Search student, roll number, topic..." oninput="applyFilters()">
           </div>
 
-          <select id="dayFilter" onchange="applyFilters()" style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); font-size:13px; background:#fff;">
+          <select id="dayFilter" onchange="applyFilters()" style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); font-size:13px; background:var(--input-bg); color:var(--text);">
             <option value="all">All Days (1 - 33)</option>
           </select>
         </div>
@@ -486,14 +492,14 @@
                 return `
                   <tr>
                     <td>
-                      <div style="font-weight:700; color:#0f172a;">${esc(item.studentName || "Student " + item.studentId)}</div>
+                      <div style="font-weight:700; color:var(--text-heading);">${esc(item.studentName || "Student " + item.studentId)}</div>
                       <small class="muted">Roll: <b>${esc(item.rollNumber || "-")}</b> · ${esc(item.department || "CSE")} · ${esc(item.year || "4th Year")}</small>
                     </td>
                     <td>
                       <b>Day ${item.day}</b>
                       <div class="muted" style="font-size:12px;">${esc(topicName)}</div>
                     </td>
-                    <td><span class="badge" style="background:#f1f5f9; color:#475569;">#${item.attemptNumber || 1}</span></td>
+                    <td><span class="badge" style="background:var(--tag-bg); color:var(--muted);">#${item.attemptNumber || 1}</span></td>
                     <td>
                       <span class="dash-score-pill ${scoreClass}">
                         ${item.score}/${item.total || 5} (${pct}%)
@@ -553,7 +559,7 @@
           <div class="student-card-item">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
               <div>
-                <h3 style="margin:0 0 4px; font-size:16px; color:#0f172a;">${esc(s.name)}</h3>
+                <h3 style="margin:0 0 4px; font-size:16px; color:var(--text-heading);">${esc(s.name)}</h3>
                 <div class="muted" style="font-size:13px;">
                   <b>Roll:</b> ${esc(s.rollNumber)} &nbsp;|&nbsp; 
                   <b>Dept:</b> ${esc(s.department)} &nbsp;|&nbsp; 
@@ -568,16 +574,16 @@
             </div>
 
             <!-- List of assessments for this student -->
-            <div style="border-top:1px solid #f1f5f9; padding-top:10px;">
-              <b style="font-size:12.5px; color:#475569; text-transform:uppercase;">Submitted Assessments:</b>
+            <div style="border-top:1px solid var(--line); padding-top:10px;">
+              <b style="font-size:12.5px; color:var(--muted); text-transform:uppercase;">Submitted Assessments:</b>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
                 ${s.assessments.map(a => `
-                  <div style="display:inline-flex; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
+                  <div style="display:inline-flex; align-items:center; background:var(--card-alt); border:1px solid var(--line); border-radius:8px; overflow:hidden;">
                     <button onclick="inspectAssessment('${esc(a.id)}')" class="ghost" style="padding:6px 10px; font-size:12px; border:none; border-radius:0; text-align:left; display:inline-flex; align-items:center; gap:6px;">
                       <span><b>Day ${a.day}:</b> ${a.percentage}%</span>
-                      <span style="color:#64748b; font-size:11px;">(${esc(a.completedAtDisplay || a.date || '')})</span>
+                      <span style="color:var(--muted); font-size:11px;">(${esc(a.completedAtDisplay || a.date || '')})</span>
                     </button>
-                    <button onclick="deleteAssessment('${esc(a.id)}', '${esc(s.name)}', ${a.day}, '${esc(s.studentId || '')}')" style="background:transparent; border:none; border-left:1px solid #e2e8f0; padding:6px 8px; color:#ef4444; cursor:pointer;" title="Delete this assessment">
+                    <button onclick="deleteAssessment('${esc(a.id)}', '${esc(s.name)}', ${a.day}, '${esc(s.studentId || '')}')" style="background:transparent; border:none; border-left:1px solid var(--line); padding:6px 8px; color:#ef4444; cursor:pointer;" title="Delete this assessment">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                   </div>
