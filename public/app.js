@@ -1,0 +1,486 @@
+const curriculum=[
+["Python Basics","Python introduction, syntax, variables, data types, input/output, type conversion"],
+["Arithmetic & Operators","Arithmetic, comparison, assignment, logical, membership, identity, bitwise operators, precedence"],
+["Conditional Statements","if, if-else, if-elif-else, nested conditions, logical conditions"],
+["Loops","for, while, range(), nested loops"],
+["Loop Control & Patterns","break, continue, pass, nested loops, pattern logic"],
+["Strings","String creation, indexing, slicing, methods, formatting, string operations"],
+["String Problem Solving + Test","String revision, placement problem-solving techniques"],
+["Lists","List creation, indexing, slicing, methods, adding/removing elements"],
+["List Problem Solving","Searching, sorting, duplicates, frequency, nested lists"],
+["Tuples & Sets","Tuple operations, immutability, set operations, conversions"],
+["Dictionaries","Key-value pairs, dictionary methods, iteration, nested dictionaries"],
+["Collections Problem Solving","Choosing appropriate collection, nested collections"],
+["Functions","Function definition, parameters, arguments, return values, scope"],
+["Advanced Functions","Default/keyword arguments, *args, **kwargs, lambda, recursion"],
+["Functions + Collections Test","Revision of lists, sets, dictionaries and functions"],
+["OOP","Classes, objects, attributes, methods"],
+["OOP Concepts","Constructor, inheritance, polymorphism, encapsulation, abstraction"],
+["Exception Handling","Errors vs exceptions, try, except, else, finally, raise"],
+["File Handling","Files, read/write/append, modes, with open(), CSV basics"],
+["Modules & Packages","import, built-in modules, math, random, datetime, custom modules"],
+["OOP + Files + Exceptions Test","Revision and problem-solving"],
+["DSA Introduction","Data structures, algorithms, problem-solving, time complexity, space complexity, Big-O"],
+["Searching & Sorting","Linear search, binary search, bubble, selection, insertion sort"],
+["Array/List-Based DSA","Traversal, frequency, two-pointer, basic sliding window"],
+["Stack & Queue","LIFO, FIFO, stack/queue operations and implementation"],
+["Problem-Solving Techniques","Brute force, optimization, frequency, hashing, two-pointer, sliding window"],
+["DSA Coding Test","DSA revision and coding strategy"],
+["SQL Fundamentals","DBMS, database, tables, rows, columns, keys, CRUD, SELECT"],
+["SQL Queries","WHERE, ORDER BY, GROUP BY, HAVING, aggregate functions"],
+["SQL Joins + Python DB Concepts","Primary/foreign keys, INNER/LEFT/RIGHT JOIN, database connectivity concepts"],
+["Technical Interview Preparation","Python interview questions, SQL questions, OOP, DSA fundamentals"],
+["Coding Interview + Mock Interview","Common placement coding problems, coding round, technical interview, debugging, HR practice"],
+["Final Assessment","Full revision: Python, DSA, SQL, OOP; final coding, SQL, debugging and technical interview"]
+];
+
+
+
+const COMPANY_INTERVIEW_BANK={
+"Wipro":[
+["Python","What is the difference between a list and a tuple?","A list is mutable; a tuple is immutable."],
+["Python","Explain mutable and immutable objects.","Lists/dictionaries are mutable; strings/tuples/integers are immutable."],
+["Python","What happens with x=[1,2,3]; y=x; y.append(4); print(x)?","[1,2,3,4], because both names reference the same list."],
+["OOP","Explain encapsulation, inheritance, polymorphism and abstraction.","They cover data/behavior bundling, reuse through hierarchy, different behavior through a common interface, and hiding implementation details."],
+["OOP","What is method overriding?","A subclass provides its own implementation of an inherited method."],
+["DSA","How do you find the second-largest distinct array element in one pass?","Track the largest and second-largest distinct values; O(n) time and O(1) extra space."],
+["DSA","When can binary search be used?","When the search space is ordered and can be repeatedly divided."],
+["DSA","How can hashing solve Two Sum efficiently?","Store seen values and test whether target-current exists; average O(n) time."],
+["SQL","How do you find the second-highest salary?","Use MAX with a subquery or DENSE_RANK over salary."],
+["SQL","WHERE vs HAVING?","WHERE filters rows before grouping; HAVING filters groups after GROUP BY."],
+["SQL","INNER JOIN vs LEFT JOIN?","INNER JOIN returns matching rows; LEFT JOIN retains every row from the left table."],
+["DBMS","Why is normalization used?","To reduce redundancy and update anomalies while maintaining relationships."],
+["Problem Solving","How would you improve an O(n²) frequency problem?","Consider hashing, sorting, two pointers or another technique based on the constraints."],
+["Project","Explain your project, your individual contribution and one technical challenge.","Explain architecture, personal contribution, challenge, solution and result clearly."],
+["HR","Why should we hire you?","Connect your programming foundation, problem-solving practice, communication and willingness to learn to the role."]
+],
+"Infosys":[
+["Python","What is the difference between shallow copy and deep copy?","A shallow copy may share nested objects; a deep copy recursively copies nested objects."],
+["Python","Why are mutable default arguments risky in Python?","A default list/dictionary is created once and can retain state between calls."],
+["Python","What is a generator and why use it?","It yields values lazily, which can reduce memory usage for large sequences."],
+["OOP","Explain polymorphism with a Python example.","Different classes can implement the same method interface differently."],
+["OOP","Composition vs inheritance?","Composition builds objects using other objects; inheritance models an is-a relationship."],
+["DSA","How do you find maximum contiguous subarray sum?","Kadane's algorithm solves it in O(n) time."],
+["DSA","How can XOR find a unique element when every other element appears twice?","Equal pairs cancel because a XOR a is zero; the remaining value is the answer."],
+["DSA","Explain sliding window.","Maintain a moving range and update its state incrementally for subarray/substring constraints."],
+["DSA","Why is optimal complexity important in coding interviews?","Interviewers assess scalability and whether the solution handles larger constraints."],
+["SQL","How do you find employees earning above average salary?","Compare salary against SELECT AVG(salary) FROM employee in a subquery."],
+["SQL","What is a self join?","Joining a table to itself, commonly for employee-manager relationships."],
+["SQL","DELETE vs TRUNCATE vs DROP?","DELETE removes rows, TRUNCATE removes all rows while retaining structure, DROP removes the table."],
+["DBMS","Primary key, foreign key and candidate key?","Primary key uniquely identifies rows; foreign key references another table's key; candidate keys are possible unique identifiers."],
+["System Thinking","How would you scale an application for 100 million users?","Discuss load balancing, caching, horizontal scaling, database indexing/partitioning, queues and monitoring."],
+["Project","Why did you choose your project's technology stack?","Explain requirements, trade-offs and why each technology was suitable."]
+],
+"TCS":[
+["Python","Difference between == and is?","== compares values; is checks object identity."],
+["Python","Why use exception handling?","To handle expected runtime failures cleanly and prevent uncontrolled program termination."],
+["OOP","What is a constructor in Python?","__init__ is commonly used to initialize instance state."],
+["OOP","Explain abstraction with a practical example.","Expose essential operations while hiding internal implementation details."],
+["DSA","How do you remove duplicates while preserving list order?","Track seen values with a set and append only unseen values to a result list."],
+["DSA","Linear search vs binary search?","Linear search is O(n) and works on unsorted data; binary search is O(log n) but needs ordered data."],
+["DSA","Average/worst-case complexity of bubble sort?","Typically O(n²); an optimized version can be O(n) on an already sorted input."],
+["DSA","How would you reverse a string without a reverse function?","Use indexing/slicing or build the result from the last character to the first."],
+["SQL","What is a primary key?","A unique identifier for each row; it cannot contain NULL values."],
+["SQL","Write the idea for counting employees per department.","GROUP BY department with COUNT(*) produces the department-wise counts."],
+["SQL","What is GROUP BY used for?","To form groups of rows for aggregate functions such as COUNT, SUM and AVG."],
+["DBMS","What are ACID properties?","Atomicity, Consistency, Isolation and Durability."],
+["Project","How did you test your project?","Discuss test cases, edge cases, validation, defect fixing and any automated/manual testing used."],
+["Technical","What happens after entering a URL in a browser?","Typically DNS resolution, connection establishment, HTTP request/response and browser rendering."],
+["HR","Where do you see yourself in five years?","Give a realistic technical-growth path aligned with the role and continuous learning."]
+]
+};
+
+const QUESTION_BANK={"1":[["Which function reads input from the keyboard?","input()","print()","read()","scan()","A"],["What is the type of the value 12.5?","int","float","str","bool","B"],["What does int('25') return?","The integer 25","The string '25'","25.0","An error","A"],["What is printed by `print(type(input()).__name__)` after entering 25?","int","str","float","None","B"],["Which expression safely converts 7.5 to an integer?","int(7.5)","integer(7.5)","roundint(7.5)","to_int(7.5)","A"]],"2":[["Which operator performs floor division?","/","//","%","**","B"],["What is 2 ** 3?","5","6","8","9","C"],["Which operator tests membership?","is","in","==","=","B"],["What is the value of `17 % 5 + 2 ** 2`?","6","9","8","12","B"],["Which expression evaluates first in `10 + 3 * 2 ** 2`?","10 + 3","3 * 2","2 ** 2","All at once","C"]],"3":[["Which keyword begins a conditional block?","if","for","def","class","A"],["Which keyword tests another condition after if?","else","elif","except","while","B"],["What is the result of 8 > 3 and 2 > 5?","True","False","8","Error","B"],["What is the output of `x=10; y=20; print(x if x>y else y)`?","10","20","30","Error","B"],["A student is eligible if age >= 18 and marks >= 50. Which condition is correct?","age>=18 or marks>=50","age>18 and marks>50","age>=18 and marks>=50","age==18 and marks==50","C"]],"4":[["Which loop iterates directly over items in a sequence?","for","if","def","try","A"],["What values are produced by range(3)?","1,2,3","0,1,2","0,1,2,3","3 only","B"],["Which loop is best when repetition continues while a condition is true?","while","class","import","if","A"],["How many times does the inner statement execute in `for i in range(3): for j in range(2): pass`?","3","5","6","9","C"],["What is the final value of `s` after `s=0; for i in range(1,5): s+=i`?","6","10","15","20","B"]],"5":[["Which statement exits a loop immediately?","continue","pass","break","return-only","C"],["Which statement skips the current iteration?","break","continue","pass","stop","B"],["What is commonly used to create nested star patterns?","Nested loops","Only strings","Only functions","SQL joins","A"],["What is printed by `for i in range(1,6):\n if i==3: continue\n print(i,end=\" \")`?","1 2 3 4 5","1 2 4 5","3 4 5","1 2","B"],["Which technique is most appropriate for printing a hollow square pattern?","Single print statement only","Nested loops with boundary checks","Recursion only","Sorting","B"]],"6":[["What is the first index of a Python string?","0","1","-1","None","A"],["What does s[::-1] do?","Sorts the string","Reverses the string","Deletes the string","Uppercases it","B"],["Which method converts a string to lowercase?","lower()","small()","down()","case()","A"],["What is the result of `\"placement\"[1:7:2]`?","lcm","lce","p a e","lae","B"],["Which expression counts occurrences of `a` in string `s`?","s.find(\"a\")","s.count(\"a\")","s.index(\"a\")","len(\"a\")","B"]],"7":[["Which structure is useful for character frequency counting?","Dictionary","Float","Boolean","None","A"],["A palindrome reads the same in which direction?","Left-to-right only","Right-to-left only","Both directions","Neither","C"],["Which method removes leading and trailing whitespace?","strip()","trim()","clean()","remove()","A"],["For the string `aabbcc`, which approach finds the first non-repeating character efficiently?","Nested loops only","Frequency dictionary then scan","Sorting only","Set conversion only","B"],["What is the key idea in a palindrome check that avoids creating a reversed copy?","Compare symmetric characters with two pointers","Use a set","Sort the string","Convert to dictionary","A"]],"8":[["Which list method adds one item at the end?","append()","add()","push()","put()","A"],["List indexing starts at:","0","1","-1","None","A"],["Which operation returns a portion of a list?","Slicing","Casting","Joining","Hashing","A"],["What does `a=[1,2,3]; b=a; b.append(4)` make `a` equal to?","[1,2,3]","[1,2,3,4]","[4]","Error","B"],["Which operation creates a shallow copy of list `a`?","b=a","b=a[:]","b=alias(a)","b=&a","B"]],"9":[["Which approach efficiently tracks duplicate counts?","Dictionary/set","Only sorting","Only printing","Only recursion","A"],["Which method sorts a list in place?","sort()","sortedonly()","order()","arrange()","A"],["Two Sum usually searches for two values matching a:","Target sum","List length","Maximum index","Random value","A"],["For finding the second largest distinct value in one pass, what should be tracked?","Only minimum","Largest and second-largest distinct values","Only length","A set only","B"],["In Two Sum, why is a dictionary useful?","It stores complements for near O(n) lookup","It sorts the list automatically","It removes all duplicates","It guarantees O(1) sorting","A"]],"10":[["Which collection is immutable?","List","Tuple","Set","Dictionary","B"],["Which set operation returns common elements?","union","intersection","difference","append","B"],["Which collection automatically removes duplicate values?","Set","List","Tuple","String","A"],["What is the result of `{1,2,3} & {2,3,4}`?","{1,4}","{2,3}","{1,2,3,4}","set()","B"],["Why can a tuple be used as a dictionary key when its elements are hashable?","It is mutable","It is immutable and hashable","It is sorted","It has indexes only","B"]],"11":[["A dictionary stores data as:","Key-value pairs","Only indexes","Only values","Rows and columns","A"],["Which method retrieves a key without immediately raising KeyError when absent?","get()","find()","fetch()","read()","A"],["If an existing dictionary key is assigned a new value, what happens?","The new value replaces the old one","A duplicate key is created","The dictionary is deleted","An exception always occurs","A"],["If `d={\"a\":2,\"b\":5}` and you execute `d[\"a\"]+=3`, what is `d[\"a\"]`?","2","3","5","8","C"],["Which approach finds the key with maximum value in a dictionary `d`?","max(d, key=d.get)","max(d.values())","d.max()","highest(d)","A"]],"12":[["Which collection is best for fast key-based lookup?","Dictionary","Tuple","String","Float","A"],["Which collection is appropriate when uniqueness is the main requirement?","Set","List","Tuple","String","A"],["A list containing dictionaries is an example of:","Nested collection","Primitive value","Module","Exception","A"],["For membership tests on many unique IDs, which structure is generally most suitable?","List","Set","Tuple","String","B"],["A nested dictionary is most useful when data naturally has:","Only one value","Hierarchical key-value relationships","Only sequential values","Only duplicates","B"]],"13":[["Which keyword defines a function?","def","function","fun","define","A"],["What does return do?","Sends a value back and ends the function","Prints automatically","Starts a loop","Creates a variable globally","A"],["A variable created inside a function normally has:","Local scope","Global scope only","Database scope","Class scope only","A"],["What is returned by a function that reaches the end without `return`?","0","False","None","Empty string","C"],["What is the output of `x=5; def f(): x=10; return x; print(x)`?","5","10","None","Error","A"]],"14":[["Which syntax collects arbitrary positional arguments?","*args","**kwargs","args[]","many()","A"],["Which syntax collects arbitrary keyword arguments?","*args","**kwargs","kwargs[]","keys()","B"],["A function calling itself is an example of:","Recursion","Inheritance","Slicing","Casting","A"],["What is the purpose of `**kwargs`?","Collect arbitrary keyword arguments","Collect positional arguments","Force recursion","Create a class","A"],["What is a major risk of deep recursion in Python?","Unlimited memory","Recursion depth can be exceeded","It always sorts data","It disables functions","B"]],"15":[["Which concept improves reuse by packaging repeated logic?","Functions","Only comments","Only variables","Only imports","A"],["Which collection guarantees unique elements?","Set","List","Tuple","String","A"],["Which structure maps keys to values?","Dictionary","Tuple","Set","List","A"],["Which combination is best for counting frequencies of list values?","List + recursion","Dictionary + iteration","Tuple + slicing only","Set + indexing","B"],["A reusable function should generally avoid depending on:","Its parameters","Global mutable state when unnecessary","Return values","Local variables","B"]],"16":[["An object is an instance of a:","Class","Loop","Module","Function only","A"],["Which special method commonly initializes an object?","__init__","__start__","__newclass__","initiate","A"],["Attributes and methods are commonly grouped inside a:","Class","Loop","File","SQL query","A"],["If two objects are created from the same class, which is normally shared?","Their instance attribute values","Class-level attributes","Their memory identity","All local variables","B"],["What is the purpose of `self` in an instance method?","Refers to the current object","Creates a new class","Imports a module","Handles exceptions","A"]],"17":[["Which OOP concept allows a child class to reuse a parent class?","Inheritance","Slicing","Iteration","Casting","A"],["Method overriding demonstrates:","Polymorphism","Input","File handling","SQL","A"],["Encapsulation focuses on:","Bundling data/behavior and controlling access","Sorting arrays","Reading files","Looping","A"],["If a subclass defines a method with the same name as its parent, which concept is demonstrated?","Encapsulation","Method overriding/polymorphism","Composition only","Iteration","B"],["Which OOP feature hides implementation details behind a simple interface?","Abstraction","Indexing","Slicing","Looping","A"]],"18":[["Which block handles an exception?","except","catch","error","handle","A"],["Which block normally runs whether or not an exception occurs?","finally","else","raise","tryonly","A"],["Which keyword deliberately raises an exception?","raise","throw","error","except","A"],["Which exception is raised by `10/0`?","ValueError","ZeroDivisionError","TypeError","KeyError","B"],["Why use separate `except` blocks for different exception types?","To handle each failure appropriately","To make code longer","To avoid try blocks","To disable errors","A"]],"19":[["Which mode opens a file for writing?","w","r","a","readwriteonly","A"],["Which mode appends to a file?","a","w","r","x","A"],["Which construct helps ensure a file is closed?","with open()","auto.close()","file.closeall()","safeopen()","A"],["What is a benefit of `with open(\"data.txt\") as f:`?","Automatic resource cleanup","Faster CPU","Automatic sorting","Database connection","A"],["Which mode allows reading and writing without truncating an existing file?","r+","w","a only","x","A"]],"20":[["Which keyword imports a module?","import","include","using","module","A"],["Which module provides sqrt()?","math","random","csv","datetimeonly","A"],["Which module is commonly used to generate random numbers?","random","math","csv","sysonly","A"],["Which module function converts a date/time object to a formatted string?","datetime.strftime","math.format","random.strftime","csv.date","A"],["Why are custom modules useful in a project?","They improve code reuse and organization","They remove all bugs","They replace Python syntax","They guarantee faster execution","A"]],"21":[["Which feature lets a child class reuse parent behavior?","Inheritance","Slicing","Casting","Iteration","A"],["Which block handles runtime exceptions?","except","finally","else","raise","A"],["Which keyword is used to open files for reading/writing?","open()","fileopen()","readfile()","usefile()","A"],["A file operation can raise `FileNotFoundError`. Which design is best?","Catch the specific exception and report/recover","Ignore every exception","Use only finally","Delete the file first","A"],["When an object method both updates a file and may fail, what combination is most appropriate?","OOP + try/except + with open","Only a global variable","Only recursion","Only a list","A"]],"22":[["Big-O mainly describes:","Growth of algorithm resource usage","Python syntax","Database schema","Variable type","A"],["Which is generally better for large input?","O(n)","O(n²)","Both are always equal","Neither","A"],["Space complexity measures:","Extra memory usage","Screen size","Output text length only","CPU brand","A"],["An algorithm that scans an array twice with independent linear loops is typically:","O(1)","O(log n)","O(n)","O(n²) always","C"],["Why can O(n log n) be preferable to O(n²) for sorting large data?","It grows more slowly as n increases","It always uses no memory","It is always recursive","It avoids comparisons","A"]],"23":[["Binary search requires the data to be:","Sorted","Random","Duplicated","Hashed","A"],["Which sort repeatedly compares adjacent elements?","Bubble sort","Selection sort","Binary sort","Heap-only","A"],["Linear search has typical time complexity:","O(n)","O(log n)","O(1) always","O(n²) always","A"],["Binary search reduces the search interval by about half each step. Its time complexity is:","O(n²)","O(n)","O(log n)","O(1) always","C"],["Which sorting algorithm generally performs well on nearly sorted data and is simple to implement?","Insertion sort","Selection sort only","Linear search","Binary search","A"]],"24":[["Two-pointer techniques are commonly applied to:","Arrays/strings","Classes only","Files only","SQL only","A"],["A frequency map is useful for:","Counting occurrences","Creating objects","Opening files","Sorting only","A"],["Moving zeros to the end while keeping non-zero order is an:","Array manipulation problem","OOP problem","SQL problem","File problem","A"],["For a sorted array, which technique can find a target pair in O(n) time?","Two pointers","Nested loops only","Binary tree construction","Recursion only","A"],["To move zeros to the end in-place while preserving non-zero order, a common strategy is:","Two-pointer compaction","Random shuffling","Sorting by value","Using SQL","A"]],"25":[["A stack follows:","LIFO","FIFO","Random order","Sorted order","A"],["A queue follows:","FIFO","LIFO","Random order","Binary order","A"],["Balanced parentheses are commonly checked using a:","Stack","Queue","Set only","Tuple only","A"],["Which data structure is most suitable for checking properly nested brackets?","Stack","Queue","Set","Dictionary only","A"],["A queue implemented with two stacks is an example of:","Combining data structures to provide FIFO behavior","Sorting","Recursion only","Hashing only","A"]],"26":[["Brute force means:","Trying a straightforward set of possibilities","Always using hashing","Only using recursion","Skipping edge cases","A"],["Hashing is commonly used for:","Fast lookup","File writing","Inheritance","Printing","A"],["Sliding window is useful for:","Contiguous sequence problems","Class construction","SQL joins","Exception handling","A"],["A frequency map can reduce repeated searching from O(n²) toward:","O(n) average","O(n³)","O(2^n)","O(log n) always","A"],["Sliding window is especially useful when the problem asks about:","A contiguous subarray/substring","A class hierarchy","A database schema","A file path","A"]],"27":[["Before optimizing an algorithm, first verify:","Correctness","Variable names","Comments","Formatting only","A"],["Debugging means:","Finding and fixing defects","Deleting code","Writing comments only","Installing Python","A"],["A good coding solution should consider:","Correctness, complexity and edge cases","Only output formatting","Only length","Only comments","A"],["If a solution is correct but O(n²) and constraints allow 10^5 elements, what should you investigate?","An O(n) or O(n log n) approach","More print statements","Longer variable names","More nested loops","A"],["Which edge case should be tested for a function finding a maximum?","Empty input if allowed, single element, duplicates, negatives","Only large positive values","Only sorted input","Only zero","A"]],"28":[["Which SQL command retrieves rows?","SELECT","GET","READ","FETCHSQL","A"],["Which key uniquely identifies a row?","Primary key","Foreign key","Duplicate key","Sort key","A"],["Which command adds rows?","INSERT","ADD","PUT","APPENDROW","A"],["Which SQL constraint prevents duplicate values in a column but may allow NULL depending on DBMS?","UNIQUE","CHECK ONLY","ORDER BY","GROUP BY","A"],["Which statement permanently removes selected rows matching a condition?","DELETE FROM ... WHERE","DROP COLUMN only","SELECT WHERE","REMOVE ROW","A"]],"29":[["Which clause filters rows before grouping?","WHERE","HAVING","GROUP","ORDER","A"],["Which clause filters grouped results?","HAVING","WHERE","FILTER","GROUP","A"],["Which aggregate counts rows?","COUNT()","ROWS()","NUMBER()","TOTAL()","A"],["What is the difference between WHERE and HAVING?","WHERE filters rows before grouping; HAVING filters groups","They are identical","HAVING filters rows before grouping","WHERE only sorts","A"],["For department-wise average salary, which clause is essential?","GROUP BY department","ORDER BY salary only","WHERE AVG(salary)","JOIN only","A"]],"30":[["Which join returns matching rows from both tables?","INNER JOIN","LEFT ONLY","MATCH JOIN","CROSS ONLY","A"],["A foreign key usually references:","A key in another table","A Python variable","A file","A loop","A"],["Which join keeps all rows from the left table?","LEFT JOIN","INNER JOIN","RIGHT JOIN","MATCH JOIN","A"],["A LEFT JOIN keeps:","All rows from the left table plus matching right rows","Only matching rows","All rows from the right table only","No unmatched rows","A"],["Why is a foreign key useful?","It enforces a relationship between related tables","It sorts rows","It encrypts data","It creates Python classes","A"]],"31":[["A strong coding explanation should include:","Approach, complexity and edge cases","Only final output","Only code","Only variable names","A"],["Which is a common Python interview topic?","Data types and functions","Monitor size","Keyboard layout","HTML colors","A"],["Why is Big-O discussed in technical interviews?","To discuss efficiency and scalability","To format SQL","To handle exceptions","To create classes","A"],["In a technical interview, if you cannot solve immediately, the best approach is to:","Clarify assumptions, explain an approach, then refine it","Stay silent","Guess without testing","Skip edge cases","A"],["Why should you state time complexity after explaining a solution?","It shows awareness of scalability","It changes Python syntax","It creates indexes","It guarantees acceptance","A"]],"32":[["A coding round primarily evaluates:","Problem solving and implementation","Typing speed only","Memory size","Screen resolution","A"],["If your code fails a test, the best response is to:","Debug systematically and explain the issue","Hide the failure","Stop immediately","Delete the solution","A"],["A mock interview simulates:","Real interview conditions","Only classroom attendance","Database backup","File compression","A"],["During a coding interview, which sequence is strongest?","Clarify → approach → code → test → complexity","Code immediately → stop","Only explain after failure","Write the longest code possible","A"],["When debugging an interview solution, what is most useful first?","Reproduce the failure with a small test case","Rewrite everything blindly","Ignore the failing case","Remove input validation","A"]],"33":[["The final assessment should cover:","Python, DSA, SQL and OOP","Only Python","Only SQL","Only HR","A"],["Placement readiness includes:","Concepts, coding and problem solving","Only memorization","Only MCQs","Only attendance","A"],["What should a final coding solution demonstrate?","Correctness, clarity and reasonable efficiency","Maximum number of lines","No testing","Only comments","A"],["A final placement assessment should test which combination?","Concept recall, application, coding and optimization","Only memorized syntax","Only easy MCQs","Only typing speed","A"],["For a final DSA problem, which solution is generally preferred?","Correct solution with appropriate complexity and edge-case handling","Longest solution","Most recursive solution","Solution with no explanation","A"]]};
+const CODING_BANK={"1":["Read name, age and marks and display them with appropriate data types.","Read two numbers and print sum, difference, product and quotient.","Build a small student report program that reads name, three marks, calculates total/average, and prints a formatted result."],"2":["Calculate simple interest from principal, rate and time.","Calculate area and perimeter of a rectangle from user input.","Given principal, rate and time, compute simple interest and final amount; validate that numeric inputs are non-negative."],"3":["Find the largest of three numbers using if/elif/else.","Calculate a student's grade from marks using conditions.","Given marks of a student, assign a grade using boundary conditions and reject invalid marks outside 0–100."],"4":["Print a multiplication table for a number.","Calculate factorial and sum of digits using a loop.","Read n and compute the sum of numbers divisible by 3 but not 5 from 1 through n."],"5":["Print a right triangle star pattern using nested loops.","Print numbers from 1 to n, skipping multiples of 3 and stopping after a limit.","Print a centered number pyramid for n rows using nested loops and correct spacing."],"6":["Reverse a string without using reversed().","Count vowels, consonants, digits and spaces in a string.","Given a sentence, return the first character that appears exactly once; ignore spaces and treat letters case-insensitively."],"7":["Check whether a string is a palindrome.","Count the frequency of every character in a string.","Determine whether two strings are anagrams without using sorted(); ignore spaces and case."],"8":["Find maximum, minimum, sum and average of a list.","Remove duplicates from a list while preserving order.","Rotate a list to the right by k positions without using built-in rotate functionality."],"9":["Find the second largest element without using sort().","Solve Two Sum for a given target.","Given an integer list, find all unique pairs whose sum equals target without returning duplicate pairs."],"10":["Find common elements of two collections using sets.","Convert a tuple to a set and report duplicate values.","Given two lists, print their unique common elements in sorted order using set operations."],"11":["Count word frequency using a dictionary.","Find the student with the highest mark from a dictionary.","Given employee names and salaries in a dictionary, print the top two distinct salaries and corresponding employees."],"12":["Analyze a mixed collection and choose appropriate list/set/dictionary structures.","Find duplicates in nested lists.","Given a list of dictionaries representing students, compute the average mark per department."],"13":["Write functions for prime checking and factorial.","Write a function that returns maximum, minimum and average of a list.","Write a function that returns the longest word in a sentence, with ties resolved by first occurrence."],"14":["Demonstrate *args and **kwargs with a reusable function.","Write recursive factorial and Fibonacci functions.","Implement recursive binary search and return the index of a target in a sorted list."],"15":["Create a function that returns frequencies of list elements.","Write a reusable utility function that removes duplicates and sorts values.","Write a function pipeline that filters even numbers, squares them, and returns their frequency dictionary."],"16":["Create a Student class with attributes and a display method.","Create a BankAccount class with deposit and withdraw methods.","Create a BankAccount class with validation, transaction history, deposit/withdraw methods, and balance display."],"17":["Create Employee and Manager classes using inheritance.","Demonstrate method overriding using Vehicle subclasses.","Create Shape, Rectangle and Circle classes demonstrating inheritance, overriding and polymorphic area calculation."],"18":["Safely read an integer and handle invalid input.","Handle ZeroDivisionError, IndexError and KeyError with separate except blocks.","Build a menu-driven calculator that handles invalid input, division by zero and invalid menu choices without crashing."],"19":["Write student records to a text file and read them back.","Create a CSV of employees and count the records.","Read a text file and produce a report containing line count, word count and the three most frequent words."],"20":["Create a calculator module and import its functions.","Use math, random and datetime in one small Python program.","Create a custom module with utility functions and a main program that imports it to process a list of numbers."],"21":["Build a class that saves records to a file and handles file errors.","Create a program combining objects and exception handling.","Create an Employee class that loads records from a CSV file and gracefully handles missing files, malformed rows and invalid salaries."],"22":["Write two approaches to find duplicates and state their time/space complexity.","Explain the Big-O complexity of a loop-based algorithm.","Given two duplicate-detection algorithms, implement both and print their Big-O time and space complexities."],"23":["Implement linear and binary search.","Implement bubble, selection and insertion sort.","Implement binary search and insertion sort, then use them to locate and order a set of employee IDs."],"24":["Solve Two Sum using a dictionary.","Move all zeros to the end while preserving the order of other elements.","Given an array, find the length of the longest subarray containing at most two distinct values using a sliding window."],"25":["Implement a stack and use it to reverse a string.","Implement a queue for task processing.","Implement a stack-based balanced-parentheses checker supporting (), [], and {}."],"26":["Solve a problem first using brute force, then optimize it.","Solve a maximum-sum sliding-window problem.","Given an array and window size k, find the maximum sum of any contiguous window in O(n) time."],"27":["Solve a placement-level array problem and explain complexity.","Debug and optimize a supplied algorithm.","Given an array, find the longest consecutive sequence in O(n) average time using hashing."],"28":["Create an Employee table and perform INSERT, UPDATE, DELETE and SELECT.","Write a query to find employees with salary above a given amount.","Create Employee and Department tables and write SQL for insert/update/delete plus a query for employees above the department average salary."],"29":["Write GROUP BY and HAVING queries for department salary data.","Use aggregate functions to find average, maximum and minimum salary.","Write SQL to return the second-highest salary in each department using GROUP BY and a subquery/window-function approach."],"30":["Create Employee and Department tables and write INNER/LEFT JOIN queries.","Describe and demonstrate basic Python database connectivity.","Write an SQL report using INNER JOIN and LEFT JOIN to show departments with and without employees, including employee counts."],"31":["Solve and explain a common Python interview problem.","Write a SQL query and explain its result step by step.","Explain and implement a Python solution to a placement problem, including assumptions, complexity and edge-case tests."],"32":["Solve a common placement coding problem and state complexity.","Write a solution while explaining approach and edge cases.","Solve a medium-level array problem under interview conditions and include a concise explanation, complexity analysis and test cases."],"33":["Complete a final Python/DSA coding problem.","Complete a multi-table SQL problem involving joins and aggregation.","Final coding task: given employee data, solve one Python DSA problem and one SQL aggregation problem, documenting complexity and edge cases."]};
+let state=JSON.parse(localStorage.getItem("placementPortal")||"null")||{
+ role:null,user:null,deletedStudentIds:[],students:[
+ {id:1,name:"Demo Student",reg:"REG001",batch:"BATCH-A",username:"student001",password:"student123"}
+ ],submissions:[],attempts:[]
+};
+function save(){localStorage.setItem("placementPortal",JSON.stringify(state))}
+function normalizeStudents(){
+  const old=Array.isArray(state.students)?state.students:[]; const byUser={};
+  old.forEach(s=>{if(s&&s.username)byUser[s.username]=s});
+  const deleted=new Set(Array.isArray(state.deletedStudentIds)?state.deletedStudentIds.map(Number):[]);
+  const arr=[];
+  for(let i=1;i<=100;i++){if(deleted.has(i))continue; const u="student"+String(i).padStart(3,"0"); const oldS=byUser[u]||{};
+    arr.push({id:i,name:oldS.name||"",department:oldS.department||"",year:oldS.year||"",rollNumber:oldS.rollNumber||"",reg:oldS.reg||"",batch:oldS.batch||"",username:u,password:(oldS.password&&oldS.password!=="student123"?oldS.password:u),profileCompleted:!!oldS.profileCompleted});}
+  state.students=arr; state.deletedStudentIds=[...deleted].filter(n=>n>=1&&n<=100).sort((a,b)=>a-b); state.attempts=Array.isArray(state.attempts)?state.attempts:[]; state.submissions=Array.isArray(state.submissions)?state.submissions:[]; save();
+}
+normalizeStudents();
+// Deleted student IDs stay deleted until a new account is explicitly created.
+
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function header(){return `<div class="top"><b><span>🎓</span> VMKVEC Placement Training · CSE</b><div class="actions"><span>${state.user?esc(state.user.name):""} ${state.role?`· ${state.role}`:""}</span><button class="ghost" style="padding:6px 12px;font-size:12px" onclick="heroPage()">Home</button><button class="ghost" style="padding:6px 12px;font-size:12px" onclick="logout()">Logout</button></div></div>`}
+
+function heroPage() {
+  document.getElementById("app").innerHTML = `
+  <div class="hero-wrapper">
+    <header class="hero-nav">
+      <div class="hero-brand">
+        <div class="hero-brand-logo">🎓</div>
+        <div class="hero-brand-text">
+          <h2>VMKVEC CSE</h2>
+          <p>Placement Training Portal</p>
+        </div>
+      </div>
+      <div class="hero-nav-actions">
+        ${state.user ? `
+          <button class="hero-nav-btn" onclick="${state.role === 'trainer' ? 'trainer()' : 'student()'}">
+            Go to Dashboard (${esc(state.user.name || state.role)}) →
+          </button>
+        ` : `
+          <button class="hero-nav-btn" onclick="login()">
+            Portal Login →
+          </button>
+        `}
+      </div>
+    </header>
+
+    <main class="hero-main">
+      <div class="hero-container">
+        <div class="hero-badge">
+          ✨ Vinayaka Mission's Kirupananda Variyar Engineering College
+        </div>
+
+        <span class="hero-dept-tag">Department of Computer Science & Engineering</span>
+        <h1 class="hero-title-banner">
+          VMKVEC Placement Training Portal
+        </h1>
+
+        <p class="hero-subtitle">
+          Master placement coding rounds and technical interviews with our 33-Day intensive curriculum — covering Python, Data Structures & Algorithms, SQL, OOP, timed coding sandbox tests, and tier-1 company interview question banks.
+        </p>
+
+        <div class="hero-cta-group">
+          ${state.user ? `
+            <button class="hero-btn-primary" onclick="${state.role === 'trainer' ? 'trainer()' : 'student()'}">
+              🚀 Open Dashboard
+            </button>
+          ` : `
+            <button class="hero-btn-primary" onclick="login()">
+              🚀 Login to Assessment Portal
+            </button>
+          `}
+          <button class="hero-btn-secondary" onclick="document.getElementById('curriculum-preview').scrollIntoView({behavior:'smooth'})">
+            📖 View 33-Day Curriculum
+          </button>
+        </div>
+
+        <div class="hero-banner-frame">
+          <img src="hero-bg.jpg" alt="VMKVEC Computer Science & Engineering Placement Training Portal" class="hero-banner-image">
+        </div>
+
+        <div class="hero-stats-grid">
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">33</div>
+            <div class="hero-stat-label">Training Days</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">165+</div>
+            <div class="hero-stat-label">Topic MCQs</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">99+</div>
+            <div class="hero-stat-label">Coding Programs</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">3</div>
+            <div class="hero-stat-label">Company Question Banks</div>
+          </div>
+        </div>
+
+        <div class="hero-features-grid">
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">💻</div>
+            <h3>Structured 33-Day Curriculum</h3>
+            <p>From Python basics, collections, OOP, and Exception Handling to advanced DSA, two-pointer techniques, SQL Joins, and mock interviews.</p>
+          </div>
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">⏱️</div>
+            <h3>Timed Practice Assessments</h3>
+            <p>20-minute daily assessments featuring 5 conceptual MCQs and 3 live programming challenges with automated submission handling.</p>
+          </div>
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">🏢</div>
+            <h3>Wipro, Infosys & TCS Banks</h3>
+            <p>Targeted interview preparation covering company-specific technical interview questions, SQL puzzles, and HR scenarios.</p>
+          </div>
+        </div>
+
+        <div id="curriculum-preview" style="margin-top: 60px; text-align: left;">
+          <div class="hero-stat-card" style="background: rgba(15, 23, 42, 0.85); padding: 32px;">
+            <div class="between" style="margin-bottom: 20px;">
+              <div>
+                <h2 style="margin: 0; color: #fff; font-size: 24px;">33-Day Placement Training Roadmap</h2>
+                <p class="muted" style="margin: 4px 0 0 0; color: #94a3b8;">Detailed day-by-day syllabus tailored for CSE placement preparation.</p>
+              </div>
+              ${state.user ? `
+                <button onclick="${state.role === 'trainer' ? 'trainer()' : 'student()'}">Start Today's Assessment</button>
+              ` : `
+                <button onclick="login()">Login to Start</button>
+              `}
+            </div>
+            <div style="max-height: 420px; overflow-y: auto; padding-right: 8px;">
+              ${curriculum.map((x, i) => `
+                <div style="padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                  <div>
+                    <span style="font-weight: 700; color: #38bdf8; margin-right: 8px;">Day ${i + 1}</span>
+                    <strong style="color: #f1f5f9;">${esc(x[0])}</strong>
+                    <div style="font-size: 13px; color: #94a3b8; margin-top: 2px;">${esc(x[1])}</div>
+                  </div>
+                  <span class="badge ghost" style="background: rgba(255,255,255,0.1); color: #cbd5e1; white-space: nowrap;">5 MCQs + 3 Programs</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="hero-footer">
+      <div>
+        <strong>Vinayaka Mission's Kirupananda Variyar Engineering College (VMKVEC)</strong>
+        <div>Department of Computer Science and Engineering (CSE) · Placement Training Cell</div>
+      </div>
+      <div>
+        ${state.user ? `
+          <button class="ghost" style="color: #94a3b8; font-size: 13px;" onclick="logout()">Logout (${esc(state.user.name || state.role)})</button>
+        ` : `
+          <button class="ghost" style="color: #94a3b8; font-size: 13px;" onclick="login()">Student / Trainer Login</button>
+        `}
+      </div>
+    </footer>
+  </div>
+  `;
+}
+
+function login(){
+  document.getElementById("app").innerHTML=`
+  <div style="min-height: 100vh; background: #090e1a; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; background-image: linear-gradient(180deg, rgba(9, 14, 26, 0.88), rgba(9, 14, 26, 0.96)), url('hero-bg.jpg'); background-size: cover; background-position: center;">
+    <div style="width: 100%; max-width: 440px; margin-bottom: 16px;">
+      <button class="ghost" style="background: rgba(255,255,255,0.1); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15);" onclick="heroPage()">← Back to Home</button>
+    </div>
+    <div class="login" style="margin: 0; width: 100%;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <span style="font-size: 28px;">🎓</span>
+        <div>
+          <h1 style="font-size: 22px; margin: 0;">VMKVEC CSE Portal</h1>
+          <p class="muted" style="margin: 0; font-size: 13px;">Placement Assessment Login</p>
+        </div>
+      </div>
+      <div class="notice">
+        <b>Trainer:</b> trainer / trainer123<br>
+        <b>Students:</b> student001 to student100 (password matches username)
+      </div>
+      <label>Login as</label>
+      <select id="role">
+        <option value="student">Student</option>
+        <option value="trainer">Trainer</option>
+      </select>
+      <label>Username</label>
+      <input id="username" placeholder="e.g. student001 or trainer">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Enter password">
+      <button style="width: 100%; padding: 12px; font-size: 15px;" onclick="doLogin()">Login to Dashboard</button>
+    </div>
+  </div>`;
+}
+
+function doLogin(){
+  let role=document.getElementById("role").value,u=document.getElementById("username").value.trim(),p=document.getElementById("password").value;
+  if(role==="trainer"&&u==="trainer"&&p==="trainer123"){state.role="trainer";state.user={name:"Training Admin",id:"TRAINER"};save();trainer();return}
+  let s=state.students.find(x=>x.username===u&&x.password===p);
+  if(s){state.role="student";state.user=s;save();if(!s.profileCompleted){studentProfile()}else{student()}}else alert("Invalid login")
+}
+
+function logout(){state.role=null;state.user=null;save();heroPage()}
+
+function studentProfile(){
+document.getElementById("app").innerHTML=header()+`<main class="wrap"><div class="card login"><h1>Student Profile</h1><p class="muted">Please enter your academic details before starting the assessments.</p><label>Student Name</label><input id="pname" value="${esc(state.user.name||"")}" placeholder="Full name" required><label>Department</label><input id="pdept" value="${esc(state.user.department||"")}" placeholder="e.g. Computer Science" required><label>Year</label><select id="pyear"><option value="">Select Year</option><option ${state.user.year==="1st Year"?"selected":""}>1st Year</option><option ${state.user.year==="2nd Year"?"selected":""}>2nd Year</option><option ${state.user.year==="3rd Year"?"selected":""}>3rd Year</option><option ${state.user.year==="4th Year"?"selected":""}>4th Year</option></select><label>Roll Number</label><input id="proll" value="${esc(state.user.rollNumber||"")}" placeholder="Roll number" required><button onclick="saveStudentProfile()">Save & Continue</button></div></main>`}
+function saveStudentProfile(){let name=document.getElementById("pname").value.trim(),department=document.getElementById("pdept").value.trim(),year=document.getElementById("pyear").value,roll=document.getElementById("proll").value.trim();if(!name||!department||!year||!roll){alert("Please fill Name, Department, Year and Roll Number.");return}let s=state.students.find(x=>x.id===state.user.id);Object.assign(s,{name,department,year,rollNumber:roll,profileCompleted:true});state.user=s;save();student()}
+function student(){
+ const myAttempts=state.attempts.filter(a=>a.studentId===state.user.id);
+ const completed=new Set(myAttempts.map(a=>a.day));
+ const byDay={}; myAttempts.forEach(a=>(byDay[a.day]??=[]).push(a));
+ const allStrong=[...new Set(myAttempts.flatMap(a=>a.strongAreas||[]))];
+ const allWeak=[...new Set(myAttempts.flatMap(a=>a.weakAreas||[]))];
+ const avg=myAttempts.length?Math.round(myAttempts.reduce((n,a)=>n+Number(a.percentage||0),0)/myAttempts.length):0;
+ document.getElementById("app").innerHTML=header()+`<main class="wrap"><div class="between"><div><h1>Student Dashboard</h1><p class="muted">33-day topic-wise placement assessment</p></div><div class="actions"><button class="ghost" onclick="studentProfile()">Edit Profile</button><button class="ghost" onclick="logout()">Logout</button></div></div>
+ <div class="card"><b>Student ID:</b> ${esc(state.user.id)} &nbsp;|&nbsp; <b>Name:</b> ${esc(state.user.name)} &nbsp;|&nbsp; <b>Department:</b> ${esc(state.user.department||"-")} &nbsp;|&nbsp; <b>Year:</b> ${esc(state.user.year||"-")} &nbsp;|&nbsp; <b>Roll No:</b> ${esc(state.user.rollNumber||"-")}</div>
+ <div class="grid"><div class="card"><div class="stat">${completed.size}</div><div class="muted">Assessments Completed</div></div><div class="card"><div class="stat">${myAttempts.length}</div><div class="muted">Total Attempts</div></div><div class="card"><div class="stat">${avg}%</div><div class="muted">Average Score</div></div><div class="card"><div class="stat">${Math.round(completed.size/curriculum.length*100)}%</div><div class="muted">Progress</div></div></div>
+ <div class="grid"><div class="card"><h2>Strong Areas</h2><p>${allStrong.length?allStrong.map(x=>`<span class="badge done">${esc(x)}</span>`).join(" "):"No strong areas yet"}</p></div><div class="card"><h2>Weak Areas</h2><p>${allWeak.length?allWeak.map(x=>`<span class="badge">${esc(x)}</span>`).join(" "):"No weak areas yet"}</p></div></div>
+ <div class="card"><h2>Assessment History</h2>${myAttempts.length?`<table><thead><tr><th>Assessment</th><th>Attempt</th><th>Score</th><th>Status</th><th>Date & Time</th><th>Time Used</th><th>Strong</th><th>Weak</th></tr></thead><tbody>${myAttempts.slice().reverse().map((a,i)=>`<tr><td>Day ${a.day} — ${esc(curriculum[a.day-1][0])}</td><td>${(byDay[a.day]||[]).length - (i>1000?0:0)}</td><td>${a.score}/${a.total} (${a.percentage}%)</td><td><span class="badge done">Completed</span></td><td>${esc(a.completedAtDisplay||a.date||a.completedAt||"")}</td><td>${Math.ceil((a.completionSeconds||0)/60)} min</td><td>${esc((a.strongAreas||[]).join(", "))}</td><td>${esc((a.weakAreas||[]).join(", "))}</td></tr>`).join("")}</tbody></table>`:"<p class='muted'>No assessments attempted yet.</p>"}</div>
+ <div class="card"><div class="between"><div><h2>Company Interview Question Bank</h2><p class="muted">Wipro, Infosys and TCS placement-oriented technical, DSA, SQL, project and HR questions.</p></div><button onclick="companyBank()">Open Company Bank</button></div></div><div class="card"><h2>Training Roadmap</h2>${curriculum.map((x,i)=>{const n=(byDay[i+1]||[]).length;const latest=(byDay[i+1]||[]).slice(-1)[0];return `<div class="day"><div class="dayhead"><span><b>Day ${i+1}</b> — ${esc(x[0])}</span><span><span class="badge ${completed.has(i+1)?"done":""}">${completed.has(i+1)?"Completed":"Not Started"}</span> ${n?`<span class="badge">${n} attempt${n>1?'s':''}</span>`:""}</span></div><div class="topics"><div class="topic"><span>${esc(x[1])}${latest?`<small class="muted">Latest: ${latest.percentage}% · ${esc(latest.completedAtDisplay||latest.date||"")}</small>`:""}</span><button onclick="assessment(${i+1})">${completed.has(i+1)?"Retake Assessment":"Open Assessment"}</button></div></div></div>`}).join("")}</div></main>`}
+function assessment(day){
+ const x=curriculum[day-1],qs=QUESTION_BANK[day],cs=CODING_BANK[day];
+ const sessionKey="assessmentSession_"+state.user.id+"_"+day;
+ let sess=JSON.parse(sessionStorage.getItem(sessionKey)||"null");
+ if(!sess){sess={startedAt:Date.now(),saved:{},problem:1};sessionStorage.setItem(sessionKey,JSON.stringify(sess));}
+ clearInterval(window.assessmentInterval);
+ document.getElementById("app").innerHTML=header()+`<main class="wrap"><button class="ghost" style="margin-bottom:18px;" onclick="student()">← Back to Dashboard</button>
+ <div class="card">
+   <div class="between">
+     <div>
+       <h1 style="margin:0 0 6px;">Day ${day} — ${esc(x[0])}</h1>
+       <p class="muted" style="margin:0;">${esc(x[1])}</p>
+     </div>
+     <div id="assessmentTimer" class="assessment-timer-badge">20:00</div>
+   </div>
+   <div class="notice" style="margin-top:20px;">
+     <b>⏱️ 20-minute timer:</b> The timer starts immediately when this assessment opens. When time reaches zero, the assessment is automatically submitted and you are returned to the dashboard.
+   </div>
+
+   <h2 class="section-title">Topic Assessment — ${qs.length} Multiple Choice Questions</h2>
+   <form id="assessmentForm">
+     ${qs.map((q,i)=>`
+       <div class="question-card">
+         <div class="q-title">
+           <span class="q-num">Q${i+1}</span>
+           <span>${esc(q[0])}</span>
+         </div>
+         <div class="options-container">
+           ${q.slice(1,5).map((o,j)=>`
+             <label class="option-tile">
+               <input type="radio" name="q${i}" value="${"ABCD"[j]}">
+               <span class="option-indicator">${"ABCD"[j]}</span>
+               <span class="option-text">${esc(o)}</span>
+             </label>
+           `).join("")}
+         </div>
+       </div>
+     `).join("")}
+
+     <h2 class="section-title" style="margin-top:40px;">Coding Assessment — 3 Placement Programs</h2>
+     <p class="muted">Complete all 3 programs. Each program has a dedicated editor and Save button. Please save each program before submitting.</p>
+
+     ${[1,2,3].map(n=>`
+       <div class="coding-card">
+         <div class="between">
+           <div class="q-title" style="margin-bottom:0;">
+             <span class="q-num" style="background:#0284c7;">Program ${n}</span>
+             <span>Problem Statement</span>
+           </div>
+           <div class="actions">
+             <button type="button" onclick="saveProgram(${day},${n})">💾 Save Program ${n}</button>
+             <span id="save${n}" class="badge done"></span>
+           </div>
+         </div>
+         <div class="coding-prompt">${esc(cs[n-1])}</div>
+         <label style="font-weight:600;font-size:13px;color:#475569;display:block;margin-top:10px;">Program ${n} Solution Code (Python):</label>
+         <textarea id="code${n}" class="code-editor" placeholder="# Write your Python solution for Program ${n} here..."></textarea>
+       </div>
+     `).join("")}
+
+     <div style="margin-top:36px; text-align:center; padding:24px; background:#f8fafc; border-radius:16px; border:1px solid var(--line);">
+       <button type="button" class="hero-btn-primary" style="padding:16px 44px; font-size:16px;" onclick="submitAssessment(${day},false)">🚀 Submit Assessment</button>
+     </div>
+   </form>
+ </div></main>`;
+ renderSaved(day); startTimer(day);
+}
+function startTimer(day){const k="assessmentSession_"+state.user.id+"_"+day;let s=JSON.parse(sessionStorage.getItem(k)||"null");if(!s){s={startedAt:Date.now(),saved:{},problem:1};sessionStorage.setItem(k,JSON.stringify(s))}const end=s.startedAt+20*60*1000;function tick(){const left=Math.max(0,end-Date.now()),m=Math.floor(left/60000),sec=Math.floor((left%60000)/1000);const el=document.getElementById("assessmentTimer");if(el)el.textContent=`${m}:${String(sec).padStart(2,"0")}`;if(left<=0){clearInterval(window.assessmentInterval);submitAssessment(day,true)}}tick();window.assessmentInterval=setInterval(tick,1000)}
+function renderSaved(day){const k="assessmentSession_"+state.user.id+"_"+day,s=JSON.parse(sessionStorage.getItem(k)||"{}");[1,2,3].forEach(n=>{const el=document.getElementById("save"+n);if(el)el.textContent=s.saved&&s.saved[n]?"Saved ✓":"";const code=document.getElementById("code"+n);if(code)code.value=(s.saved&&s.saved[n])||""})}
+function switchProgram(day,n){}
+function saveProgram(day,n){const codeEl=document.getElementById("code"+n);const code=codeEl?codeEl.value.trim():"";if(!code){alert("Please enter code before saving Program "+n+".");return}const k="assessmentSession_"+state.user.id+"_"+day,s=JSON.parse(sessionStorage.getItem(k)||"{}");s.saved=s.saved||{};s.saved[n]=code;sessionStorage.setItem(k,JSON.stringify(s));document.getElementById("save"+n).textContent="Saved ✓";alert("Program "+n+" saved successfully.")}
+function submitAssessment(day,timedOut){
+ const k="assessmentSession_"+state.user.id+"_"+day,sess=JSON.parse(sessionStorage.getItem(k)||"null");if(!sess)return;
+ const qs=QUESTION_BANK[day];let score=0,mcqDetails=[];
+ for(let i=0;i<qs.length;i++){
+   const v=document.querySelector(`input[name="q${i}"]:checked`),answer=v?v.value:"Not Answered",correct=qs[i][5];
+   const ok=answer===correct;if(ok)score++;
+   mcqDetails.push({number:i+1,question:qs[i][0],options:qs[i].slice(1,5),answer,correct,result:ok?"Correct":"Incorrect"});
+ }
+ const saved=sess.saved||{};
+ if(!saved[1]||!saved[2]||!saved[3]){if(timedOut){}else{alert("Please save Program 1, Program 2 and Program 3 before submitting.");return}}
+ const total=qs.length,percentage=Math.round(score/total*100),topic=curriculum[day-1][0],strong=percentage>=80?[topic]:[],weak=percentage<60?[topic]:[];
+ const used=Math.min(20*60,Math.max(0,Math.round((Date.now()-sess.startedAt)/1000))),now=new Date(),display=now.toLocaleString();
+ const prior=state.attempts.filter(a=>a.studentId===state.user.id&&a.day===day).length+1;
+ const attemptId="A"+Date.now();
+ state.attempts.push({id:attemptId,studentId:state.user.id,studentName:state.user.name,username:state.user.username,department:state.user.department,year:state.user.year,rollNumber:state.user.rollNumber,day,attemptNumber:prior,score,total,percentage,completed:true,timedOut:!!timedOut,completedAt:now.toISOString(),completedAtDisplay:display,date:display,completionSeconds:used,strongAreas:strong,weakAreas:weak,program1:saved[1]||"",program2:saved[2]||"",program3:saved[3]||"",program1Prompt:CODING_BANK[day][0],program2Prompt:CODING_BANK[day][1],program3Prompt:CODING_BANK[day][2],mcqDetails});
+ state.submissions.push({id:Date.now(),attemptId,studentId:state.user.id,day,topic,problem:1,prompt:CODING_BANK[day][0],code:saved[1]||"",score:null,status:"Submitted",feedback:"",submittedAt:display,attemptNumber:prior});
+ state.submissions.push({id:Date.now()+1,attemptId,studentId:state.user.id,day,topic,problem:2,prompt:CODING_BANK[day][1],code:saved[2]||"",score:null,status:"Submitted",feedback:"",submittedAt:display,attemptNumber:prior});
+ state.submissions.push({id:Date.now()+2,attemptId,studentId:state.user.id,day,topic,problem:3,prompt:CODING_BANK[day][2],code:saved[3]||"",score:null,status:"Submitted",feedback:"",submittedAt:display,attemptNumber:prior});
+ save();sessionStorage.removeItem(k);clearInterval(window.assessmentInterval);alert(`Assessment ${timedOut?"time expired and was closed":"submitted"}. Score: ${score}/${total} (${percentage}%).`);student();
+}
+
+function companyBank(){
+ const companies=Object.keys(COMPANY_INTERVIEW_BANK);
+ const back=state.role==="trainer"?"trainer()":"student()";
+ document.getElementById("app").innerHTML=header()+`<main class="wrap"><button class="ghost" onclick="${back}">← Back</button>
+ <div class="card"><h1>Company Interview Question Bank</h1><p class="muted">Original placement-preparation questions based on publicly reported interview themes. They are not confidential or leaked company assessment questions.</p></div>
+ ${companies.map(c=>`<div class="card"><h2>${c}</h2><table><thead><tr><th>#</th><th>Area</th><th>Question</th><th>Key Answer / Expected Point</th></tr></thead><tbody>${COMPANY_INTERVIEW_BANK[c].map((q,i)=>`<tr><td>${i+1}</td><td><span class="badge">${esc(q[0])}</span></td><td>${esc(q[1])}</td><td>${esc(q[2])}</td></tr>`).join("")}</tbody></table></div>`).join("")}</main>`;
+}
+
+function trainer(){
+ const students=state.students,subs=state.submissions,attempts=state.attempts;
+ const completed=attempts.filter(a=>a.completed).length,unique=new Set(attempts.map(a=>a.studentId)).size;
+ document.getElementById("app").innerHTML=header()+`<main class="wrap"><div class="between"><div><h1>Trainer Dashboard</h1><p class="muted">Trainer access is read-only except deleting student/assessment records and downloading reports.</p></div><button class="ghost" onclick="logout()">Logout</button></div>
+ <div class="grid"><div class="card"><div class="stat">${students.length}</div><div class="muted">Student Accounts</div></div><div class="card"><div class="stat">${unique}</div><div class="muted">Students Attempted</div></div><div class="card"><div class="stat">${completed}</div><div class="muted">Completed Assessments</div></div></div>
+ <div class="card"><h2>Downloads</h2><div class="actions"><button onclick="exportAllAssessmentRecords()">Download All Records Excel</button><button onclick="exportAllRecordsPDF()">Download All Records PDF</button><button onclick="exportDepartmentRecords()">Download Student Summary Excel</button></div><p class="muted">Downloads include student details, every MCQ/question, selected answer, correct answer, result, all three coding programs, submitted code, attempt number, date/time, score, strong/weak areas and review data.</p></div>
+ <div class="card"><h2>Company Interview Question Bank</h2><p class="muted">Wipro, Infosys and TCS interview preparation.</p><button onclick="companyBank()">Open Company Bank</button></div><div class="card"><h2>Students</h2><p class="muted">Delete permanently removes the student account and all assessment records, marks and program submissions for that ID.</p><table><thead><tr><th>ID</th><th>Login</th><th>Name</th><th>Department</th><th>Year</th><th>Roll No</th><th>Assessments</th><th>Actions</th></tr></thead><tbody>${students.map(s=>{const aa=attempts.filter(a=>a.studentId===s.id);return `<tr><td>${s.id}</td><td>${esc(s.username)}</td><td>${esc(s.name||"Not entered")}</td><td>${esc(s.department||"-")}</td><td>${esc(s.year||"-")}</td><td>${esc(s.rollNumber||"-")}</td><td>${aa.length}</td><td class="actions"><button onclick="viewStudent(${s.id})">Review</button><button onclick="exportStudentRecords(${s.id})">Excel</button><button onclick="exportStudentPDF(${s.id})">PDF</button><button class="danger" onclick="deleteStudent(${s.id})">Delete</button></td></tr>`}).join("")}</tbody></table></div>
+ <div class="card"><h2>All Assessment Attempts</h2><table><thead><tr><th>Student</th><th>ID</th><th>Assessment</th><th>Attempt</th><th>Score</th><th>Date & Time</th><th>Time Used</th><th>Strong</th><th>Weak</th><th>Action</th></tr></thead><tbody>${attempts.slice().reverse().map(a=>`<tr><td>${esc(a.studentName||a.username)}</td><td>${a.studentId}</td><td>Day ${a.day} — ${esc(curriculum[a.day-1][0])}</td><td>${a.attemptNumber||1}</td><td>${a.score}/${a.total} (${a.percentage}%)</td><td>${esc(a.completedAtDisplay||a.date||"")}</td><td>${Math.ceil((a.completionSeconds||0)/60)} min</td><td>${esc((a.strongAreas||[]).join(", "))}</td><td>${esc((a.weakAreas||[]).join(", "))}</td><td><button onclick="viewAttempt(${JSON.stringify(a.id)})">Review</button><button class="danger" onclick="deleteAttempt(${JSON.stringify(a.id)})">Delete Attempt</button></td></tr>`).join("")||"<tr><td colspan=10>No assessment attempts yet.</td></tr>"}</tbody></table></div></main>`}
+function getAttemptDetails(a){
+ const qs=QUESTION_BANK[a.day]||[];
+ const details=a.mcqDetails&&a.mcqDetails.length?a.mcqDetails:qs.map((q,i)=>({number:i+1,question:q[0],options:q.slice(1,5),answer:"Not recorded",correct:q[5],result:"Not recorded"}));
+ return details;
+}
+function reviewHTML(a){
+ const st=state.students.find(x=>x.id===a.studentId)||{};const details=getAttemptDetails(a);const subs=state.submissions.filter(x=>x.studentId===a.studentId&&x.day===a.day&&(x.attemptNumber||1)===(a.attemptNumber||1));
+ return `<div class="card"><h2>Assessment Review — Day ${a.day}</h2><p><b>Student:</b> ${esc(st.name||a.studentName||a.username)} · <b>ID:</b> ${a.studentId} · <b>Attempt:</b> ${a.attemptNumber||1} · <b>Date/Time:</b> ${esc(a.completedAtDisplay||a.date||"")}</p><p><b>Score:</b> ${a.score}/${a.total} (${a.percentage}%) · <b>Time Used:</b> ${Math.ceil((a.completionSeconds||0)/60)} min · <b>Strong:</b> ${esc((a.strongAreas||[]).join(", ")||"None")} · <b>Weak:</b> ${esc((a.weakAreas||[]).join(", ")||"None")}</p>
+ <h3>MCQ Questions & Answers</h3><table><tr><th>Q</th><th>Question</th><th>Options</th><th>Student Answer</th><th>Correct Answer</th><th>Result</th></tr>${details.map(d=>`<tr><td>${d.number}</td><td>${esc(d.question)}</td><td>${esc(d.options.map((o,i)=>"ABCD"[i]+". "+o).join(" | "))}</td><td>${esc(d.answer)}</td><td>${esc(d.correct)}</td><td>${esc(d.result)}</td></tr>`).join("")}</table>
+ <h3>Programs</h3>${[1,2,3].map(n=>{const sub=subs.find(x=>x.problem===n),code=a["program"+n]||sub?.code||"";return `<div class="topic"><b>Program ${n}:</b> ${esc(a["program"+n+"Prompt"]||sub?.prompt||CODING_BANK[a.day]?.[n-1]||"")}<br><b>Status:</b> ${esc(sub?.status||"Submitted")}<br><b>Code:</b><pre class="code">${esc(code||"No code saved")}</pre>${sub?.feedback?`<b>Trainer feedback:</b> ${esc(sub.feedback)}`:""}</div>`}).join("")}</div>`;
+}
+function viewStudent(id){
+ const s=state.students.find(x=>x.id===id),a=state.attempts.filter(x=>x.studentId===id);if(!s)return;
+ const strong=[...new Set(a.flatMap(x=>x.strongAreas||[]))],weak=[...new Set(a.flatMap(x=>x.weakAreas||[]))];
+ document.getElementById("app").innerHTML=header()+`<main class="wrap"><button class="ghost" onclick="trainer()">← Back</button><div class="between"><h1>${esc(s.name||s.username)}</h1><div class="actions"><button onclick="exportStudentRecords(${id})">Download Excel</button><button onclick="exportStudentPDF(${id})">Download PDF</button></div></div><p><b>Student ID:</b> ${s.id} · <b>Login:</b> ${esc(s.username)} · <b>Department:</b> ${esc(s.department||"-")} · <b>Year:</b> ${esc(s.year||"-")} · <b>Roll No:</b> ${esc(s.rollNumber||"-")}</p>
+ <div class="grid"><div class="card"><h2>Strong Areas</h2><p>${strong.length?strong.join(", "):"None"}</p></div><div class="card"><h2>Weak Areas</h2><p>${weak.length?weak.join(", "):"None"}</p></div></div>
+ <div class="card"><h2>Every Assessment Attempt</h2><table><tr><th>Assessment</th><th>Attempt</th><th>Score</th><th>Date & Time</th><th>Time</th><th>Status</th><th>Strong</th><th>Weak</th><th>Actions</th></tr>${a.slice().reverse().map(x=>`<tr><td>Day ${x.day} — ${esc(curriculum[x.day-1][0])}</td><td>${x.attemptNumber||1}</td><td>${x.score}/${x.total} (${x.percentage}%)</td><td>${esc(x.completedAtDisplay||x.date||"")}</td><td>${Math.ceil((x.completionSeconds||0)/60)} min</td><td>Completed</td><td>${esc((x.strongAreas||[]).join(", "))}</td><td>${esc((x.weakAreas||[]).join(", "))}</td><td><button onclick="viewAttempt(${JSON.stringify(x.id)})">Review</button><button class="danger" onclick="deleteAttempt(${JSON.stringify(x.id)})">Delete</button></td></tr>`).join("")||"<tr><td colspan=9>No attempts.</td></tr>"}</table></div></main>`;
+}
+function viewAttempt(id){const a=state.attempts.find(x=>String(x.id)===String(id));if(!a)return;document.getElementById("app").innerHTML=header()+`<main class="wrap"><button class="ghost" onclick="viewStudent(${a.studentId})">← Back</button><div class="between"><h1>Complete Record Review</h1><div class="actions"><button onclick="exportAttemptExcel(${JSON.stringify(a.id)})">Download Excel</button><button onclick="exportAttemptPDF(${JSON.stringify(a.id)})">Download PDF</button><button class="danger" onclick="deleteAttempt(${JSON.stringify(a.id)})">Delete Attempt</button></div></div>${reviewHTML(a)}</main>`}
+function deleteAttempt(id){const a=state.attempts.find(x=>String(x.id)===String(id));if(!a)return;if(!confirm(`Delete Day ${a.day} Attempt ${a.attemptNumber||1} for ${a.username}? This removes the complete assessment record and reopens the assessment for retake.`))return;state.attempts=state.attempts.filter(x=>String(x.id)!==String(id));state.submissions=state.submissions.filter(x=>!(x.studentId===a.studentId&&x.day===a.day&&(x.attemptNumber||1)===(a.attemptNumber||1)));save();alert(`Assessment record deleted. Day ${a.day} is now open for retake.`);const target=state.role==="trainer"?"trainer":"student";target==="trainer"?trainer():student()}
+function deleteStudent(id){
+ const n=Number(id);
+ if(!Number.isInteger(n)||n<1||n>100){alert("Invalid student ID.");return;}
+ const st=state.students.find(x=>Number(x.id)===n);
+ if(!st){alert("Student ID not found.");return;}
+ const username=st.username||(`student${String(n).padStart(3,"0")}`);
+ if(!confirm(`Delete Student ID ${n} (${username}) permanently? This will remove the student login/profile and ALL assessment attempts, marks, MCQ answers and program submissions for this student. This cannot be undone.`))return;
+ state.students=state.students.filter(x=>Number(x.id)!==n);
+ state.attempts=state.attempts.filter(a=>Number(a.studentId)!==n);
+ state.submissions=state.submissions.filter(x=>Number(x.studentId)!==n);
+ if(!Array.isArray(state.deletedStudentIds))state.deletedStudentIds=[];
+ if(!state.deletedStudentIds.includes(n))state.deletedStudentIds.push(n);
+ state.deletedStudentIds.sort((a,b)=>a-b);
+ save();
+ alert(`Student ID ${n} and all of its records have been deleted.`);
+ trainer();
+}
+function xlsCell(v){return `<Cell><Data ss:Type="String">${esc(String(v??""))}</Data></Cell>`}
+function downloadExcel(filename,headers,rows){const body=rows.map(r=>`<Row>${r.map(xlsCell).join("")}</Row>`).join("");const xml=`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Records"><Table><Row>${headers.map(xlsCell).join("")}</Row>${body}</Table></Worksheet></Workbook>`;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([xml],{type:"application/vnd.ms-excel"}));a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function flattenAttemptRows(a){
+ const st=state.students.find(x=>x.id===a.studentId)||{};const details=getAttemptDetails(a);const rows=[];
+ details.forEach(d=>rows.push([st.id,a.username,st.name||a.studentName,st.department||"",st.year||"",st.rollNumber||"","Day "+a.day,"MCQ "+d.number,d.question,d.options.map((o,i)=>"ABCD"[i]+". "+o).join(" | "),d.answer,d.correct,d.result,a.attemptNumber||1,a.score+"/"+a.total,a.percentage+"%",a.completedAtDisplay||a.date||"",Math.ceil((a.completionSeconds||0)/60),(a.strongAreas||[]).join("; "),(a.weakAreas||[]).join("; "),"","",""]));
+ [1,2,3].forEach(n=>{const sub=state.submissions.find(x=>x.studentId===a.studentId&&x.day===a.day&&x.problem===n&&(x.attemptNumber||1)===(a.attemptNumber||1));rows.push([st.id,a.username,st.name||a.studentName,st.department||"",st.year||"",st.rollNumber||"","Day "+a.day,"Program "+n,a["program"+n+"Prompt"]||sub?.prompt||CODING_BANK[a.day]?.[n-1]||"","",a["program"+n]||sub?.code||"","",sub?.status||"Submitted",a.attemptNumber||1,a.score+"/"+a.total,a.percentage+"%",a.completedAtDisplay||a.date||"",Math.ceil((a.completionSeconds||0)/60),(a.strongAreas||[]).join("; "),(a.weakAreas||[]).join("; "),sub?.score??"",sub?.feedback||"",sub?.submittedAt||""])});
+ return rows;
+}
+const EXPORT_HEADERS=["Student ID","Username","Name","Department","Year","Roll No","Assessment","Item","Question / Program","Options","Student Answer / Code","Correct Answer","Result / Status","Attempt","Score","Percentage","Completed At","Time Used (min)","Strong Areas","Weak Areas","Program Score","Trainer Feedback","Submitted At"];
+function exportAllAssessmentRecords(){const rows=[];state.attempts.forEach(a=>rows.push(...flattenAttemptRows(a)));downloadExcel("all_student_complete_assessment_records.xls",EXPORT_HEADERS,rows)}
+function exportStudentRecords(id){const st=state.students.find(x=>x.id===id);if(!st)return;const rows=[];state.attempts.filter(a=>a.studentId===id).forEach(a=>rows.push(...flattenAttemptRows(a)));downloadExcel((st.rollNumber||st.username)+"_complete_assessment_records.xls",EXPORT_HEADERS,rows)}
+function exportAttemptExcel(id){const a=state.attempts.find(x=>String(x.id)===String(id));if(!a)return;downloadExcel(`${a.username}_day${a.day}_attempt${a.attemptNumber||1}_complete_record.xls`,EXPORT_HEADERS,flattenAttemptRows(a))}
+function exportDepartmentRecords(dept){const rows=[["Student ID","Username","Name","Department","Year","Roll No","Assessments Completed","Average %","Strong Areas","Weak Areas","Status"]];state.students.filter(s=>!dept||s.department===dept).forEach(st=>{const aa=state.attempts.filter(a=>a.studentId===st.id);const avg=aa.length?Math.round(aa.reduce((n,a)=>n+a.percentage,0)/aa.length):0;rows.push([st.id,st.username,st.name,st.department,st.year,st.rollNumber,aa.length,avg+"%",[...new Set(aa.flatMap(a=>a.strongAreas||[]))].join("; "),[...new Set(aa.flatMap(a=>a.weakAreas||[]))].join("; "),aa.length?"Completed":"Open"])});downloadExcel((dept||"all_departments")+"_student_summary.xls",rows.shift(),rows)}
+function pdfEscape(v){return String(v??"").replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)").replace(/\r?\n/g," ")}
+function makePDF(title,lines){
+ const perPage=48,pages=[];for(let i=0;i<lines.length;i+=perPage)pages.push(lines.slice(i,i+perPage));if(!pages.length)pages.push([""]);let objs=[];const pageIds=[],contentIds=[];let objNo=3;pages.forEach(()=>{pageIds.push(objNo++);contentIds.push(objNo++)});const fontId=objNo++;let pdf=`%PDF-1.4\n`;
+ const offsets=[0];function add(id,body){offsets[id]=pdf.length;pdf+=id+` 0 obj\n`+body+`\nendobj\n`}
+ add(1,`<< /Type /Catalog /Pages 2 0 R >>`);add(2,`<< /Type /Pages /Kids [${pageIds.map(x=>x+" 0 R").join(" ")}] /Count ${pages.length} >>`);
+ pages.forEach((pg,i)=>{add(pageIds[i],`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${contentIds[i]} 0 R >>`);let stream="BT\n/F1 9 Tf\n40 760 Td\n";pg.forEach((line,j)=>{if(j===0)stream+=`/F1 12 Tf (${pdfEscape(line)}) Tj\n/F1 9 Tf 0 -20 Td\n`;else stream+=`(${pdfEscape(line)}) Tj\n0 -14 Td\n`});stream+="ET";add(contentIds[i],`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`)});add(fontId,`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);const xref=pdf.length;pdf+=`xref\n0 ${objNo}\n0000000000 65535 f \n`;for(let i=1;i<objNo;i++)pdf+=String(offsets[i]).padStart(10,"0")+" 00000 n \n";pdf+=`trailer\n<< /Size ${objNo} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([pdf],{type:"application/pdf"}));a.download=title;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function attemptPDFLines(a){const st=state.students.find(x=>x.id===a.studentId)||{};const lines=["PLACEMENT ASSESSMENT COMPLETE RECORD","Student ID: "+st.id+" | Login: "+a.username+" | Name: "+(st.name||a.studentName||"-"),"Department: "+(st.department||"-")+" | Year: "+(st.year||"-")+" | Roll No: "+(st.rollNumber||"-"),"Day "+a.day+" - "+curriculum[a.day-1][0]+" | Attempt "+(a.attemptNumber||1),"Score: "+a.score+"/"+a.total+" ("+a.percentage+"%) | Date/Time: "+(a.completedAtDisplay||a.date||""),"Time Used: "+Math.ceil((a.completionSeconds||0)/60)+" min | Strong: "+((a.strongAreas||[]).join(", ")||"None")+" | Weak: "+((a.weakAreas||[]).join(", ")||"None"),"","MCQ QUESTIONS / ANSWERS"];
+ getAttemptDetails(a).forEach(d=>{lines.push("Q"+d.number+": "+d.question);lines.push("Options: "+d.options.map((o,i)=>"ABCD"[i]+". "+o).join(" | "));lines.push("Student: "+d.answer+" | Correct: "+d.correct+" | "+d.result);lines.push("")});lines.push("CODING PROGRAMS");[1,2,3].forEach(n=>{const sub=state.submissions.find(x=>x.studentId===a.studentId&&x.day===a.day&&x.problem===n&&(x.attemptNumber||1)===(a.attemptNumber||1));lines.push("Program "+n+": "+(a["program"+n+"Prompt"]||sub?.prompt||CODING_BANK[a.day]?.[n-1]||""));lines.push("Status: "+(sub?.status||"Submitted"));(a["program"+n]||sub?.code||"No code saved").split(/\r?\n/).forEach(x=>lines.push("Code: "+x));if(sub?.feedback)lines.push("Trainer Feedback: "+sub.feedback);lines.push("")});return lines}
+function exportAttemptPDF(id){const a=state.attempts.find(x=>String(x.id)===String(id));if(!a)return;makePDF(`${a.username}_day${a.day}_attempt${a.attemptNumber||1}_complete_record.pdf`,attemptPDFLines(a))}
+function exportStudentPDF(id){const st=state.students.find(x=>x.id===id);if(!st)return;const aa=state.attempts.filter(a=>a.studentId===id);let lines=["PLACEMENT ASSESSMENT STUDENT REPORT","Student ID: "+st.id+" | Login: "+st.username+" | Name: "+(st.name||"-"),"Department: "+(st.department||"-")+" | Year: "+(st.year||"-")+" | Roll No: "+(st.rollNumber||"-"),"Total Attempts: "+aa.length,"","COMPLETE ASSESSMENT RECORDS"];aa.forEach(a=>lines.push(...attemptPDFLines(a),"============================================================"));makePDF((st.rollNumber||st.username)+"_complete_assessment_report.pdf",lines)}
+function exportAllRecordsPDF(){let lines=["PLACEMENT ASSESSMENT - ALL STUDENT COMPLETE RECORDS","Generated: "+new Date().toLocaleString(),""];state.attempts.forEach(a=>lines.push(...attemptPDFLines(a),"============================================================"));makePDF("all_student_complete_assessment_records.pdf",lines)}
+
+state.role==="trainer"?trainer():state.role==="student"?student():heroPage();
