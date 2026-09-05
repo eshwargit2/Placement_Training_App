@@ -1,0 +1,15 @@
+{
+  "name": "placement-training-portal",
+  "version": "1.0.0",
+  "description": "Placement Training App with Express & Firebase Serverless Backend",
+  "main": "Backend/server.js",
+  "scripts": {
+    "start": "node Backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.1.0"
+  }
+}
