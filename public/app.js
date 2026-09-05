@@ -298,8 +298,132 @@ function doLogin(){
 function logout(){state.role=null;state.user=null;save();heroPage()}
 
 function studentProfile(){
-document.getElementById("app").innerHTML=header()+`<main class="wrap"><div class="card login"><h1>Student Profile</h1><p class="muted">Please enter your academic details before starting the assessments.</p><label>Student Name</label><input id="pname" value="${esc(state.user.name||"")}" placeholder="Full name" required><label>Department</label><input id="pdept" value="${esc(state.user.department||"")}" placeholder="e.g. Computer Science" required><label>Year</label><select id="pyear"><option value="">Select Year</option><option ${state.user.year==="1st Year"?"selected":""}>1st Year</option><option ${state.user.year==="2nd Year"?"selected":""}>2nd Year</option><option ${state.user.year==="3rd Year"?"selected":""}>3rd Year</option><option ${state.user.year==="4th Year"?"selected":""}>4th Year</option></select><label>Roll Number</label><input id="proll" value="${esc(state.user.rollNumber||"")}" placeholder="Roll number" required><button onclick="saveStudentProfile()">Save & Continue</button></div></main>`}
-function saveStudentProfile(){let name=document.getElementById("pname").value.trim(),department=document.getElementById("pdept").value.trim(),year=document.getElementById("pyear").value,roll=document.getElementById("proll").value.trim();if(!name||!department||!year||!roll){alert("Please fill Name, Department, Year and Roll Number.");return}let s=state.students.find(x=>x.id===state.user.id);Object.assign(s,{name,department,year,rollNumber:roll,profileCompleted:true});state.user=s;save();student()}
+  const user = state.user || {};
+  const currentDept = "Computer Science and Engineering (CSE)";
+  const currentYear = "3rd Year";
+  
+  document.getElementById("app").innerHTML = header() + `
+  <main class="wrap">
+    <div class="card login" style="max-width: 480px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <span style="font-size:28px;">📝</span>
+        <div>
+          <h1 style="margin:0; font-size:24px;">Student Profile</h1>
+          <p class="muted" style="margin:2px 0 0;">Please enter your academic details.</p>
+        </div>
+      </div>
+
+      <div class="notice" style="margin-bottom:20px; font-size:13px;">
+        Student ID: <b>${esc(user.id)}</b> &nbsp;|&nbsp; Login: <b>${esc(user.username)}</b>
+      </div>
+
+      <form id="profileForm" onsubmit="event.preventDefault(); saveStudentProfile();">
+        <div class="form-group">
+          <label for="pname">Student Name <span class="req">*</span></label>
+          <input id="pname" type="text" value="${esc(user.name||"")}" placeholder="Enter full name" maxlength="50" oninput="clearErr('pname')">
+          <span class="field-hint">Alphabets, spaces, and dots only</span>
+          <span class="field-err" id="err-pname"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="pdept">Department <span class="req">*</span></label>
+          <input id="pdept" type="text" value="Computer Science and Engineering (CSE)" readonly style="background:#f8fafc; font-weight:600; color:#334155; cursor:default;">
+          <span class="field-err" id="err-pdept"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="pyear">Year of Study <span class="req">*</span></label>
+          <select id="pyear" onchange="clearErr('pyear')">
+            <option value="4th Year" ${currentYear==="4th Year"?"selected":""}>4th Year</option>
+            <option value="3rd Year" ${currentYear==="3rd Year"||!currentYear?"selected":""}>3rd Year</option>
+            <option value="2nd Year" ${currentYear==="2nd Year"?"selected":""}>2nd Year</option>
+            <option value="1st Year" ${currentYear==="1st Year"?"selected":""}>1st Year</option>
+          </select>
+          <span class="field-err" id="err-pyear"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="proll">Roll Number <span class="req">*</span></label>
+          <input id="proll" type="text" value="${esc(user.rollNumber||"")}" placeholder="e.g. 01, 25, or 21CS045" maxlength="25" oninput="clearErr('proll')">
+          <span class="field-hint">Enter your student roll number (digits or alphanumeric)</span>
+          <span class="field-err" id="err-proll"></span>
+        </div>
+
+        <div style="margin-top:24px; display:flex; gap:12px;">
+          <button type="submit" style="flex:1; padding:14px; font-size:15px;">💾 Save & Continue</button>
+          ${user.profileCompleted ? `<button type="button" class="ghost" style="padding:14px;" onclick="student()">Cancel</button>` : ""}
+        </div>
+      </form>
+    </div>
+  </main>`;
+}
+
+function clearErr(id){
+  const el = document.getElementById(id);
+  const err = document.getElementById("err-" + id);
+  if(el) el.classList.remove("input-invalid");
+  if(err) err.textContent = "";
+}
+
+function setErr(id, msg){
+  const el = document.getElementById(id);
+  const err = document.getElementById("err-" + id);
+  if(el) {
+    el.classList.add("input-invalid");
+    el.focus();
+  }
+  if(err) err.textContent = msg;
+}
+
+function saveStudentProfile(){
+  const nameEl = document.getElementById("pname");
+  const deptEl = document.getElementById("pdept");
+  const yearEl = document.getElementById("pyear");
+  const rollEl = document.getElementById("proll");
+
+  const name = nameEl ? nameEl.value.trim() : "";
+  const department = deptEl ? deptEl.value.trim() : "Computer Science and Engineering (CSE)";
+  const year = yearEl ? yearEl.value.trim() : "3rd Year";
+  const roll = rollEl ? rollEl.value.trim() : "";
+
+  let hasError = false;
+
+  // Validate Name (alphabets, spaces, dots, min 2, max 50)
+  const nameRegex = /^[a-zA-Z\s.']{2,50}$/;
+  if(!name){
+    setErr("pname", "Student name is required.");
+    hasError = true;
+  } else if(!nameRegex.test(name)){
+    setErr("pname", "Name must contain only alphabetic letters, dots, and spaces (no numbers or symbols).");
+    hasError = true;
+  } else {
+    clearErr("pname");
+  }
+
+  // Validate Roll Number (allow digits e.g. 1, 01, 25 or alphanumeric e.g. 21CS045)
+  const rollRegex = /^[a-zA-Z0-9_-]{1,25}$/;
+  if(!roll){
+    setErr("proll", "Roll number is required.");
+    hasError = true;
+  } else if(!rollRegex.test(roll)){
+    setErr("proll", "Please enter a valid roll number (digits or alphanumeric).");
+    hasError = true;
+  } else {
+    clearErr("proll");
+  }
+
+  if(hasError) return;
+
+  let s = state.students.find(x => x.id === state.user.id);
+  if(!s){
+    s = state.user;
+    state.students.push(s);
+  }
+  Object.assign(s, { name, department, year, rollNumber: roll, profileCompleted: true });
+  state.user = s;
+  save();
+  student();
+}
 function student(){
  const myAttempts=state.attempts.filter(a=>a.studentId===state.user.id);
  const completed=new Set(myAttempts.map(a=>a.day));

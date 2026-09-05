@@ -98,7 +98,7 @@ button:active {
 }
 
 .login {
-  max-width: 440px;
+  max-width: 460px;
   margin: 0 auto;
   background: white;
   padding: 36px 32px;
@@ -112,6 +112,48 @@ button:active {
   margin-bottom: 6px;
   font-size: 26px;
   color: #0f172a;
+}
+
+.form-group {
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.form-group label .req {
+  color: #dc2626;
+  margin-left: 2px;
+}
+
+.field-err {
+  display: block;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: -10px;
+  margin-bottom: 12px;
+  min-height: 16px;
+}
+
+.field-hint {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  margin-top: -10px;
+  margin-bottom: 12px;
+}
+
+.input-invalid {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2 !important;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15) !important;
 }
 
 input, select, textarea {
