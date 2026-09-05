@@ -3,15 +3,166 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Placement Assessment Portal</title>
+  <title>VMKVEC CSE Placement Training Portal</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="logo.jpg" type="image/x-icon">
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
   <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
-  <meta name="description" content="Placement Assessment Portal vmkvec department of cse">
+  <meta name="description" content="Vinayaka Mission's Kirupananda Variyar Engineering College - Department of Computer Science and Engineering Placement Training Portal">
 </head>
 <body>
-  <div id="app"></div>
-  <script src="app.js"></script>
+  <div class="hero-wrapper">
+    <header class="hero-nav">
+      <div class="hero-brand">
+        <div class="hero-brand-logo">🎓</div>
+        <div class="hero-brand-text">
+          <h2>VMKVEC CSE</h2>
+          <p>Placement Training Portal</p>
+        </div>
+      </div>
+      <div class="hero-nav-actions" id="heroNavActions">
+        <a href="login.html" class="hero-nav-btn" style="text-decoration:none;">Portal Login →</a>
+      </div>
+    </header>
+
+    <main class="hero-main">
+      <div class="hero-container">
+        <div class="hero-badge">
+          ✨ Vinayaka Mission's Kirupananda Variyar Engineering College
+        </div>
+
+        <span class="hero-dept-tag">Department of Computer Science & Engineering</span>
+        <h1 class="hero-title-banner">
+          VMKVEC Placement Training Portal
+        </h1>
+
+        <p class="hero-subtitle">
+          Master placement coding rounds and technical interviews with our 33-Day intensive curriculum — covering Python, Data Structures & Algorithms, SQL, OOP, timed coding sandbox tests, and tier-1 company interview question banks.
+        </p>
+
+        <div class="hero-cta-group" id="heroCtaGroup">
+          <a href="login.html" class="hero-btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+            🚀 Login to Assessment Portal
+          </a>
+          <button class="hero-btn-secondary" onclick="document.getElementById('curriculum-preview').scrollIntoView({behavior:'smooth'})">
+            📖 View 33-Day Curriculum
+          </button>
+        </div>
+
+        <div class="hero-banner-frame">
+          <img src="hero-bg.jpg" alt="VMKVEC Computer Science & Engineering Placement Training Portal" class="hero-banner-image">
+        </div>
+
+        <div class="hero-stats-grid">
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">33</div>
+            <div class="hero-stat-label">Training Days</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">165+</div>
+            <div class="hero-stat-label">Topic MCQs</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">99+</div>
+            <div class="hero-stat-label">Coding Programs</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="hero-stat-num">3</div>
+            <div class="hero-stat-label">Company Question Banks</div>
+          </div>
+        </div>
+
+        <div class="hero-features-grid">
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">💻</div>
+            <h3>Structured 33-Day Curriculum</h3>
+            <p>From Python basics, collections, OOP, and Exception Handling to advanced DSA, two-pointer techniques, SQL Joins, and mock interviews.</p>
+          </div>
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">⏱️</div>
+            <h3>Timed Practice Assessments</h3>
+            <p>20-minute daily assessments featuring 5 conceptual MCQs and 3 live programming challenges with automated submission handling.</p>
+          </div>
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">🏢</div>
+            <h3>Wipro, Infosys & TCS Banks</h3>
+            <p>Targeted interview preparation covering company-specific technical interview questions, SQL puzzles, and HR scenarios.</p>
+          </div>
+        </div>
+
+        <div id="curriculum-preview" style="margin-top: 60px; text-align: left;">
+          <div class="hero-stat-card" style="background: rgba(15, 23, 42, 0.85); padding: 32px;">
+            <div class="between" style="margin-bottom: 20px;">
+              <div>
+                <h2 style="margin: 0; color: #fff; font-size: 24px;">33-Day Placement Training Roadmap</h2>
+                <p class="muted" style="margin: 4px 0 0 0; color: #94a3b8;">Detailed day-by-day syllabus tailored for CSE placement preparation.</p>
+              </div>
+              <div id="curriculumCta">
+                <a href="login.html" class="hero-btn-primary" style="padding: 10px 20px; font-size: 14px; text-decoration:none;">Login to Start</a>
+              </div>
+            </div>
+            <div id="curriculumList" style="max-height: 420px; overflow-y: auto; padding-right: 8px;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="hero-footer">
+      <div>
+        <strong>Vinayaka Mission's Kirupananda Variyar Engineering College (VMKVEC)</strong>
+        <div>Department of Computer Science and Engineering (CSE) · Placement Training Cell</div>
+      </div>
+      <div id="footerAction">
+        <a href="login.html" class="ghost" style="color: #94a3b8; font-size: 13px; text-decoration:none; padding:8px 12px; border-radius:8px;">Student / Trainer Login</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script>
+    // Populate dynamic user state & curriculum
+    const user = state.user;
+    const role = state.role;
+    const targetDashboard = role === "trainer" ? "trainer.html" : "dashboard.html";
+
+    if (user && role) {
+      document.getElementById("heroNavActions").innerHTML = `
+        <a href="${targetDashboard}" class="hero-nav-btn" style="text-decoration:none;">
+          Go to Dashboard (${esc(user.name || role)}) →
+        </a>
+      `;
+      document.getElementById("heroCtaGroup").innerHTML = `
+        <a href="${targetDashboard}" class="hero-btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+          🚀 Open Dashboard
+        </a>
+        <button class="hero-btn-secondary" onclick="document.getElementById('curriculum-preview').scrollIntoView({behavior:'smooth'})">
+          📖 View 33-Day Curriculum
+        </button>
+      `;
+      document.getElementById("curriculumCta").innerHTML = `
+        <a href="${targetDashboard}" class="hero-btn-primary" style="padding: 10px 20px; font-size: 14px; text-decoration:none;">Start Today's Assessment</a>
+      `;
+      document.getElementById("footerAction").innerHTML = `
+        <button class="ghost" style="color: #94a3b8; font-size: 13px;" onclick="logout()">Logout (${esc(user.name || role)})</button>
+      `;
+    }
+
+    const listEl = document.getElementById("curriculumList");
+    if (listEl && typeof curriculum !== "undefined") {
+      listEl.innerHTML = curriculum.map((x, i) => `
+        <div style="padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px;">
+            <span style="font-weight: 700; color: #38bdf8; margin-right: 8px;">Day ${i + 1}</span>
+            <strong style="color: #f1f5f9;">${esc(x[0])}</strong>
+            <div style="font-size: 13px; color: #94a3b8; margin-top: 2px;">${esc(x[1])}</div>
+          </div>
+          <span class="badge ghost" style="background: rgba(255,255,255,0.1); color: #cbd5e1; white-space: nowrap;">5 MCQs + 3 Programs</span>
+        </div>
+      `).join("");
+    }
+  </script>
 </body>
 </html>

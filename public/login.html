@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login · VMKVEC Placement Training Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
+  <meta name="description" content="VMKVEC CSE Placement Assessment Portal Login">
+</head>
+<body style="background: #090e1a; min-height: 100vh;">
+  <div style="min-height: 100vh; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; background-image: linear-gradient(180deg, rgba(9, 14, 26, 0.88), rgba(9, 14, 26, 0.96)), url('hero-bg.jpg'); background-size: cover; background-position: center;">
+    <div style="width: 100%; max-width: 440px; margin-bottom: 16px;">
+      <a href="index.html" class="ghost" style="background: rgba(255,255,255,0.1); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15); text-decoration:none; display:inline-flex; align-items:center; padding: 8px 16px; border-radius: 10px;">← Back to Home</a>
+    </div>
+
+    <div class="login">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <span style="font-size: 28px;">🎓</span>
+        <div>
+          <h1 style="font-size: 22px; margin: 0;">VMKVEC CSE Portal</h1>
+          <p class="muted" style="margin: 0; font-size: 13px;">Placement Assessment Login</p>
+        </div>
+      </div>
+
+      <div class="notice">
+        <b>Trainer:</b> trainer / trainer123<br>
+        <b>Students:</b> student001 to student100 (password matches username)
+      </div>
+
+      <form onsubmit="event.preventDefault(); handleLogin();">
+        <label for="role">Login as</label>
+        <select id="role">
+          <option value="student">Student</option>
+          <option value="trainer">Trainer</option>
+        </select>
+
+        <label for="username">Username</label>
+        <input id="username" placeholder="e.g. student001 or trainer" autocomplete="username" required>
+
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" required>
+
+        <button type="submit" style="width: 100%; padding: 13px; font-size: 15px; margin-top: 6px;">
+          🚀 Login to Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script>
+    // Auto-redirect if already logged in
+    if (state.user && state.role) {
+      if (state.role === "trainer") {
+        window.location.href = "trainer.html";
+      } else if (!state.user.profileCompleted) {
+        window.location.href = "profile.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+    }
+
+    function handleLogin() {
+      const role = document.getElementById("role").value;
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value;
+
+      if (role === "trainer" && u === "trainer" && p === "trainer123") {
+        state.role = "trainer";
+        state.user = { name: "Training Admin", id: "TRAINER" };
+        save();
+        window.location.href = "trainer.html";
+        return;
+      }
+
+      const s = state.students.find(x => x.username === u && x.password === p);
+      if (s) {
+        state.role = "student";
+        state.user = s;
+        save();
+        if (!s.profileCompleted) {
+          window.location.href = "profile.html";
+        } else {
+          window.location.href = "dashboard.html";
+        }
+      } else {
+        alert("Invalid login credentials. Please check your username and password.");
+      }
+    }
+  </script>
+</body>
+</html>

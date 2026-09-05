@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assessment · VMKVEC Placement Training</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
+</head>
+<body>
+  <div id="mainHeader"></div>
+
+  <main class="wrap">
+    <a href="dashboard.html" class="ghost" style="margin-bottom:18px; text-decoration:none; display:inline-flex; align-items:center; padding:8px 16px; border-radius:10px;">← Back to Dashboard</a>
+
+    <div class="card">
+      <div class="between">
+        <div>
+          <h1 id="assessmentTitle" style="margin:0 0 6px;">Day Assessment</h1>
+          <p id="assessmentDesc" class="muted" style="margin:0;">Curriculum Topic</p>
+        </div>
+        <div id="assessmentTimer" class="assessment-timer-badge">20:00</div>
+      </div>
+
+      <div class="notice" style="margin-top:20px;">
+        <b>⏱️ 20-minute timer:</b> The timer starts immediately when this assessment opens. When time reaches zero, the assessment is automatically submitted and you are returned to the dashboard.
+      </div>
+
+      <form id="assessmentForm" onsubmit="event.preventDefault(); submitAssessment(false);">
+        <h2 class="section-title">Topic Assessment — 5 Multiple Choice Questions</h2>
+        <div id="mcqContainer"></div>
+
+        <h2 class="section-title" style="margin-top:40px;">Coding Assessment — 3 Placement Programs</h2>
+        <p class="muted">Complete all 3 programs. Each program has a dedicated editor and Save button. Please save each program before submitting.</p>
+
+        <div id="codingContainer"></div>
+
+        <div style="margin-top:36px; text-align:center; padding:24px; background:#f8fafc; border-radius:16px; border:1px solid var(--line);">
+          <button type="submit" class="hero-btn-primary" style="padding:16px 44px; font-size:16px;">
+            🚀 Submit Assessment
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script>
+    if (!requireAuth("student")) {
+      // redirected
+    }
+
+    renderHeader("assessment");
+
+    const params = new URLSearchParams(window.location.search);
+    let day = parseInt(params.get("day") || "1", 10);
+    if (isNaN(day) || day < 1 || day > 33) day = 1;
+
+    const topicData = curriculum[day - 1] || ["Python Basics", ""];
+    const qs = QUESTION_BANK[day] || [];
+    const cs = CODING_BANK[day] || [];
+
+    document.getElementById("assessmentTitle").textContent = `Day ${day} — ${topicData[0]}`;
+    document.getElementById("assessmentDesc").textContent = topicData[1];
+
+    // Render MCQs
+    document.getElementById("mcqContainer").innerHTML = qs.map((q, i) => `
+      <div class="question-card">
+        <div class="q-title">
+          <span class="q-num">Q${i + 1}</span>
+          <span>${esc(q[0])}</span>
+        </div>
+        <div class="options-container">
+          ${q.slice(1, 5).map((o, j) => `
+            <label class="option-tile">
+              <input type="radio" name="q${i}" value="${"ABCD"[j]}">
+              <span class="option-indicator">${"ABCD"[j]}</span>
+              <span class="option-text">${esc(o)}</span>
+            </label>
+          `).join("")}
+        </div>
+      </div>
+    `).join("");
+
+    // Render Coding Programs
+    document.getElementById("codingContainer").innerHTML = [1, 2, 3].map(n => `
+      <div class="coding-card">
+        <div class="between">
+          <div class="q-title" style="margin-bottom:0;">
+            <span class="q-num" style="background:#0284c7;">Program ${n}</span>
+            <span>Problem Statement</span>
+          </div>
+          <div class="actions">
+            <button type="button" onclick="saveProgram(${n})">💾 Save Program ${n}</button>
+            <span id="save${n}" class="badge done"></span>
+          </div>
+        </div>
+        <div class="coding-prompt">${esc(cs[n - 1] || "")}</div>
+        <label for="code${n}" style="font-weight:600;font-size:13px;color:#475569;display:block;margin-top:10px;">Program ${n} Solution Code (Python):</label>
+        <textarea id="code${n}" class="code-editor" placeholder="# Write your Python solution for Program ${n} here..."></textarea>
+      </div>
+    `).join("");
+
+    // Session Timer & Autosave Setup
+    const sessionKey = "assessmentSession_" + state.user.id + "_" + day;
+    let sess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
+    if (!sess) {
+      sess = { startedAt: Date.now(), saved: {}, problem: 1 };
+      sessionStorage.setItem(sessionKey, JSON.stringify(sess));
+    }
+
+    // Populate saved code if any
+    [1, 2, 3].forEach(n => {
+      const el = document.getElementById("save" + n);
+      if (el) el.textContent = sess.saved && sess.saved[n] ? "Saved ✓" : "";
+      const code = document.getElementById("code" + n);
+      if (code) code.value = (sess.saved && sess.saved[n]) || "";
+    });
+
+    // Start 20-minute Timer
+    const end = sess.startedAt + 20 * 60 * 1000;
+    function tick() {
+      const left = Math.max(0, end - Date.now());
+      const m = Math.floor(left / 60000);
+      const sec = Math.floor((left % 60000) / 1000);
+      const timerEl = document.getElementById("assessmentTimer");
+      if (timerEl) timerEl.textContent = `${m}:${String(sec).padStart(2, "0")}`;
+      if (left <= 0) {
+        clearInterval(window.assessmentInterval);
+        submitAssessment(true);
+      }
+    }
+    tick();
+    window.assessmentInterval = setInterval(tick, 1000);
+
+    function saveProgram(n) {
+      const codeEl = document.getElementById("code" + n);
+      const code = codeEl ? codeEl.value.trim() : "";
+      if (!code) {
+        alert("Please enter code before saving Program " + n + ".");
+        return;
+      }
+      let currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "{}");
+      currentSess.saved = currentSess.saved || {};
+      currentSess.saved[n] = code;
+      sessionStorage.setItem(sessionKey, JSON.stringify(currentSess));
+      document.getElementById("save" + n).textContent = "Saved ✓";
+      alert("Program " + n + " saved successfully.");
+    }
+
+    function submitAssessment(timedOut) {
+      const currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
+      if (!currentSess) return;
+
+      let score = 0;
+      let mcqDetails = [];
+      for (let i = 0; i < qs.length; i++) {
+        const v = document.querySelector(`input[name="q${i}"]:checked`);
+        const answer = v ? v.value : "Not Answered";
+        const correct = qs[i][5];
+        const ok = answer === correct;
+        if (ok) score++;
+        mcqDetails.push({
+          number: i + 1,
+          question: qs[i][0],
+          options: qs[i].slice(1, 5),
+          answer,
+          correct,
+          result: ok ? "Correct" : "Incorrect"
+        });
+      }
+
+      const saved = currentSess.saved || {};
+      if (!saved[1] || !saved[2] || !saved[3]) {
+        if (!timedOut) {
+          alert("Please save Program 1, Program 2 and Program 3 before submitting.");
+          return;
+        }
+      }
+
+      const total = qs.length;
+      const percentage = Math.round((score / total) * 100);
+      const topic = topicData[0];
+      const strong = percentage >= 80 ? [topic] : [];
+      const weak = percentage < 60 ? [topic] : [];
+      const used = Math.min(20 * 60, Math.max(0, Math.round((Date.now() - currentSess.startedAt) / 1000)));
+      const now = new Date();
+      const display = now.toLocaleString();
+      const prior = state.attempts.filter(a => a.studentId === state.user.id && a.day === day).length + 1;
+      const attemptId = "A" + Date.now();
+
+      state.attempts.push({
+        id: attemptId,
+        studentId: state.user.id,
+        studentName: state.user.name,
+        username: state.user.username,
+        department: state.user.department,
+        year: state.user.year,
+        rollNumber: state.user.rollNumber,
+        day,
+        attemptNumber: prior,
+        score,
+        total,
+        percentage,
+        completed: true,
+        timedOut: !!timedOut,
+        completedAt: now.toISOString(),
+        completedAtDisplay: display,
+        date: display,
+        completionSeconds: used,
+        strongAreas: strong,
+        weakAreas: weak,
+        program1: saved[1] || "",
+        program2: saved[2] || "",
+        program3: saved[3] || "",
+        program1Prompt: CODING_BANK[day][0],
+        program2Prompt: CODING_BANK[day][1],
+        program3Prompt: CODING_BANK[day][2],
+        mcqDetails
+      });
+
+      state.submissions.push({
+        id: Date.now(), attemptId, studentId: state.user.id, day, topic, problem: 1,
+        prompt: CODING_BANK[day][0], code: saved[1] || "", score: null, status: "Submitted",
+        feedback: "", submittedAt: display, attemptNumber: prior
+      });
+      state.submissions.push({
+        id: Date.now() + 1, attemptId, studentId: state.user.id, day, topic, problem: 2,
+        prompt: CODING_BANK[day][1], code: saved[2] || "", score: null, status: "Submitted",
+        feedback: "", submittedAt: display, attemptNumber: prior
+      });
+      state.submissions.push({
+        id: Date.now() + 2, attemptId, studentId: state.user.id, day, topic, problem: 3,
+        prompt: CODING_BANK[day][2], code: saved[3] || "", score: null, status: "Submitted",
+        feedback: "", submittedAt: display, attemptNumber: prior
+      });
+
+      save();
+      sessionStorage.removeItem(sessionKey);
+      clearInterval(window.assessmentInterval);
+      alert(`Assessment ${timedOut ? "time expired and was closed" : "submitted"}. Score: ${score}/${total} (${percentage}%).`);
+      window.location.href = "dashboard.html";
+    }
+  </script>
+</body>
+</html>

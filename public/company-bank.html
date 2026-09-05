@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Company Interview Question Bank · VMKVEC Placement</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
+</head>
+<body>
+  <div id="mainHeader"></div>
+
+  <main class="wrap">
+    <a id="backBtn" href="index.html" class="ghost" style="margin-bottom:18px; text-decoration:none; display:inline-flex; align-items:center; padding:8px 16px; border-radius:10px;">← Back</a>
+
+    <div class="card">
+      <h1 style="margin:0 0 6px;">Company Interview Question Bank</h1>
+      <p class="muted" style="margin:0;">Original placement-preparation questions based on publicly reported interview themes. Tier-1 placement technical, DSA, SQL, project and HR questions.</p>
+    </div>
+
+    <div id="companyCards">
+      <!-- Filled by JS -->
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script>
+    renderHeader("company");
+
+    const backBtn = document.getElementById("backBtn");
+    if (state.role === "trainer") {
+      backBtn.href = "trainer.html";
+      backBtn.textContent = "← Back to Trainer Dashboard";
+    } else if (state.role === "student") {
+      backBtn.href = "dashboard.html";
+      backBtn.textContent = "← Back to Student Dashboard";
+    } else {
+      backBtn.href = "index.html";
+      backBtn.textContent = "← Back to Home";
+    }
+
+    const companies = Object.keys(COMPANY_INTERVIEW_BANK);
+    document.getElementById("companyCards").innerHTML = companies.map(c => `
+      <div class="card">
+        <h2 style="margin-top:0; color:var(--primary);">${c} Placement Preparation</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px;">#</th>
+                <th style="width:140px;">Area</th>
+                <th>Question</th>
+                <th>Key Answer / Expected Point</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${COMPANY_INTERVIEW_BANK[c].map((q, i) => `
+                <tr>
+                  <td><b>${i + 1}</b></td>
+                  <td><span class="badge">${esc(q[0])}</span></td>
+                  <td><b>${esc(q[1])}</b></td>
+                  <td>${esc(q[2])}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `).join("");
+  </script>
+</body>
+</html>

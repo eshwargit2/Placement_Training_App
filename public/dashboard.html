@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Dashboard · VMKVEC Placement Training</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
+</head>
+<body>
+  <div id="mainHeader"></div>
+
+  <main class="wrap">
+    <div class="between" style="margin-bottom: 20px;">
+      <div>
+        <h1 style="margin:0 0 4px;">Student Dashboard</h1>
+        <p class="muted" style="margin:0;">33-day topic-wise placement training & timed assessments</p>
+      </div>
+      <div class="actions">
+        <a href="profile.html" class="ghost" style="padding:10px 18px; text-decoration:none; border-radius:10px; display:inline-flex; align-items:center;">✏️ Edit Profile</a>
+        <button class="ghost" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="card" id="studentInfoCard">
+      <!-- Filled by JS -->
+    </div>
+
+    <div class="grid" id="studentStatsGrid">
+      <!-- Filled by JS -->
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2 style="margin-top:0;">🌟 Strong Areas</h2>
+        <p id="strongAreasList">No strong areas yet</p>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0;">🎯 Focus / Weak Areas</h2>
+        <p id="weakAreasList">No weak areas yet</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">📊 Assessment History</h2>
+      <div id="assessmentHistoryTable"></div>
+    </div>
+
+    <div class="card">
+      <div class="between">
+        <div>
+          <h2 style="margin:0 0 6px;">🏢 Company Interview Question Bank</h2>
+          <p class="muted" style="margin:0;">Wipro, Infosys and TCS placement-oriented technical, DSA, SQL, project and HR questions.</p>
+        </div>
+        <a href="company-bank.html" style="text-decoration:none; padding:12px 20px;" class="hero-btn-primary">Open Company Bank</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">🗺️ 33-Day Training & Assessment Roadmap</h2>
+      <div id="roadmapList"></div>
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script>
+    if (!requireAuth("student")) {
+      // redirected by requireAuth
+    }
+
+    renderHeader("dashboard");
+
+    const user = state.user || {};
+    const myAttempts = state.attempts.filter(a => a.studentId === user.id);
+    const completed = new Set(myAttempts.map(a => a.day));
+    const byDay = {};
+    myAttempts.forEach(a => (byDay[a.day] ??= []).push(a));
+    const allStrong = [...new Set(myAttempts.flatMap(a => a.strongAreas || []))];
+    const allWeak = [...new Set(myAttempts.flatMap(a => a.weakAreas || []))];
+    const avg = myAttempts.length ? Math.round(myAttempts.reduce((n, a) => n + Number(a.percentage || 0), 0) / myAttempts.length) : 0;
+
+    // Student Info Card
+    document.getElementById("studentInfoCard").innerHTML = `
+      <b>Student ID:</b> ${esc(user.id)} &nbsp;|&nbsp; 
+      <b>Name:</b> ${esc(user.name || "Not entered")} &nbsp;|&nbsp; 
+      <b>Department:</b> ${esc(user.department || "-")} &nbsp;|&nbsp; 
+      <b>Year:</b> ${esc(user.year || "-")} &nbsp;|&nbsp; 
+      <b>Roll No:</b> ${esc(user.rollNumber || "-")}
+    `;
+
+    // Stats Grid
+    document.getElementById("studentStatsGrid").innerHTML = `
+      <div class="card"><div class="stat">${completed.size}</div><div class="muted">Assessments Completed</div></div>
+      <div class="card"><div class="stat">${myAttempts.length}</div><div class="muted">Total Attempts</div></div>
+      <div class="card"><div class="stat">${avg}%</div><div class="muted">Average Score</div></div>
+      <div class="card"><div class="stat">${Math.round((completed.size / curriculum.length) * 100)}%</div><div class="muted">Curriculum Progress</div></div>
+    `;
+
+    // Strong & Weak areas
+    document.getElementById("strongAreasList").innerHTML = allStrong.length ?
+      allStrong.map(x => `<span class="badge done" style="margin-right:6px; margin-bottom:6px;">${esc(x)}</span>`).join(" ") :
+      "<span class='muted'>Complete assessments to identify strengths.</span>";
+
+    document.getElementById("weakAreasList").innerHTML = allWeak.length ?
+      allWeak.map(x => `<span class="badge" style="margin-right:6px; margin-bottom:6px;">${esc(x)}</span>`).join(" ") :
+      "<span class='muted'>No weak areas identified.</span>";
+
+    // Assessment History Table
+    const histEl = document.getElementById("assessmentHistoryTable");
+    if (myAttempts.length) {
+      histEl.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Assessment</th>
+                <th>Attempt</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Date & Time</th>
+                <th>Time Used</th>
+                <th>Strong</th>
+                <th>Weak</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${myAttempts.slice().reverse().map((a, i) => `
+                <tr>
+                  <td>Day ${a.day} — ${esc(curriculum[a.day - 1][0])}</td>
+                  <td>${(byDay[a.day] || []).length - (i > 1000 ? 0 : 0)}</td>
+                  <td>${a.score}/${a.total} (${a.percentage}%)</td>
+                  <td><span class="badge done">Completed</span></td>
+                  <td>${esc(a.completedAtDisplay || a.date || a.completedAt || "")}</td>
+                  <td>${Math.ceil((a.completionSeconds || 0) / 60)} min</td>
+                  <td>${esc((a.strongAreas || []).join(", "))}</td>
+                  <td>${esc((a.weakAreas || []).join(", "))}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    } else {
+      histEl.innerHTML = "<p class='muted'>No assessments attempted yet. Select a day below to start your practice.</p>";
+    }
+
+    // Roadmap List
+    document.getElementById("roadmapList").innerHTML = curriculum.map((x, i) => {
+      const dayNum = i + 1;
+      const n = (byDay[dayNum] || []).length;
+      const isDone = completed.has(dayNum);
+      const latest = (byDay[dayNum] || []).slice(-1)[0];
+      return `
+        <div class="day">
+          <div class="dayhead">
+            <span><b>Day ${dayNum}</b> — ${esc(x[0])}</span>
+            <span>
+              <span class="badge ${isDone ? "done" : ""}">${isDone ? "Completed ✓" : "Not Started"}</span> 
+              ${n ? `<span class="badge">${n} attempt${n > 1 ? 's' : ''}</span>` : ""}
+            </span>
+          </div>
+          <div class="topics">
+            <div class="topic">
+              <div>
+                <span>${esc(x[1])}</span>
+                ${latest ? `<br><small class="muted">Latest Attempt: ${latest.percentage}% · ${esc(latest.completedAtDisplay || latest.date || "")}</small>` : ""}
+              </div>
+              <a href="assessment.html?day=${dayNum}" class="hero-btn-primary" style="text-decoration:none; padding:9px 18px; font-size:13.5px; white-space:nowrap;">
+                ${isDone ? "Retake Assessment" : "Open Assessment →"}
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  </script>
+</body>
+</html>
