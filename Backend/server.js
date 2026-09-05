@@ -424,18 +424,31 @@ app.get('/api/admin/assessment/:id', async (req, res) => {
 app.delete('/api/admin/assessment/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const { studentId } = req.query;
 
     if (firestoreDb) {
       try {
-        await firestoreDb.collection('assessments').doc(id).delete();
-      } catch (e) {}
+        const docRef = firestoreDb.collection('assessments').doc(id);
+        const docSnap = await docRef.get();
+        const sId = studentId || (docSnap.exists ? docSnap.data().studentId : null);
+
+        await docRef.delete();
+
+        if (sId) {
+          try {
+            await firestoreDb.collection('students').doc(sId).collection('assessments').doc(id).delete();
+          } catch (errSub) {}
+        }
+      } catch (e) {
+        console.error('Firestore delete error:', e.message);
+      }
     }
 
     let list = getLocalAssessments();
     list = list.filter(a => String(a.id) !== String(id));
     saveLocalAssessments(list);
 
-    return res.json({ success: true, message: `Assessment ${id} deleted.` });
+    return res.json({ success: true, message: `Assessment ${id} deleted successfully.` });
   } catch (error) {
     console.error('Error deleting assessment:', error);
     return res.status(500).json({ success: false, error: error.message });
