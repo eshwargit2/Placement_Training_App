@@ -44,7 +44,11 @@
 
         <div class="form-group">
           <label for="pdept">Department <span class="req">*</span></label>
-          <input id="pdept" type="text" value="Computer Science and Engineering (CSE)" readonly style="background:#f8fafc; font-weight:600; color:#334155; cursor:default;">
+          <select id="pdept" onchange="clearErr('pdept')">
+            <option value="Computer Science and Engineering (CSE)">Computer Science and Engineering (CSE)</option>
+            <option value="Information Technology (IT)">Information Technology (IT)</option>
+            <option value="Artificial Intelligence and Data Science (AI & DS)">Artificial Intelligence and Data Science (AI & DS)</option>
+          </select>
           <span class="field-err" id="err-pdept"></span>
         </div>
 
@@ -88,6 +92,24 @@
     `;
 
     if (user.name) document.getElementById("pname").value = user.name;
+    if (user.department) {
+      const deptEl = document.getElementById("pdept");
+      if (deptEl) {
+        const match = Array.from(deptEl.options).find(o => 
+          o.value === user.department ||
+          o.value.toLowerCase().includes(user.department.toLowerCase()) ||
+          user.department.toLowerCase().includes(o.value.toLowerCase()) ||
+          (user.department.toUpperCase() === "IT" && o.value.includes("(IT)")) ||
+          (user.department.toUpperCase().includes("AI") && o.value.includes("(AI & DS)")) ||
+          (user.department.toUpperCase() === "CSE" && o.value.includes("(CSE)"))
+        );
+        if (match) {
+          deptEl.value = match.value;
+        } else {
+          deptEl.value = user.department;
+        }
+      }
+    }
     if (user.year) document.getElementById("pyear").value = user.year;
     if (user.rollNumber) document.getElementById("proll").value = user.rollNumber;
 

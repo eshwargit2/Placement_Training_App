@@ -140,7 +140,8 @@ function renderHeader(activePage) {
   if (user && role) {
     const dashHref = role === "trainer" ? "admin.html" : "dashboard.html";
     const showDashboardBtn = activePage !== "dashboard" && activePage !== "admin" && activePage !== "trainer" && activePage !== "profile";
-    const adminBtn = role === "trainer" ? `<a href="admin.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3);font-weight:600;">Admin Panel</a>` : "";
+    const showAdminBtn = role === "trainer" && activePage !== "admin" && activePage !== "trainer";
+    const adminBtn = showAdminBtn ? `<a href="admin.html" class="ghost" style="padding:6px 12px;font-size:12px;text-decoration:none;border-radius:10px;display:inline-flex;align-items:center;background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3);font-weight:600;">Admin Panel</a>` : "";
     const showUserLabel = activePage !== "dashboard";
     const userLabelHtml = showUserLabel ? `<span>${esc(user.name || user.username)} ${role ? `· ${role}` : ""}</span>` : "";
     actionsHtml = `
