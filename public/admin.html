@@ -342,6 +342,10 @@
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script>
+    if (!requireAuth("trainer")) {
+      // redirected to login.html
+    }
+
     renderHeader("trainer");
 
     // Populate day filter

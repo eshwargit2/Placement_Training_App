@@ -9,7 +9,7 @@
       window.location.href = "index.html";
     }
   } else if (stateData.role === "trainer") {
-    window.location.href = "trainer.html";
+    window.location.href = "admin.html";
   } else if (stateData.role === "student") {
     if (!stateData.user.profileCompleted) {
       window.location.href = "profile.html";

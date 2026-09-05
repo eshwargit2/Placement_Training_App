@@ -26,7 +26,7 @@
       <p class="muted" style="margin: 0 0 16px 56px; font-size: 13px;">Placement Assessment Login</p>
 
       <div class="notice">
-        <b>Trainer:</b> trainer / trainer123<br>
+       
         <b>Students:</b> student001 to student100 (password matches username)
       </div>
 
@@ -38,7 +38,7 @@
         </select>
 
         <label for="username">Username</label>
-        <input id="username" placeholder="e.g. student001 or trainer" autocomplete="username" required>
+        <input id="username" placeholder="e.g. student001 or Trainer" autocomplete="username" required>
 
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" required>
@@ -57,7 +57,7 @@
     // Auto-redirect if already logged in
     if (state.user && state.role) {
       if (state.role === "trainer") {
-        window.location.href = "trainer.html";
+        window.location.href = "admin.html";
       } else if (!state.user.profileCompleted) {
         window.location.href = "profile.html";
       } else {
@@ -70,11 +70,11 @@
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value;
 
-      if (role === "trainer" && u === "trainer" && p === "trainer123") {
+      if (role === "trainer" && (u.toLowerCase() === "trainer" || u === "Trainer") && p === "Trainer@Admin555") {
         state.role = "trainer";
         state.user = { name: "Training Admin", id: "TRAINER" };
         save();
-        window.location.href = "trainer.html";
+        window.location.href = "admin.html";
         return;
       }
 
