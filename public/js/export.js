@@ -657,10 +657,16 @@ function exportAttemptPDF(id) {
 }
 
 function exportStudentPDF(id) {
-  const st = (typeof state !== 'undefined' && state.students) ? state.students.find(x => x.id === id) : null;
-  if (!st) return;
-  const aa = (typeof state !== 'undefined' && state.attempts) ? state.attempts.filter(a => a.studentId === id) : [];
-  exportAllRecordsPDF(aa, `${st.rollNumber || st.username}_assessment_report.pdf`);
+  const currentId = id || (typeof state !== 'undefined' && state.user ? state.user.id : null);
+  const st = (typeof state !== 'undefined' && state.students) ? (state.students.find(x => x.id === currentId) || state.user || {}) : (state.user || {});
+  const rawAttempts = (typeof state !== 'undefined' && state.attempts) ? state.attempts : [];
+  const aa = rawAttempts.filter(a => String(a.studentId) === String(currentId) || String(a.username) === String(st.username));
+  if (!aa.length) {
+    alert("No assessment records found to export for this student.");
+    return;
+  }
+  const roll = st.rollNumber || st.username || currentId || 'student';
+  exportAllRecordsPDF(aa, `${roll}_assessment_report.pdf`);
 }
 
 function exportAllRecordsPDF(customList, filename) {
