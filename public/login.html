@@ -34,17 +34,17 @@
         <label for="role">Login as</label>
         <select id="role">
           <option value="student">Student</option>
-          <option value="trainer">Trainer</option>
+          <option value="admin">Admin</option>
         </select>
 
         <label for="username">Username</label>
-        <input id="username" placeholder="e.g. student001 or Trainer" autocomplete="username" required>
+        <input id="username" placeholder="e.g. student001 or Admin" autocomplete="username" required>
 
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" required>
 
         <button type="submit" style="width: 100%; padding: 13px; font-size: 15px; margin-top: 6px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
-          <span>Login to Dashboard</span>
+          <span>Login to Portal</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         </button>
       </form>
@@ -56,7 +56,7 @@
   <script>
     // Auto-redirect if already logged in
     if (state.user && state.role) {
-      if (state.role === "trainer") {
+      if (state.role === "admin" || state.role === "trainer") {
         window.location.href = "admin.html";
       } else if (!state.user.profileCompleted) {
         window.location.href = "profile.html";
@@ -70,9 +70,11 @@
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value;
 
-      if (role === "trainer" && (u.toLowerCase() === "trainer" || u === "Trainer") && p === "Trainer@Admin555") {
-        state.role = "trainer";
-        state.user = { name: "Training Admin", id: "TRAINER" };
+      if ((role === "admin" || role === "trainer") && 
+          (u.toLowerCase() === "admin" || u.toLowerCase() === "trainer") && 
+          (p === "Trainer@Admin555" || p === "Admin@555" || p === "admin123")) {
+        state.role = "admin";
+        state.user = { name: "System Admin", id: "ADMIN" };
         save();
         window.location.href = "admin.html";
         return;

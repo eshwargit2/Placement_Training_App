@@ -129,7 +129,7 @@
         <div>Department of Computer Science and Engineering (CSE) · Placement Training Cell</div>
       </div>
       <div id="footerAction">
-        <a href="login.html" class="ghost" style="color: #94a3b8; font-size: 13px; text-decoration:none; padding:8px 12px; border-radius:8px;">Student / Trainer Login</a>
+        <a href="login.html" class="ghost" style="color: #94a3b8; font-size: 13px; text-decoration:none; padding:8px 12px; border-radius:8px;">Student / Admin Login</a>
       </div>
     </footer>
   </div>
@@ -140,7 +140,7 @@
     // Populate dynamic user state & curriculum
     const user = state.user;
     const role = state.role;
-    const targetDashboard = role === "trainer" ? "trainer.html" : "dashboard.html";
+    const targetDashboard = (role === "admin" || role === "trainer") ? "admin.html" : "dashboard.html";
 
     if (user && role) {
       document.getElementById("heroNavActions").innerHTML = `

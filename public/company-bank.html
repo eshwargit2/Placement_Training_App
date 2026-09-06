@@ -37,9 +37,9 @@
     renderHeader("company");
 
     const backBtn = document.getElementById("backBtn");
-    if (state.role === "trainer") {
-      backBtn.href = "trainer.html";
-      backBtn.textContent = "← Back to Trainer Dashboard";
+    if (state.role === "admin" || state.role === "trainer") {
+      backBtn.href = "admin.html";
+      backBtn.textContent = "← Back to Admin Panel";
     } else if (state.role === "student") {
       backBtn.href = "dashboard.html";
       backBtn.textContent = "← Back to Student Dashboard";
