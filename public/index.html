@@ -3,133 +3,310 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VMKVEC CSE Placement Training Portal</title>
+  <title>VMKVEC CSE · Placement Training & Assessment Portal</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="logo.jpg" type="image/x-icon">
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
   <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
-  <meta name="description" content="Vinayaka Mission's Kirupananda Variyar Engineering College - Department of Computer Science and Engineering Placement Training Portal">
+  <meta name="description" content="Vinayaka Mission's Kirupananda Variyar Engineering College - Department of Computer Science and Engineering Placement Training & Assessment Portal">
+  <script>
+    (function() {
+      const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
 </head>
 <body>
   <div class="hero-wrapper">
+    <!-- Top Navigation -->
     <header class="hero-nav">
-      <div class="hero-brand">
+      <a href="index.html" class="hero-brand">
         <div class="hero-brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
         </div>
         <div class="hero-brand-text">
-          <h2>VMKVEC CSE</h2>
-          <p>Placement Training Portal</p>
+          <h2>
+            VMKVEC CSE
+            <span class="badge-pill">Placement Cell</span>
+          </h2>
+          <p>Training & Assessment Portal</p>
         </div>
-      </div>
+      </a>
+
+      <nav class="hero-nav-links" id="heroNavLinks">
+        <a href="#features" class="hero-nav-link">Key Features</a>
+        <a href="#curriculum-preview" class="hero-nav-link">33-Day Roadmap</a>
+        <a href="#company-tracks" class="hero-nav-link">Company Banks</a>
+        <a href="#metrics" class="hero-nav-link">Stats</a>
+      </nav>
+
       <div class="hero-nav-actions" id="heroNavActions">
-        <a href="login.html" class="hero-nav-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+        <a href="company-bank.html" class="hero-nav-ghost-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          <span>Company Banks</span>
+        </a>
+        <a href="login.html" class="hero-nav-btn" id="heroLoginBtn">
           <span>Portal Login</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </a>
       </div>
     </header>
 
+    <!-- Main Hero Body -->
     <main class="hero-main">
       <div class="hero-container">
-        <div class="hero-badge">
-          Vinayaka Mission's Kirupananda Variyar Engineering College
+        <!-- Institutional Badge Ribbon -->
+        <div class="hero-badge-wrap">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            <span>Vinayaka Mission's Kirupananda Variyar Engineering College (VMKVEC)</span>
+          </div>
+          <span class="hero-dept-tag">Department of Computer Science & Engineering</span>
         </div>
 
-        <span class="hero-dept-tag">Department of Computer Science & Engineering</span>
+        <!-- Hero Title -->
         <h1 class="hero-title-banner">
-          VMKVEC Placement Training Portal
+          Master Placement Coding & Technical Interviews
         </h1>
 
+        <!-- Hero Subtitle -->
         <p class="hero-subtitle">
-          Master placement coding rounds and technical interviews with our 33-Day intensive curriculum — covering Python, Data Structures & Algorithms, SQL, OOP, timed coding sandbox tests, and tier-1 company interview question banks.
+          Intensive 33-Day placement training curriculum — structured mastery of Python, Data Structures & Algorithms, SQL, Object-Oriented Programming, timed 20-minute daily assessments, and tier-1 MNC question archives.
         </p>
 
+        <!-- CTA Buttons -->
         <div class="hero-cta-group" id="heroCtaGroup">
-          <a href="login.html" class="hero-btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+          <a href="login.html" class="hero-btn-primary" id="primaryCtaBtn">
             <span>Login to Assessment Portal</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
           </a>
-          <button class="hero-btn-secondary" onclick="document.getElementById('curriculum-preview').scrollIntoView({behavior:'smooth'})" style="display:inline-flex; align-items:center; justify-content:center; gap:8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            <span>View 33-Day Curriculum</span>
+          <button class="hero-btn-secondary" onclick="document.getElementById('curriculum-preview').scrollIntoView({behavior:'smooth'})">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            <span>View 33-Day Syllabus</span>
           </button>
+          <a href="company-bank.html" class="hero-btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+            </svg>
+            <span>Company Banks</span>
+          </a>
         </div>
 
-        <div class="hero-banner-frame">
+        <!-- Quick Trust / Platform Pills -->
+        <div class="hero-trust-pills">
+          <div class="hero-trust-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>20-Min Timed Assessments</span>
+          </div>
+          <div class="hero-trust-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>165+ Curated MCQs</span>
+          </div>
+          <div class="hero-trust-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>99+ Live Coding Challenges</span>
+          </div>
+          <div class="hero-trust-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Instant Evaluation & Feedback</span>
+          </div>
+        </div>
+
+        <!-- Interactive Browser Mockup Showcase -->
+        <div class="hero-window-mockup">
+          <div class="hero-window-header">
+            <div class="hero-window-dots">
+              <span class="hero-window-dot red"></span>
+              <span class="hero-window-dot yellow"></span>
+              <span class="hero-window-dot green"></span>
+            </div>
+            <div class="hero-window-title">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+              VMKVEC CSE · Placement Assessment Engine
+            </div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">Academic Batch 2026–27</div>
+          </div>
           <img src="hero-bg.jpg" alt="VMKVEC Computer Science & Engineering Placement Training Portal" class="hero-banner-image">
         </div>
 
-        <div class="hero-stats-grid">
+        <!-- Metrics / Impact Stats -->
+        <div class="hero-stats-grid" id="metrics">
           <div class="hero-stat-card">
             <div class="hero-stat-num">33</div>
-            <div class="hero-stat-label">Training Days</div>
+            <div class="hero-stat-label">Structured Training Days</div>
           </div>
           <div class="hero-stat-card">
             <div class="hero-stat-num">165+</div>
-            <div class="hero-stat-label">Topic MCQs</div>
+            <div class="hero-stat-label">Placement Topic MCQs</div>
           </div>
           <div class="hero-stat-card">
             <div class="hero-stat-num">99+</div>
-            <div class="hero-stat-label">Coding Programs</div>
+            <div class="hero-stat-label">Coding Practice Challenges</div>
           </div>
           <div class="hero-stat-card">
-            <div class="hero-stat-num">3</div>
-            <div class="hero-stat-label">Company Question Banks</div>
+            <div class="hero-stat-num">3+</div>
+            <div class="hero-stat-label">MNC Interview Question Banks</div>
           </div>
+        </div>
+
+        <!-- Platform Pillars Section -->
+        <div class="hero-section-head" id="features">
+          <h2>Engineered for Placement Excellence</h2>
+          <p>A rigorous, full-stack training system designed to transform students into job-ready software engineers and placement toppers.</p>
         </div>
 
         <div class="hero-features-grid">
           <div class="hero-feature-card">
             <div class="hero-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
             </div>
             <h3>Structured 33-Day Curriculum</h3>
-            <p>From Python basics, collections, OOP, and Exception Handling to advanced DSA, two-pointer techniques, SQL Joins, and mock interviews.</p>
+            <p>Sequenced learning from Python syntax, collections, and OOP to advanced DSA, two-pointer algorithms, SQL joins, and mock interviews.</p>
           </div>
+
           <div class="hero-feature-card">
             <div class="hero-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
-            <h3>Timed Practice Assessments</h3>
-            <p>20-minute daily assessments featuring 5 conceptual MCQs and 3 live programming challenges with automated submission handling.</p>
+            <h3>Timed Daily Assessments</h3>
+            <p>20-minute daily tests featuring 5 conceptual MCQs and 3 live programming challenges with strict countdown timers and automated submission.</p>
           </div>
+
           <div class="hero-feature-card">
             <div class="hero-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
             </div>
-            <h3>Wipro, Infosys & TCS Banks</h3>
-            <p>Targeted interview preparation covering company-specific technical interview questions, SQL puzzles, and HR scenarios.</p>
+            <h3>Tier-1 MNC Interview Banks</h3>
+            <p>Targeted interview preparation covering company-specific technical interview questions, SQL puzzles, DBMS fundamentals, and HR rounds.</p>
           </div>
-        </div>
+
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            </div>
+            <h3>Skill Radar & Analytics</h3>
+            <p>Real-time analytics highlighting strong vs. weak technical areas, overall score percentiles, and one-click student PDF report generation.</p>
+          </div>
+
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3>Faculty & Trainer Oversight</h3>
+            <p>Dedicated administration dashboard with live student monitoring, individual submission inspection, manual grading adjustments, and CSV exports.</p>
+          </div>
         </div>
 
-        <div id="curriculum-preview" style="margin-top: 60px; text-align: left;">
-          <div class="hero-stat-card" style="background: rgba(15, 23, 42, 0.85); padding: 32px;">
-            <div class="between" style="margin-bottom: 20px;">
-              <div>
-                <h2 style="margin: 0; color: #fff; font-size: 24px;">33-Day Placement Training Roadmap</h2>
-                <p class="muted" style="margin: 4px 0 0 0; color: #94a3b8;">Detailed day-by-day syllabus tailored for CSE placement preparation.</p>
-              </div>
-              <div id="curriculumCta">
-                <a href="login.html" class="hero-btn-primary" style="padding: 10px 20px; font-size: 14px; text-decoration:none;">Login to Start</a>
-              </div>
+        <!-- Company Interview Prep Section -->
+        <div class="hero-section-head" id="company-tracks">
+          <h2>Company-Specific Placement Banks</h2>
+          <p>Curated technical, coding, SQL, and HR questions based on top recruiter patterns.</p>
+        </div>
+
+        <div class="hero-companies-grid">
+          <div class="hero-company-card">
+            <div class="hero-company-head">
+              <div class="hero-company-badge">Elite Track</div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
             </div>
-            <div id="curriculumList" style="max-height: 420px; overflow-y: auto; padding-right: 8px;">
-              <!-- Rendered via JS -->
+            <h3>Wipro Technologies</h3>
+            <p>Focuses on Python mutability, OOP encapsulation/polymorphism, single-pass DSA algorithms, and SQL normalization & DENSE_RANK.</p>
+            <div class="hero-company-tags">
+              <span class="hero-company-tag">Python Internals</span>
+              <span class="hero-company-tag">OOP</span>
+              <span class="hero-company-tag">Two Sum Hashing</span>
+              <span class="hero-company-tag">SQL Joins</span>
             </div>
+            <a href="company-bank.html" class="hero-btn-secondary" style="padding: 10px 18px; font-size: 13.5px; width: 100%;">Explore Wipro Bank →</a>
+          </div>
+
+          <div class="hero-company-card">
+            <div class="hero-company-head">
+              <div class="hero-company-badge">Specialist Track</div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <h3>Infosys (DSE & SE)</h3>
+            <p>Deep dive into shallow vs deep copy, dictionary hashing, Stack/Queue monotonic operations, SQL aggregate grouping, and problem decomposition.</p>
+            <div class="hero-company-tags">
+              <span class="hero-company-tag">Memory Copies</span>
+              <span class="hero-company-tag">DSA Stacks</span>
+              <span class="hero-company-tag">HAVING Clause</span>
+              <span class="hero-company-tag">Debugging</span>
+            </div>
+            <a href="company-bank.html" class="hero-btn-secondary" style="padding: 10px 18px; font-size: 13.5px; width: 100%;">Explore Infosys Bank →</a>
+          </div>
+
+          <div class="hero-company-card">
+            <div class="hero-company-head">
+              <div class="hero-company-badge">NQT & Ninja Track</div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <h3>TCS (NQT / Digital)</h3>
+            <p>Comprehensive coverage of array traversals, Big-O time-space complexity, primary/foreign key relationships, exception handling, and technical HR.</p>
+            <div class="hero-company-tags">
+              <span class="hero-company-tag">Complexity</span>
+              <span class="hero-company-tag">Arrays</span>
+              <span class="hero-company-tag">Foreign Keys</span>
+              <span class="hero-company-tag">HR Strategy</span>
+            </div>
+            <a href="company-bank.html" class="hero-btn-secondary" style="padding: 10px 18px; font-size: 13.5px; width: 100%;">Explore TCS Bank →</a>
+          </div>
+        </div>
+
+        <!-- 33-Day Interactive Curriculum Preview -->
+        <div id="curriculum-preview" class="hero-curriculum-wrap">
+          <div class="hero-curriculum-header">
+            <div>
+              <h2 style="margin: 0; color: #fff; font-size: 24px; font-weight: 800;">33-Day Placement Training Roadmap</h2>
+              <p style="margin: 6px 0 0; color: #94a3b8; font-size: 14px;">Explore each day's structured syllabus, conceptual MCQs, and hands-on coding tests.</p>
+            </div>
+            <div id="curriculumCta">
+              <a href="login.html" class="hero-btn-primary" style="padding: 10px 22px; font-size: 14px;">Login to Start</a>
+            </div>
+          </div>
+
+          <div class="hero-curriculum-controls">
+            <input type="text" id="curriculumSearch" class="hero-search-box" placeholder="🔍 Search topics or concepts (e.g. Binary Search, SQL, OOP, Tuples, Dictionaries)..." oninput="filterCurriculum()">
+            
+            <div class="hero-filter-tabs">
+              <button class="hero-filter-tab active" onclick="setPhaseFilter('all', this)">All (33 Days)</button>
+              <button class="hero-filter-tab" onclick="setPhaseFilter('python', this)">Phase 1: Python Core (1–15)</button>
+              <button class="hero-filter-tab" onclick="setPhaseFilter('oop', this)">Phase 2: OOP & Files (16–21)</button>
+              <button class="hero-filter-tab" onclick="setPhaseFilter('dsa', this)">Phase 3: DSA & Problem Solving (22–27)</button>
+              <button class="hero-filter-tab" onclick="setPhaseFilter('sql', this)">Phase 4: SQL & Interviews (28–33)</button>
+            </div>
+          </div>
+
+          <div id="curriculumList" class="hero-curriculum-scroll">
+            <!-- Rendered dynamically via JS -->
           </div>
         </div>
       </div>
     </main>
 
+    <!-- Professional Footer -->
     <footer class="hero-footer">
-      <div>
+      <div class="hero-footer-brand">
         <strong>Vinayaka Mission's Kirupananda Variyar Engineering College (VMKVEC)</strong>
-        <div>Department of Computer Science and Engineering (CSE) · Placement Training Cell</div>
+        <div>Department of Computer Science and Engineering · Placement Training Cell</div>
+        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Salem, Tamil Nadu, India · Academic Year 2026–2027</div>
       </div>
-      <div id="footerAction">
-        <a href="login.html" class="ghost" style="color: #94a3b8; font-size: 13px; text-decoration:none; padding:8px 12px; border-radius:8px;">Student / Admin Login</a>
+      <div id="footerAction" style="display:flex; align-items:center; gap:16px;">
+        <a href="company-bank.html" style="font-size: 13px;">Company Question Bank</a>
+        <a href="login.html" class="ghost" style="color: #cbd5e1; font-size: 13px; text-decoration:none; padding:8px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.12);">Student / Admin Login</a>
       </div>
     </footer>
   </div>
@@ -137,46 +314,125 @@
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script>
-    // Populate dynamic user state & curriculum
-    const user = state.user;
-    const role = state.role;
+    // Safe HTML Escaping
+    function esc(s) {
+      if (!s) return "";
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Populate Dynamic User State
+    const user = typeof state !== "undefined" ? state.user : null;
+    const role = typeof state !== "undefined" ? state.role : null;
     const targetDashboard = (role === "admin" || role === "trainer") ? "admin.html" : "dashboard.html";
 
     if (user && role) {
+      const displayName = user.name || (user.id ? user.id : role);
       document.getElementById("heroNavActions").innerHTML = `
-        <a href="${targetDashboard}" class="hero-nav-btn" style="text-decoration:none;">
-          Go to Dashboard (${esc(user.name || role)}) →
+        <a href="company-bank.html" class="hero-nav-ghost-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          <span>Company Banks</span>
+        </a>
+        <a href="${targetDashboard}" class="hero-nav-btn">
+          <span>Go to Dashboard (${esc(displayName)})</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </a>
       `;
+
       document.getElementById("heroCtaGroup").innerHTML = `
-        <a href="${targetDashboard}" class="hero-btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-          🚀 Open Dashboard
+        <a href="${targetDashboard}" class="hero-btn-primary">
+          <span>🚀 Open Dashboard (${esc(displayName)})</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         <button class="hero-btn-secondary" onclick="document.getElementById('curriculum-preview').scrollIntoView({behavior:'smooth'})">
-          📖 View 33-Day Curriculum
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>View 33-Day Curriculum</span>
         </button>
+        <a href="company-bank.html" class="hero-btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
+          <span>Company Banks</span>
+        </a>
       `;
+
       document.getElementById("curriculumCta").innerHTML = `
-        <a href="${targetDashboard}" class="hero-btn-primary" style="padding: 10px 20px; font-size: 14px; text-decoration:none;">Start Today's Assessment</a>
+        <a href="${targetDashboard}" class="hero-btn-primary" style="padding: 10px 22px; font-size: 14px;">Start Today's Assessment →</a>
       `;
+
       document.getElementById("footerAction").innerHTML = `
-        <button class="ghost" style="color: #94a3b8; font-size: 13px;" onclick="logout()">Logout (${esc(user.name || role)})</button>
+        <a href="company-bank.html" style="font-size: 13px;">Company Question Bank</a>
+        <a href="${targetDashboard}" style="font-size: 13px; color:#38bdf8;">Dashboard</a>
+        <button class="ghost" style="color: #cbd5e1; font-size: 13px; padding:6px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.12);" onclick="logout()">Logout (${esc(displayName)})</button>
       `;
     }
 
-    const listEl = document.getElementById("curriculumList");
-    if (listEl && typeof curriculum !== "undefined") {
-      listEl.innerHTML = curriculum.map((x, i) => `
-        <div style="padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 200px;">
-            <span style="font-weight: 700; color: #38bdf8; margin-right: 8px;">Day ${i + 1}</span>
-            <strong style="color: #f1f5f9;">${esc(x[0])}</strong>
-            <div style="font-size: 13px; color: #94a3b8; margin-top: 2px;">${esc(x[1])}</div>
+    // Dynamic Curriculum Rendering with Search & Filter
+    let currentPhase = 'all';
+
+    function setPhaseFilter(phase, el) {
+      currentPhase = phase;
+      document.querySelectorAll('.hero-filter-tab').forEach(b => b.classList.remove('active'));
+      if (el) el.classList.add('active');
+      filterCurriculum();
+    }
+
+    function filterCurriculum() {
+      const listEl = document.getElementById("curriculumList");
+      if (!listEl || typeof curriculum === "undefined") return;
+
+      const q = (document.getElementById("curriculumSearch")?.value || "").trim().toLowerCase();
+
+      const filtered = curriculum.map((item, index) => ({
+        dayNum: index + 1,
+        title: item[0],
+        desc: item[1]
+      })).filter(d => {
+        // Phase filtering
+        if (currentPhase === 'python' && (d.dayNum < 1 || d.dayNum > 15)) return false;
+        if (currentPhase === 'oop' && (d.dayNum < 16 || d.dayNum > 21)) return false;
+        if (currentPhase === 'dsa' && (d.dayNum < 22 || d.dayNum > 27)) return false;
+        if (currentPhase === 'sql' && (d.dayNum < 28 || d.dayNum > 33)) return false;
+
+        // Query filtering
+        if (!q) return true;
+        return d.title.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q) || `day ${d.dayNum}`.includes(q);
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div style="padding: 36px 20px; text-align: center; color: #94a3b8;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.6;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <div style="font-weight:600; color:#cbd5e1;">No topics matched your search</div>
+            <div style="font-size:13px; margin-top:4px;">Try searching for terms like "SQL", "Tree", "Loop", or "Array".</div>
           </div>
-          <span class="badge ghost" style="background: rgba(255,255,255,0.1); color: #cbd5e1; white-space: nowrap;">5 MCQs + 3 Programs</span>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => `
+        <div class="hero-day-row">
+          <div style="flex: 1; min-width: 240px;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+              <span class="hero-day-pill">Day ${item.dayNum}</span>
+              <strong class="hero-day-title">${esc(item.title)}</strong>
+            </div>
+            <div class="hero-day-desc">${esc(item.desc)}</div>
+          </div>
+          <span class="hero-day-badge">5 MCQs + 3 Coding Challenges</span>
         </div>
       `).join("");
     }
+
+    // Initial render
+    filterCurriculum();
   </script>
 </body>
 </html>
