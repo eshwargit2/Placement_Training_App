@@ -91,7 +91,7 @@
             </svg>
             Priority Focus &amp; Weak Areas
           </h2>
-          <span class="badge" style="background:#fef3c7; color:#b45309; font-weight:700;" id="countWeakPill">0 Topics</span>
+          <span class="badge badge-warning" style="font-weight:700;" id="countWeakPill">0 Topics</span>
         </div>
         <div id="weakAreasList"></div>
       </div>
@@ -330,12 +330,12 @@
     document.getElementById("strongAreasList").innerHTML = masteredTopics.length ? `
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${masteredTopics.map(t => `
-          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px 14px;">
+          <div class="dash-mastered-topic-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
-              <span style="font-weight:700; color:#166534; font-size:13.5px;">Day ${t.day} — ${esc(t.topic)}</span>
+              <span class="dash-mastered-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
               <span class="badge done" style="font-size:11px; font-weight:700;">✓ ${t.correctQuestions.length} Correct (${t.pct}%)</span>
             </div>
-            <div style="font-size:12px; color:#15803d; line-height:1.4;">
+            <div class="dash-mastered-topic-detail">
               <b>Mastered Concepts:</b> ${t.correctQuestions.slice(0, 2).map(q => esc(q.question)).join(" · ")}${t.correctQuestions.length > 2 ? ` (+${t.correctQuestions.length - 2} more)` : ''}
             </div>
           </div>
@@ -350,28 +350,28 @@
     document.getElementById("weakAreasList").innerHTML = weakTopics.length ? `
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${weakTopics.map(t => `
-          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:10px 14px;">
+          <div class="dash-weak-topic-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
-              <span style="font-weight:700; color:#92400e; font-size:13.5px;">Day ${t.day} — ${esc(t.topic)}</span>
+              <span class="dash-weak-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
               <div style="display:flex; gap:6px; align-items:center;">
-                <span class="badge" style="background:#fee2e2; color:#b91c1c; font-weight:700; font-size:11px;">⚠️ ${t.incorrectQuestions.length || 1} Missed</span>
-                <a href="assessment.html?day=${t.day}" class="ghost" style="padding:2px 8px; font-size:11px; border-radius:6px; background:#fef3c7; color:#b45309; text-decoration:none; font-weight:700; border:1px solid #fcd34d;">Revise</a>
+                <span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; font-weight:700; font-size:11px;">⚠️ ${t.incorrectQuestions.length || 1} Missed</span>
+                <a href="assessment.html?day=${t.day}" class="ghost" style="padding:2px 8px; font-size:11px; border-radius:6px; text-decoration:none; font-weight:700;">Revise</a>
               </div>
             </div>
             ${t.incorrectQuestions.length ? `
-              <div style="margin-top:6px; padding-top:6px; border-top:1px dashed #fcd34d; font-size:12px;">
+              <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--line); font-size:12px;">
                 ${t.incorrectQuestions.slice(0, 2).map(q => `
                   <div style="margin-bottom:4px;">
-                    <div style="color:#78350f; font-weight:600;">• ${esc(q.question)}</div>
-                    <div style="padding-left:10px; color:#475569; font-size:11.5px;">
-                      Selected: <span style="color:#b91c1c; font-weight:700;">${esc(q.yourAnswer || 'Incorrect')}</span> &nbsp;|&nbsp; Correct: <span style="color:#15803d; font-weight:700;">${esc(q.correct)}</span>
+                    <div class="dash-weak-topic-question">• ${esc(q.question)}</div>
+                    <div class="dash-weak-topic-answers">
+                      Selected: <span style="color:#ef4444; font-weight:700;">${esc(q.yourAnswer || 'Incorrect')}</span> &nbsp;|&nbsp; Correct: <span style="color:#22c55e; font-weight:700;">${esc(q.correct)}</span>
                     </div>
                   </div>
                 `).join("")}
-                ${t.incorrectQuestions.length > 2 ? `<div style="color:#92400e; font-size:11px; padding-left:10px;">+${t.incorrectQuestions.length - 2} more missed question(s) to review</div>` : ''}
+                ${t.incorrectQuestions.length > 2 ? `<div class="dash-weak-topic-foot">+${t.incorrectQuestions.length - 2} more missed question(s) to review</div>` : ''}
               </div>
             ` : `
-              <div style="font-size:12px; color:#b45309;">Score was below 75%. Retake assessment to improve score and mastery.</div>
+              <div class="dash-weak-topic-foot">Score was below 75%. Retake assessment to improve score and mastery.</div>
             `}
           </div>
         `).join("")}
@@ -424,7 +424,7 @@
                   return `
                     <tr>
                       <td><b>Day ${a.day}</b> — ${esc(curriculum[a.day - 1] ? curriculum[a.day - 1][0] : '')}</td>
-                      <td><span class="badge" style="background:#f1f5f9; color:#475569;">#${(byDay[a.day] || []).indexOf(a) + 1}</span></td>
+                      <td><span class="badge badge-neutral">#${(byDay[a.day] || []).indexOf(a) + 1}</span></td>
                       <td>
                         <span class="dash-score-pill ${scoreClass}">
                           ${a.score}/${a.total} (${pct}%)
@@ -439,7 +439,7 @@
                       <td>${esc(a.completedAtDisplay || a.date || a.completedAt || "-")}</td>
                       <td>
                         <span style="display:inline-flex; align-items:center; gap:4px;">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                           ${Math.ceil((a.completionSeconds || 0) / 60)} min
                         </span>
                       </td>
@@ -451,7 +451,7 @@
                             Synced
                           </span>
                         ` : `
-                          <button onclick="uploadSingleAttempt('${esc(a.id)}')" id="btnSync_${esc(a.id)}" class="ghost" style="padding:5px 12px; font-size:12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600;">
+                          <button onclick="uploadSingleAttempt('${esc(a.id)}')" id="btnSync_${esc(a.id)}" class="ghost" style="padding:5px 12px; font-size:12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-weight:600;">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                             Upload
                           </button>
@@ -467,10 +467,10 @@
       } else {
         histEl.innerHTML = `
           <div style="text-align:center; padding:32px 16px;">
-            <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; background:#eff6ff; color:#2563eb; margin-bottom:12px;">
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; background:rgba(37, 99, 235, 0.1); color:#3b82f6; margin-bottom:12px;">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
             </div>
-            <p style="margin:0; font-weight:700; color:#1e293b; font-size:16px;">No assessments attempted yet</p>
+            <p style="margin:0; font-weight:700; color:var(--text-heading); font-size:16px;">No assessments attempted yet</p>
             <p class="muted" style="margin:4px 0 16px;">Pick any module from the 33-day roadmap below to take your first timed test.</p>
             <a href="assessment.html?day=1" class="hero-btn-primary" style="text-decoration:none; padding:10px 20px; font-size:13.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
               <span>Start Day 1 Assessment</span>
@@ -646,8 +646,8 @@
             <div class="dash-card-header-bar">
               <div class="dash-day-badge">
                 ${item.isDone ? 
-                  `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>` : 
-                  `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+                  `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>` : 
+                  `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
                 }
                 <b>Day ${item.dayNum}</b> — ${esc(item.title)}
               </div>
@@ -657,10 +657,10 @@
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     Completed
                   </span>` : 
-                  `<span class="badge" style="background:#e0f2fe; color:#0369a1;">Pending</span>`
+                  `<span class="badge badge-pending">Pending</span>`
                 }
                 ${item.attempts.length ? 
-                  `<span class="badge" style="background:#f1f5f9; color:#475569;">${item.attempts.length} attempt${item.attempts.length > 1 ? 's' : ''}</span>` : 
+                  `<span class="badge badge-neutral">${item.attempts.length} attempt${item.attempts.length > 1 ? 's' : ''}</span>` : 
                   ''
                 }
               </div>
