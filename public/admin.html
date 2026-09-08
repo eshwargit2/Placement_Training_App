@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +10,7 @@
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
   <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
   <script>
-    (function() {
+    (function () {
       const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", t);
     })();
@@ -29,6 +30,7 @@
       gap: 20px;
       flex-wrap: wrap;
     }
+
     .status-badge-live {
       display: inline-flex;
       align-items: center;
@@ -41,6 +43,7 @@
       border: 1px solid rgba(16, 185, 129, 0.4);
       color: #34d399;
     }
+
     .status-badge-offline {
       display: inline-flex;
       align-items: center;
@@ -53,12 +56,14 @@
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #f87171;
     }
+
     .status-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       background: currentColor;
     }
+
     .view-toggle-tabs {
       display: flex;
       gap: 8px;
@@ -67,6 +72,7 @@
       border-radius: 12px;
       margin-bottom: 18px;
     }
+
     .view-tab-btn {
       flex: 1;
       border: 0;
@@ -79,15 +85,18 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
     .view-tab-btn:hover {
-      background: rgba(255,255,255,0.6);
+      background: rgba(255, 255, 255, 0.6);
       color: #0f172a;
     }
+
     .view-tab-btn.active {
       background: #fff;
       color: #2563eb;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
+
     .student-card-item {
       background: #fff;
       border: 1px solid var(--line);
@@ -97,10 +106,12 @@
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
     }
+
     .student-card-item:hover {
       border-color: #93c5fd;
       box-shadow: 0 6px 20px rgba(37, 99, 235, 0.08);
     }
+
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -118,10 +129,12 @@
       pointer-events: none;
       transition: opacity 0.2s ease;
     }
+
     .modal-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
+
     .modal-container {
       background: #fff;
       border-radius: 18px;
@@ -130,10 +143,11 @@
       max-height: 90vh;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
       border: 1px solid var(--line);
       overflow: hidden;
     }
+
     .modal-header {
       padding: 18px 24px;
       border-bottom: 1px solid var(--line);
@@ -142,11 +156,13 @@
       align-items: center;
       background: #f8fafc;
     }
+
     .modal-body {
       padding: 24px;
       overflow-y: auto;
       flex: 1;
     }
+
     .modal-footer {
       padding: 14px 24px;
       border-top: 1px solid var(--line);
@@ -155,6 +171,7 @@
       justify-content: flex-end;
       gap: 10px;
     }
+
     .code-box {
       background: #0f172a;
       color: #f8fafc;
@@ -168,6 +185,7 @@
       margin: 8px 0 16px;
       border: 1px solid #334155;
     }
+
     .mcq-review-item {
       background: #f8fafc;
       border: 1px solid var(--line);
@@ -175,6 +193,7 @@
       padding: 16px;
       margin-bottom: 12px;
     }
+
     .btn-delete-action {
       background: #fef2f2;
       color: #dc2626;
@@ -189,6 +208,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .btn-delete-action:hover {
       background: #dc2626;
       color: #ffffff;
@@ -196,6 +216,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="mainHeader"></div>
 
@@ -204,13 +225,19 @@
     <div class="admin-hero">
       <div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
-          <div style="width:40px; height:40px; border-radius:10px; background:rgba(99,102,241,0.2); display:flex; align-items:center; justify-content:center;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div
+            style="width:40px; height:40px; border-radius:10px; background:rgba(99,102,241,0.2); display:flex; align-items:center; justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
           </div>
-          <h1 style="margin:0; font-size:22px; font-weight:800; color:#fff;">Admin Assessment &amp; Evaluation Panel</h1>
+          <h1 style="margin:0; font-size:22px; font-weight:800; color:#fff;">Admin Assessment &amp; Evaluation Panel
+          </h1>
         </div>
         <p style="margin:0; color:#cbd5e1; font-size:13.5px;">
-          Central assessment data repository. Inspect candidate MCQ responses, coding solutions, and performance logs in real time.
+          Central assessment data repository. Inspect candidate MCQ responses, coding solutions, and performance logs in
+          real time.
         </p>
       </div>
 
@@ -218,16 +245,34 @@
         <span id="serverStatusBadge" class="status-badge-offline">
           <span class="status-dot"></span> Checking Server...
         </span>
-        <button onclick="fetchAdminData()" class="ghost" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+        <button onclick="fetchAdminData()" class="ghost"
+          style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+          </svg>
           Refresh Data
         </button>
-        <button onclick="exportAdminCSV()" class="ghost" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <button onclick="exportAdminCSV()" class="ghost"
+          style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
           Export CSV
         </button>
-        <button onclick="exportAdminPDF()" class="hero-btn-primary" style="padding:8px 18px; font-size:13px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <button onclick="exportAdminPDF()" class="hero-btn-primary"
+          style="padding:8px 18px; font-size:13px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
+          </svg>
           Export PDF
         </button>
       </div>
@@ -239,7 +284,10 @@
         <div class="dash-stat-top">
           <div class="dash-stat-title">Assessments Stored</div>
           <div class="dash-stat-icon-wrap dash-stat-icon-blue">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
           </div>
         </div>
         <div class="dash-stat-value" id="statTotalSubmissions">0</div>
@@ -250,7 +298,12 @@
         <div class="dash-stat-top">
           <div class="dash-stat-title">Unique Students</div>
           <div class="dash-stat-icon-wrap dash-stat-icon-green">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
           </div>
         </div>
         <div class="dash-stat-value" id="statUniqueStudents">0</div>
@@ -261,7 +314,11 @@
         <div class="dash-stat-top">
           <div class="dash-stat-title">Batch Average Score</div>
           <div class="dash-stat-icon-wrap dash-stat-icon-purple">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
           </div>
         </div>
         <div class="dash-stat-value" id="statAvgScore">0%</div>
@@ -272,7 +329,11 @@
         <div class="dash-stat-top">
           <div class="dash-stat-title">Database Status</div>
           <div class="dash-stat-icon-wrap dash-stat-icon-amber">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3" />
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+            </svg>
           </div>
         </div>
         <div class="dash-stat-value" style="font-size:18px;" id="statDbMode">Cloud Active</div>
@@ -281,32 +342,53 @@
     </div>
 
     <!-- Database Cleanup & Records Management Toolbar -->
-    <div class="card" style="margin-bottom: 20px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid #ef4444;">
+    <div class="card"
+      style="margin-bottom: 20px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid #ef4444;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
         <div>
           <h3 style="margin:0 0 4px; font-size:15px; display:flex; align-items:center; gap:8px; color:#ef4444;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
             Database Cleanup &amp; Records Management
           </h3>
           <p class="muted" style="margin:0; font-size:12.5px;">
-            Permanently delete assessment records by selecting a specific date, or purge all records from the Firebase database.
+            Permanently delete assessment records by selecting a specific date, or purge all records from the Firebase
+            database.
           </p>
         </div>
 
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
           <!-- Specific Date Cleanup -->
-          <div style="display:inline-flex; align-items:center; gap:6px; background:var(--card-alt); padding:5px 10px; border-radius:10px; border:1px solid var(--line);">
-            <label for="deleteDateInput" style="font-size:12px; font-weight:700; color:var(--muted); margin:0;">Date:</label>
-            <input type="date" id="deleteDateInput" style="padding:5px 8px; border-radius:6px; border:1px solid var(--line); font-size:12.5px; background:var(--input-bg); color:var(--text);">
-            <button onclick="deleteRecordsByDate()" class="btn-delete-action" style="padding:6px 12px; font-size:12px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;" title="Delete all assessment records submitted on this date">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <div
+            style="display:inline-flex; align-items:center; gap:6px; background:var(--card-alt); padding:5px 10px; border-radius:10px; border:1px solid var(--line);">
+            <label for="deleteDateInput"
+              style="font-size:12px; font-weight:700; color:var(--muted); margin:0;">Date:</label>
+            <input type="date" id="deleteDateInput"
+              style="padding:5px 8px; border-radius:6px; border:1px solid var(--line); font-size:12.5px; background:var(--input-bg); color:var(--text);">
+            <button onclick="deleteRecordsByDate()" class="btn-delete-action"
+              style="padding:6px 12px; font-size:12px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"
+              title="Delete all assessment records submitted on this date">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
               <span>Delete by Date</span>
             </button>
           </div>
 
           <!-- Delete All Records -->
-          <button onclick="deleteAllRecords()" class="btn-delete-action" style="padding:9px 16px; font-size:12.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); font-weight:700;" title="Permanently delete all assessment records across all dates">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          <button onclick="deleteAllRecords()" class="btn-delete-action"
+            style="padding:9px 16px; font-size:12.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); font-weight:700;"
+            title="Permanently delete all assessment records across all dates">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
             <span>Delete All Records</span>
           </button>
         </div>
@@ -328,18 +410,24 @@
       <div class="dash-section-header">
         <div>
           <h2 style="margin:0 0 4px;" id="panelSectionTitle">Student Assessment Submissions</h2>
-          <p class="muted" style="margin:0;">Inspect individual candidate MCQ results and 3 coding programs stored in the database.</p>
+          <p class="muted" style="margin:0;">Inspect individual candidate MCQ results and 3 coding programs stored in
+            the database.</p>
         </div>
 
         <div class="dash-filter-controls">
           <div class="dash-search-box">
             <span class="dash-search-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
             </span>
-            <input type="text" id="adminSearchInput" class="dash-search-input" placeholder="Search student, roll number, topic..." oninput="applyFilters()">
+            <input type="text" id="adminSearchInput" class="dash-search-input"
+              placeholder="Search student, roll number, topic..." oninput="applyFilters()">
           </div>
 
-          <select id="dayFilter" onchange="applyFilters()" style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); font-size:13px; background:var(--input-bg); color:var(--text);">
+          <select id="dayFilter" onchange="applyFilters()"
+            style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); font-size:13px; background:var(--input-bg); color:var(--text);">
             <option value="all">All Days (1 - 33)</option>
           </select>
         </div>
@@ -365,16 +453,23 @@
           <h2 style="margin:0; font-size:18px;" id="modalTitle">Candidate Assessment Details</h2>
           <p class="muted" style="margin:2px 0 0; font-size:13px;" id="modalSubtitle">Details</p>
         </div>
-        <button onclick="closeInspectModal()" class="ghost" style="padding:6px 12px; font-size:16px; border-radius:8px;">✕</button>
+        <button onclick="closeInspectModal()" class="ghost"
+          style="padding:6px 12px; font-size:16px; border-radius:8px;">✕</button>
       </div>
 
       <div class="modal-body" id="modalBody">
         <!-- Filled by JS -->
       </div>
 
-      <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div class="modal-footer"
+        style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <button id="modalBtnDeleteAssessment" class="btn-delete-action" style="padding:8px 16px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
           Delete Assessment
         </button>
         <button class="ghost" onclick="closeInspectModal()">Close</button>
@@ -397,14 +492,14 @@
     for (let i = 1; i <= 33; i++) {
       const opt = document.createElement("option");
       opt.value = i;
-      opt.textContent = `Day ${i} — ${curriculum[i-1] ? curriculum[i-1][0] : ''}`;
+      opt.textContent = `Day ${i} — ${curriculum[i - 1] ? curriculum[i - 1][0] : ''}`;
       daySelect.appendChild(opt);
     }
 
     let allSubmissions = [];
     let allRegisteredStudents = [];
     let currentView = 'submissions';
-    const API_BASE = (typeof getApiBase === 'function' ? getApiBase() : 'http://localhost:5000');
+    const API_BASE = (typeof getApiBase === 'function' ? getApiBase() : 'https://placement-server-iota.vercel.app');
 
     function setViewMode(mode) {
       currentView = mode;
@@ -412,15 +507,15 @@
       document.getElementById("tabBtnStudents").classList.toggle("active", mode === 'students');
       document.getElementById("submissionsTableView").style.display = mode === 'submissions' ? 'block' : 'none';
       document.getElementById("studentsGroupedView").style.display = mode === 'students' ? 'block' : 'none';
-      document.getElementById("panelSectionTitle").textContent = mode === 'submissions' 
-        ? "All Student Assessment Submissions" 
+      document.getElementById("panelSectionTitle").textContent = mode === 'submissions'
+        ? "All Student Assessment Submissions"
         : "Student Accounts & Firebase Profiles Management";
       applyFilters();
     }
 
     async function fetchAdminData() {
       const badge = document.getElementById("serverStatusBadge");
-      
+
       // 1. Health check
       try {
         const healthRes = await fetch(`${API_BASE}/api/health`);
@@ -481,8 +576,8 @@
       }
       document.getElementById("statUniqueStudents").textContent = uniqueIds.size;
       document.getElementById("countStudentsTab").textContent = uniqueIds.size;
-      
-      const avg = allSubmissions.length 
+
+      const avg = allSubmissions.length
         ? Math.round(allSubmissions.reduce((acc, a) => acc + Number(a.percentage || 0), 0) / allSubmissions.length)
         : 0;
       document.getElementById("statAvgScore").textContent = avg + "%";
@@ -497,7 +592,7 @@
         if (q) {
           const matchName = (a.studentName || "").toLowerCase().includes(q);
           const matchRoll = (a.rollNumber || "").toLowerCase().includes(q);
-          const matchTopic = (a.topic || (curriculum[a.day-1] ? curriculum[a.day-1][0] : "")).toLowerCase().includes(q);
+          const matchTopic = (a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : "")).toLowerCase().includes(q);
           const matchDay = `day ${a.day}`.includes(q);
           const matchUser = (a.username || "").toLowerCase().includes(q);
           if (!matchName && !matchRoll && !matchTopic && !matchDay && !matchUser) return false;
@@ -543,11 +638,11 @@
             </thead>
             <tbody>
               ${list.map((item, idx) => {
-                const pct = Number(item.percentage || 0);
-                const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
-                const topicName = item.topic || (curriculum[item.day - 1] ? curriculum[item.day - 1][0] : "Assessment");
+        const pct = Number(item.percentage || 0);
+        const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
+        const topicName = item.topic || (curriculum[item.day - 1] ? curriculum[item.day - 1][0] : "Assessment");
 
-                return `
+        return `
                   <tr>
                     <td>
                       <div style="font-weight:700; color:var(--text-heading);">${esc(item.studentName || "Student " + (item.username || item.studentId))}</div>
@@ -579,7 +674,7 @@
                     </td>
                   </tr>
                 `;
-              }).join("")}
+      }).join("")}
             </tbody>
           </table>
         </div>
@@ -731,7 +826,7 @@
       const u = String(username || '').trim();
       const name = studentName || u;
       const confirmMsg = `⚠️ DANGER: PERMANENT ACCOUNT DELETION\n\nAre you sure you want to permanently delete the student account for "${name}" (${u})?\n\nThis will remove their profile and all assessment submissions from the Firebase Database.`;
-      
+
       if (!confirm(confirmMsg)) return;
 
       try {
@@ -996,7 +1091,7 @@
         `"${a.department || ''}"`,
         `"${a.year || ''}"`,
         a.day,
-        `"${(a.topic || (curriculum[a.day-1] ? curriculum[a.day-1][0] : '')).replace(/"/g, '""')}"`,
+        `"${(a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : '')).replace(/"/g, '""')}"`,
         a.attemptNumber || 1,
         a.score || 0,
         a.total || 5,
@@ -1026,4 +1121,5 @@
     fetchAdminData();
   </script>
 </body>
+
 </html>

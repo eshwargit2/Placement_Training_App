@@ -68,7 +68,7 @@ function applyTheme(theme) {
   }
   try {
     localStorage.setItem("appTheme", t);
-  } catch(e) {}
+  } catch (e) { }
   updateThemeToggleButtons(t);
 }
 
@@ -83,10 +83,10 @@ function updateThemeToggleButtons(theme) {
   document.querySelectorAll(".theme-toggle-btn").forEach(btn => {
     btn.innerHTML = `
       <span class="theme-toggle-icon">
-        ${isDark ? 
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' : 
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-        }
+        ${isDark ?
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' :
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      }
       </span>
       <span class="theme-toggle-label">${isDark ? "Light" : "Dark"}</span>
     `;
@@ -95,7 +95,7 @@ function updateThemeToggleButtons(theme) {
 }
 
 // Immediate theme execution
-(function() {
+(function () {
   const t = getTheme();
   document.documentElement.setAttribute("data-theme", t);
   if (document.readyState === "loading") {
@@ -127,10 +127,10 @@ function renderHeader(activePage) {
   const themeToggleHtml = `
     <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="${isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}">
       <span class="theme-toggle-icon">
-        ${isDark ? 
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' : 
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-        }
+        ${isDark ?
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' :
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    }
       </span>
       <span class="theme-toggle-label">${isDark ? "Light" : "Dark"}</span>
     </button>
@@ -227,20 +227,39 @@ function getStudentCandidateKeys(rawId) {
 window.parseStudentNumericId = parseStudentNumericId;
 window.getStudentCandidateKeys = getStudentCandidateKeys;
 
+const PROD_BACKEND_API = "https://placement-server-iota.vercel.app";
+
 function getApiBase() {
-  if (window.API_BASE) return window.API_BASE;
+  if (window.API_BASE) return window.API_BASE.replace(/\/+$/, '');
+  const custom = localStorage.getItem('CUSTOM_API_BASE');
+  if (custom) return custom.replace(/\/+$/, '');
+  
   const h = window.location.hostname;
-  const p = window.location.port;
   if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0') {
     return 'http://localhost:5000';
   }
-  if (window.location.origin && !window.location.origin.includes('null') && !window.location.origin.startsWith('file:')) {
-    return window.location.origin;
-  }
-  return 'http://localhost:5000';
+  
+  // Point to deployed Vercel backend
+  return PROD_BACKEND_API;
 }
 
 window.getApiBase = getApiBase;
+window.PROD_BACKEND_API = PROD_BACKEND_API;
+
+async function safeFetchJson(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (parseErr) {
+    if (text.trim().startsWith('<') || (res.headers && res.headers.get('content-type')?.includes('text/html'))) {
+      const statusInfo = `${res.status} ${res.statusText || ''}`.trim();
+      throw new Error(`Server returned HTML (${statusInfo}) instead of JSON.\n\nBackend API is: ${getApiBase()}`);
+    }
+    throw new Error(text || `Server error (${res.status})`);
+  }
+}
+
+window.safeFetchJson = safeFetchJson;
 
 async function serverLogin(username, password, role) {
   const u = String(username || '').trim();
@@ -255,7 +274,7 @@ async function serverLogin(username, password, role) {
       body: JSON.stringify({ username: u, password: p, role: r })
     });
 
-    const data = await res.json();
+    const data = await safeFetchJson(res);
     if (!res.ok || !data.success) {
       throw new Error(data.error || 'Server validation failed. Invalid username or password.');
     }
@@ -275,7 +294,7 @@ async function serverLogin(username, password, role) {
   } catch (err) {
     console.error('Server login validation error:', err);
     if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('net::ERR_CONNECTION_REFUSED'))) {
-      throw new Error(`Cannot connect to Backend Server at ${apiBase}.\nPlease ensure backend is running with "node Backend/server.js" on port 5000.`);
+      throw new Error(`Cannot connect to Backend Server at ${apiBase}.\nPlease ensure the backend service is reachable.`);
     }
     throw err;
   }
@@ -289,7 +308,7 @@ async function deleteStudentAccountOnline(studentId) {
     const res = await fetch(`${apiBase}/api/admin/student/${encodeURIComponent(sId)}`, {
       method: 'DELETE'
     });
-    const data = await res.json();
+    const data = await safeFetchJson(res);
     if (!res.ok || !data.success) {
       throw new Error(data.error || 'Failed to delete student account from server.');
     }
@@ -314,7 +333,7 @@ async function saveStudentProfileOnline(profileData) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const data = await res.json();
+    const data = await safeFetchJson(res);
     if (!res.ok || !data.success) {
       throw new Error(data.error || 'Failed to save student profile in database.');
     }
@@ -343,7 +362,7 @@ async function fetchStudentDashboardOnline(studentIdOrUsername) {
   try {
     const res = await fetch(`${apiBase}/api/student/${encodeURIComponent(sId)}/dashboard`);
     if (!res.ok) return null;
-    const data = await res.json();
+    const data = await safeFetchJson(res);
     if (data.success) {
       if (data.student) {
         state.user = Object.assign(state.user || {}, data.student);
