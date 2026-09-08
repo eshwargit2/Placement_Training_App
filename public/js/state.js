@@ -44,6 +44,7 @@ function normalizeStudents() {
   state.deletedStudentIds = [...deleted].filter(n => n >= 1 && n <= 100).sort((a, b) => a - b);
   state.attempts = Array.isArray(state.attempts) ? state.attempts : [];
   state.submissions = Array.isArray(state.submissions) ? state.submissions : [];
+  state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
   save();
 }
 
@@ -234,6 +235,10 @@ function getApiBase() {
   const custom = localStorage.getItem('CUSTOM_API_BASE');
   if (custom) return custom.replace(/\/+$/, '');
   
+  if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:5000';
+  }
+
   // Default to the live Vercel backend API URL
   return PROD_BACKEND_API;
 }

@@ -19,7 +19,7 @@
   <div id="mainHeader"></div>
 
   <main class="wrap">
-    <a href="dashboard.html" class="ghost" style="margin-bottom:18px; text-decoration:none; display:inline-flex; align-items:center; padding:8px 16px; border-radius:10px;">← Back to Dashboard</a>
+    <a href="dashboard.html" onclick="event.preventDefault(); showExitModal('dashboard.html');" class="ghost" style="margin-bottom:18px; text-decoration:none; display:inline-flex; align-items:center; padding:8px 16px; border-radius:10px;">← Back to Dashboard</a>
 
     <div class="card">
       <div class="between">
@@ -30,19 +30,20 @@
         <div id="assessmentTimer" class="assessment-timer-badge">20:00</div>
       </div>
 
-      <div class="notice" style="margin-top:20px; display:flex; align-items:center; gap:8px;">
+      <div id="assessmentNotice" class="notice" style="margin-top:20px; display:flex; align-items:center; gap:8px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span><b>20-minute timer:</b> The timer starts immediately when this assessment opens. When time reaches zero, the assessment is automatically submitted and you are returned to the dashboard.</span>
       </div>
 
       <form id="assessmentForm" onsubmit="event.preventDefault(); submitAssessment(false);">
-        <h2 class="section-title">Topic Assessment — 5 Multiple Choice Questions</h2>
+        <h2 id="mcqHeaderTitle" class="section-title">Topic Assessment — 5 Multiple Choice Questions</h2>
         <div id="mcqContainer"></div>
 
-        <h2 class="section-title" style="margin-top:40px;">Coding Assessment — 3 Placement Programs</h2>
-        <p class="muted">Complete all 3 programs. Each program has a dedicated editor and Save button. Please save each program before submitting.</p>
-
-        <div id="codingContainer"></div>
+        <div id="codingSectionWrap">
+          <h2 class="section-title" style="margin-top:40px;">Coding Assessment — 3 Placement Programs</h2>
+          <p class="muted">Complete all 3 programs. Each program has a dedicated editor and Save button. Please save each program before submitting.</p>
+          <div id="codingContainer"></div>
+        </div>
 
         <div style="margin-top:36px; text-align:center; padding:24px; background:#f8fafc; border-radius:16px; border:1px solid var(--line);">
           <button type="submit" class="hero-btn-primary" style="padding:16px 44px; font-size:16px; display:inline-flex; align-items:center; gap:8px;">
@@ -54,6 +55,31 @@
     </div>
   </main>
 
+  <!-- Stop Assessment Confirmation Popup Modal -->
+  <div id="exitConfirmModal" class="modal-backdrop" style="display:none;" onclick="if(event.target === this) closeExitModal();">
+    <div class="modal-card" style="max-width:440px; text-align:center; padding:28px 24px; border-radius:18px;">
+      <div style="width:56px; height:56px; border-radius:50%; background:rgba(239,68,68,0.12); color:#ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h3 style="margin:0 0 8px; font-size:20px; font-weight:800; color:var(--text-heading);">Stop Assessment?</h3>
+      <p style="margin:0 0 22px; font-size:14px; color:var(--muted); line-height:1.5;">
+        You have an active assessment in progress. If you go back to home or dashboard, your assessment timer and session will be stopped. Are you sure you want to stop and exit?
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button type="button" class="ghost" onclick="closeExitModal()" style="padding:10px 22px; font-weight:600; border-radius:10px; cursor:pointer;">
+          Continue Test
+        </button>
+        <button type="button" onclick="confirmExitToUrl()" style="background:#ef4444; color:#fff; border:none; padding:10px 22px; font-weight:700; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(239,68,68,0.3);">
+          Stop &amp; Exit
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script>
@@ -64,15 +90,85 @@
     renderHeader("assessment");
 
     const params = new URLSearchParams(window.location.search);
-    let day = parseInt(params.get("day") || "1", 10);
-    if (isNaN(day) || day < 1 || day > 33) day = 1;
+    const customId = params.get("customId");
 
-    const topicData = curriculum[day - 1] || ["Python Basics", ""];
-    const qs = QUESTION_BANK[day] || [];
-    const cs = CODING_BANK[day] || [];
+    let isCustomMode = false;
+    let customExam = null;
+    let durationMins = 20;
+    let qs = [];
+    let cs = [];
+    let topicName = "Assessment";
+    let day = null;
+    let sessionKey = "";
 
-    document.getElementById("assessmentTitle").textContent = `Day ${day} — ${topicData[0]}`;
-    document.getElementById("assessmentDesc").textContent = topicData[1];
+    if (customId) {
+      isCustomMode = true;
+      let customList = (typeof state !== 'undefined' && Array.isArray(state.customAssessments)) ? state.customAssessments : [];
+      try {
+        const extra = JSON.parse(localStorage.getItem("placementPortal_customAssessments") || "[]");
+        if (Array.isArray(extra) && extra.length) {
+          const map = new Map();
+          extra.forEach(e => { if (e && e.id) map.set(String(e.id), e); });
+          customList.forEach(e => { if (e && e.id) map.set(String(e.id), e); });
+          customList = Array.from(map.values());
+        }
+      } catch (e) {}
+
+      customExam = customList.find(e => String(e.id) === String(customId));
+
+      if (!customExam) {
+        customExam = {
+          id: customId,
+          title: "Custom Assessment",
+          topic: "Placement Mock Test",
+          durationMinutes: 20,
+          questions: []
+        };
+      }
+
+      durationMins = customExam.durationMinutes || 20;
+      topicName = customExam.topic || customExam.title;
+
+      document.getElementById("assessmentTitle").textContent = customExam.title;
+      document.getElementById("assessmentDesc").textContent = `${topicName} · Custom Examination`;
+      document.getElementById("assessmentNotice").innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span><b>${durationMins}-minute timer:</b> The timer starts immediately when this assessment opens. When time reaches zero, the assessment is automatically evaluated and submitted.</span>
+      `;
+
+      qs = (customExam.questions || []).map(q => [
+        q.question,
+        (q.options && q.options[0]) || "Option A",
+        (q.options && q.options[1]) || "Option B",
+        (q.options && q.options[2]) || "Option C",
+        (q.options && q.options[3]) || "Option D",
+        q.answer || "A"
+      ]);
+
+      cs = customExam.codingPrograms || [];
+      document.getElementById("mcqHeaderTitle").textContent = `Assessment Questions — ${qs.length} Multiple Choice Questions`;
+
+      const codingWrap = document.getElementById("codingSectionWrap");
+      if (codingWrap) {
+        codingWrap.style.display = cs.length ? "block" : "none";
+      }
+
+      sessionKey = "customAssessmentSession_" + (state.user ? state.user.id : "guest") + "_" + customId;
+    } else {
+      day = parseInt(params.get("day") || "1", 10);
+      if (isNaN(day) || day < 1 || day > 33) day = 1;
+
+      const topicData = curriculum[day - 1] || ["Python Basics", ""];
+      topicName = topicData[0];
+      qs = QUESTION_BANK[day] || [];
+      cs = CODING_BANK[day] || [];
+
+      document.getElementById("assessmentTitle").textContent = `Day ${day} — ${topicData[0]}`;
+      document.getElementById("assessmentDesc").textContent = topicData[1];
+      document.getElementById("mcqHeaderTitle").textContent = `Topic Assessment — ${qs.length} Multiple Choice Questions`;
+
+      sessionKey = "assessmentSession_" + (state.user ? state.user.id : "guest") + "_" + day;
+    }
 
     // Render MCQs
     document.getElementById("mcqContainer").innerHTML = qs.map((q, i) => `
@@ -93,27 +189,31 @@
       </div>
     `).join("");
 
-    // Render Coding Programs
-    document.getElementById("codingContainer").innerHTML = [1, 2, 3].map(n => `
-      <div class="coding-card">
-        <div class="between">
-          <div class="q-title" style="margin-bottom:0;">
-            <span class="q-num" style="background:#0284c7;">Program ${n}</span>
-            <span>Problem Statement</span>
+    // Render Coding Programs if any
+    if (cs.length) {
+      document.getElementById("codingContainer").innerHTML = cs.map((promptText, idx) => {
+        const n = idx + 1;
+        return `
+          <div class="coding-card">
+            <div class="between">
+              <div class="q-title" style="margin-bottom:0;">
+                <span class="q-num" style="background:#0284c7;">Program ${n}</span>
+                <span>Problem Statement</span>
+              </div>
+              <div class="actions">
+                <button type="button" onclick="saveProgram(${n})">💾 Save Program ${n}</button>
+                <span id="save${n}" class="badge done"></span>
+              </div>
+            </div>
+            <div class="coding-prompt">${esc(promptText || "")}</div>
+            <label for="code${n}" style="font-weight:600;font-size:13px;color:#475569;display:block;margin-top:10px;">Program ${n} Solution Code (Python):</label>
+            <textarea id="code${n}" class="code-editor" placeholder="# Write your Python solution for Program ${n} here..."></textarea>
           </div>
-          <div class="actions">
-            <button type="button" onclick="saveProgram(${n})">💾 Save Program ${n}</button>
-            <span id="save${n}" class="badge done"></span>
-          </div>
-        </div>
-        <div class="coding-prompt">${esc(cs[n - 1] || "")}</div>
-        <label for="code${n}" style="font-weight:600;font-size:13px;color:#475569;display:block;margin-top:10px;">Program ${n} Solution Code (Python):</label>
-        <textarea id="code${n}" class="code-editor" placeholder="# Write your Python solution for Program ${n} here..."></textarea>
-      </div>
-    `).join("");
+        `;
+      }).join("");
+    }
 
     // Session Timer & Autosave Setup
-    const sessionKey = "assessmentSession_" + state.user.id + "_" + day;
     let sess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
     if (!sess) {
       sess = { startedAt: Date.now(), saved: {}, problem: 1 };
@@ -121,15 +221,18 @@
     }
 
     // Populate saved code if any
-    [1, 2, 3].forEach(n => {
-      const el = document.getElementById("save" + n);
-      if (el) el.textContent = sess.saved && sess.saved[n] ? "Saved ✓" : "";
-      const code = document.getElementById("code" + n);
-      if (code) code.value = (sess.saved && sess.saved[n]) || "";
-    });
+    if (cs.length) {
+      cs.forEach((_, idx) => {
+        const n = idx + 1;
+        const el = document.getElementById("save" + n);
+        if (el) el.textContent = sess.saved && sess.saved[n] ? "Saved ✓" : "";
+        const code = document.getElementById("code" + n);
+        if (code) code.value = (sess.saved && sess.saved[n]) || "";
+      });
+    }
 
-    // Start 20-minute Timer
-    const end = sess.startedAt + 20 * 60 * 1000;
+    // Start Timer
+    const end = sess.startedAt + durationMins * 60 * 1000;
     function tick() {
       const left = Math.max(0, end - Date.now());
       const m = Math.floor(left / 60000);
@@ -137,7 +240,7 @@
       const timerEl = document.getElementById("assessmentTimer");
       if (timerEl) timerEl.textContent = `${m}:${String(sec).padStart(2, "0")}`;
       if (left <= 0) {
-        clearInterval(window.assessmentInterval);
+        if (window.assessmentInterval) clearInterval(window.assessmentInterval);
         submitAssessment(true);
       }
     }
@@ -159,7 +262,76 @@
       alert("Program " + n + " saved successfully.");
     }
 
+    let isSubmitting = false;
+    let pendingRedirectUrl = "dashboard.html";
+
+    function showExitModal(url) {
+      if (isSubmitting) return;
+      pendingRedirectUrl = url || "dashboard.html";
+      const modal = document.getElementById("exitConfirmModal");
+      if (modal) {
+        modal.style.display = "flex";
+      }
+    }
+
+    function closeExitModal() {
+      const modal = document.getElementById("exitConfirmModal");
+      if (modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    function confirmExitToUrl() {
+      isSubmitting = true;
+      if (window.assessmentInterval) clearInterval(window.assessmentInterval);
+      sessionStorage.removeItem(sessionKey);
+      window.location.href = pendingRedirectUrl || "dashboard.html";
+    }
+
+    // Intercept navigation links leaving assessment
+    document.addEventListener("click", function(e) {
+      if (isSubmitting) return;
+      const link = e.target.closest("a");
+      if (!link) return;
+      const href = link.getAttribute("href");
+      if (href && !href.startsWith("#") && !href.startsWith("javascript:") && !href.includes("assessment.html")) {
+        e.preventDefault();
+        showExitModal(link.href);
+      }
+    });
+
+    // Intercept browser back button / history navigation
+    try {
+      history.pushState({ inAssessment: true }, "");
+      window.addEventListener("popstate", function(e) {
+        if (!isSubmitting) {
+          history.pushState({ inAssessment: true }, "");
+          showExitModal("dashboard.html");
+        }
+      });
+    } catch (err) {}
+
+    // When navigating away or unloading without completing submission, clear session timer
+    window.addEventListener("pagehide", function() {
+      if (!isSubmitting) {
+        if (window.assessmentInterval) clearInterval(window.assessmentInterval);
+        sessionStorage.removeItem(sessionKey);
+      }
+    });
+
+    // Warn on tab reload or tab close
+    window.addEventListener("beforeunload", function(e) {
+      if (!isSubmitting) {
+        if (window.assessmentInterval) clearInterval(window.assessmentInterval);
+        sessionStorage.removeItem(sessionKey);
+        e.preventDefault();
+        e.returnValue = "Assessment in progress. If you leave now, your assessment will be stopped and your timer will reset.";
+        return e.returnValue;
+      }
+    });
+
     function submitAssessment(timedOut) {
+      isSubmitting = true;
       const currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
       if (!currentSess) return;
 
@@ -182,22 +354,27 @@
       }
 
       const saved = currentSess.saved || {};
-      if (!saved[1] || !saved[2] || !saved[3]) {
-        if (!timedOut) {
-          alert("Please save Program 1, Program 2 and Program 3 before submitting.");
-          return;
+      if (cs.length > 0) {
+        if (!saved[1] || !saved[2] || !saved[3]) {
+          if (!timedOut) {
+            alert(`Please save all ${cs.length} coding programs before submitting.`);
+            isSubmitting = false;
+            return;
+          }
         }
       }
 
       const total = qs.length;
-      const percentage = Math.round((score / total) * 100);
-      const topic = topicData[0];
+      const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+      const topic = topicName || "Assessment";
       const strong = percentage >= 80 ? [topic] : [];
       const weak = percentage < 60 ? [topic] : [];
-      const used = Math.min(20 * 60, Math.max(0, Math.round((Date.now() - currentSess.startedAt) / 1000)));
+      const used = Math.min(durationMins * 60, Math.max(0, Math.round((Date.now() - currentSess.startedAt) / 1000)));
       const now = new Date();
       const display = now.toLocaleString();
-      const prior = state.attempts.filter(a => a.studentId === state.user.id && a.day === day).length + 1;
+      const prior = isCustomMode
+        ? state.attempts.filter(a => a.studentId === state.user.id && (a.customAssessmentId === customId || a.topic === topicName)).length + 1
+        : state.attempts.filter(a => a.studentId === state.user.id && a.day === day).length + 1;
       const attemptId = "A" + Date.now();
 
       const sUsername = state.user.username || (typeof state.user.id === 'number' ? `student${String(state.user.id).padStart(3, '0')}` : String(state.user.id || ''));
@@ -211,8 +388,11 @@
         department: state.user.department || "CSE",
         year: state.user.year || "4th Year",
         rollNumber: state.user.rollNumber || "",
-        day,
-        topic,
+        day: isCustomMode ? null : day,
+        topic: topic,
+        isCustomExam: isCustomMode,
+        customAssessmentId: isCustomMode ? customId : null,
+        examTitle: isCustomMode ? (customExam ? customExam.title : topicName) : null,
         attemptNumber: prior,
         score,
         total,
@@ -225,12 +405,12 @@
         completionSeconds: used,
         strongAreas: strong,
         weakAreas: weak,
-        program1: saved[1] || "",
-        program2: saved[2] || "",
-        program3: saved[3] || "",
-        program1Prompt: CODING_BANK[day][0],
-        program2Prompt: CODING_BANK[day][1],
-        program3Prompt: CODING_BANK[day][2],
+        program1: cs[0] ? (saved[1] || "") : "",
+        program2: cs[1] ? (saved[2] || "") : "",
+        program3: cs[2] ? (saved[3] || "") : "",
+        program1Prompt: cs[0] || "",
+        program2Prompt: cs[1] || "",
+        program3Prompt: cs[2] || "",
         mcqDetails
       };
 
@@ -250,25 +430,30 @@
         }).catch(() => {});
       }
 
-      state.submissions.push({
-        id: Date.now(), attemptId, studentId: state.user.id, day, topic, problem: 1,
-        prompt: CODING_BANK[day][0], code: saved[1] || "", score: null, status: "Submitted",
-        feedback: "", submittedAt: display, attemptNumber: prior
-      });
-      state.submissions.push({
-        id: Date.now() + 1, attemptId, studentId: state.user.id, day, topic, problem: 2,
-        prompt: CODING_BANK[day][1], code: saved[2] || "", score: null, status: "Submitted",
-        feedback: "", submittedAt: display, attemptNumber: prior
-      });
-      state.submissions.push({
-        id: Date.now() + 2, attemptId, studentId: state.user.id, day, topic, problem: 3,
-        prompt: CODING_BANK[day][2], code: saved[3] || "", score: null, status: "Submitted",
-        feedback: "", submittedAt: display, attemptNumber: prior
-      });
+      if (cs.length > 0) {
+        cs.forEach((promptText, pIdx) => {
+          const pNum = pIdx + 1;
+          state.submissions.push({
+            id: Date.now() + pIdx,
+            attemptId,
+            studentId: state.user.id,
+            day: isCustomMode ? null : day,
+            topic,
+            problem: pNum,
+            prompt: promptText || "",
+            code: saved[pNum] || "",
+            score: null,
+            status: "Submitted",
+            feedback: "",
+            submittedAt: display,
+            attemptNumber: prior
+          });
+        });
+      }
 
       save();
       sessionStorage.removeItem(sessionKey);
-      clearInterval(window.assessmentInterval);
+      if (window.assessmentInterval) clearInterval(window.assessmentInterval);
 
       alert(`Assessment ${timedOut ? "time expired and was closed" : "submitted"}. Score: ${score}/${total} (${percentage}%).\n\nAssessment data stored in database!`);
       window.location.href = "dashboard.html";

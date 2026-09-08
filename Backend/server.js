@@ -105,8 +105,30 @@ try {
   if (!fs.existsSync(STUDENTS_FILE)) {
     fs.writeFileSync(STUDENTS_FILE, JSON.stringify({}, null, 2), 'utf-8');
   }
+  if (!fs.existsSync(path.join(DATA_DIR, 'custom_assessments.json'))) {
+    fs.writeFileSync(path.join(DATA_DIR, 'custom_assessments.json'), JSON.stringify([], null, 2), 'utf-8');
+  }
 } catch (e) {
   console.warn('Storage directory initialization notice:', e.message);
+}
+
+const CUSTOM_ASSESSMENTS_FILE = path.join(DATA_DIR, 'custom_assessments.json');
+
+function getLocalCustomAssessments() {
+  try {
+    const raw = fs.readFileSync(CUSTOM_ASSESSMENTS_FILE, 'utf-8');
+    return JSON.parse(raw || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLocalCustomAssessments(arr) {
+  try {
+    fs.writeFileSync(CUSTOM_ASSESSMENTS_FILE, JSON.stringify(arr, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn('Local custom assessment save notice:', e.message);
+  }
 }
 
 function getLocalAssessments() {
@@ -540,8 +562,8 @@ app.post('/api/assessments', async (req, res) => {
   try {
     const payload = req.body;
 
-    if (!payload || !payload.day || !payload.studentId) {
-      return res.status(400).json({ success: false, error: 'Missing required assessment submission fields (day, studentId).' });
+    if (!payload || !payload.studentId || (!payload.day && !payload.customAssessmentId && !payload.topic)) {
+      return res.status(400).json({ success: false, error: 'Missing required assessment submission fields (studentId, day/customAssessmentId).' });
     }
 
     const assessmentRecord = {
@@ -552,8 +574,11 @@ app.post('/api/assessments', async (req, res) => {
       department: payload.department || 'CSE',
       year: payload.year || '4th Year',
       rollNumber: payload.rollNumber || '',
-      day: Number(payload.day),
-      topic: payload.topic || '',
+      day: payload.day !== undefined && payload.day !== null ? Number(payload.day) : null,
+      topic: payload.topic || payload.examTitle || 'Assessment',
+      examTitle: payload.examTitle || payload.topic || '',
+      isCustomExam: !!payload.isCustomExam || !!payload.customAssessmentId,
+      customAssessmentId: payload.customAssessmentId || null,
       attemptNumber: Number(payload.attemptNumber || 1),
       score: Number(payload.score || 0),
       total: Number(payload.total || 5),
@@ -1115,6 +1140,145 @@ app.delete('/api/admin/student/:studentId', async (req, res) => {
     });
   } catch (error) {
     console.error('Error deleting student account:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ==========================================================================
+// 6. CUSTOM ASSESSMENTS MANAGEMENT (EXCEL / CSV UPLOADED EXAMS)
+// ==========================================================================
+
+// 6.1 Get all Custom Assessments
+app.get('/api/custom-assessments', async (req, res) => {
+  try {
+    let list = [];
+    if (firestoreDb) {
+      try {
+        const snap = await firestoreDb.collection('custom_assessments').get();
+        snap.forEach(doc => {
+          list.push(Object.assign({ id: doc.id }, doc.data()));
+        });
+        list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        console.log(`[Firebase Firestore] Retrieved ${list.length} custom assessments`);
+      } catch (fbErr) {
+        console.warn('Firestore custom assessments query fallback:', fbErr.message);
+        list = getLocalCustomAssessments();
+      }
+    } else {
+      list = getLocalCustomAssessments();
+    }
+
+    return res.json({
+      success: true,
+      count: list.length,
+      databaseMode,
+      customAssessments: list
+    });
+  } catch (error) {
+    console.error('Error fetching custom assessments:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 6.2 Create / Publish new Custom Assessment
+app.post('/api/custom-assessments', async (req, res) => {
+  try {
+    const payload = req.body;
+    if (!payload || !payload.title || !Array.isArray(payload.questions) || !payload.questions.length) {
+      return res.status(400).json({ success: false, error: 'Exam Title and at least one Question are required.' });
+    }
+
+    const examId = payload.id || 'CUST_EXAM_' + Date.now();
+    const customExam = {
+      id: examId,
+      title: String(payload.title).trim(),
+      topic: String(payload.topic || payload.title).trim(),
+      description: String(payload.description || '').trim(),
+      durationMinutes: Number(payload.durationMinutes || 20),
+      totalQuestions: payload.questions.length,
+      questions: payload.questions, // array of { question, options: [A, B, C, D], answer: "A", explanation: "" }
+      codingPrograms: Array.isArray(payload.codingPrograms) ? payload.codingPrograms : [],
+      status: payload.status || 'active',
+      createdAt: payload.createdAt || new Date().toISOString(),
+      createdAtDisplay: payload.createdAtDisplay || new Date().toLocaleString(),
+      createdBy: payload.createdBy || 'Admin'
+    };
+
+    // Save to Firebase Firestore if connected
+    if (firestoreDb) {
+      try {
+        await firestoreDb.collection('custom_assessments').doc(examId).set(customExam);
+        console.log(`[Firebase Firestore] Custom assessment '${customExam.title}' saved with ID ${examId}`);
+      } catch (fbErr) {
+        console.error('Firestore save custom assessment error:', fbErr.message);
+      }
+    }
+
+    // Save to Local Fallback Store
+    const localExams = getLocalCustomAssessments();
+    const existingIdx = localExams.findIndex(e => String(e.id) === String(examId));
+    if (existingIdx >= 0) {
+      localExams[existingIdx] = customExam;
+    } else {
+      localExams.unshift(customExam);
+    }
+    saveLocalCustomAssessments(localExams);
+
+    return res.json({
+      success: true,
+      databaseMode,
+      message: 'Custom assessment published successfully.',
+      customAssessment: customExam
+    });
+  } catch (error) {
+    console.error('Error creating custom assessment:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 6.3 Delete Custom Assessment
+app.delete('/api/custom-assessments/:id', async (req, res) => {
+  try {
+    const rawParam = decodeURIComponent(String(req.params.id || '').trim());
+    if (!rawParam) {
+      return res.status(400).json({ success: false, error: 'Custom assessment ID is required.' });
+    }
+
+    if (firestoreDb) {
+      try {
+        // 1. Direct doc deletion
+        await firestoreDb.collection('custom_assessments').doc(rawParam).delete();
+
+        // 2. Query and batch delete by ID or title match
+        const snap = await firestoreDb.collection('custom_assessments').get();
+        const batch = firestoreDb.batch();
+        let matchCount = 0;
+        snap.forEach(doc => {
+          const d = doc.data() || {};
+          if (doc.id === rawParam || String(d.id) === rawParam || String(d.title || '').trim().toLowerCase() === rawParam.toLowerCase()) {
+            batch.delete(doc.ref);
+            matchCount++;
+          }
+        });
+        if (matchCount > 0) {
+          await batch.commit();
+        }
+        console.log(`[Firebase Firestore] Deleted custom assessment matching '${rawParam}' (${matchCount} docs removed).`);
+      } catch (fbErr) {
+        console.error('Firestore delete custom assessment error:', fbErr.message);
+      }
+    }
+
+    let localExams = getLocalCustomAssessments();
+    localExams = localExams.filter(e => String(e.id) !== rawParam && String(e.title || '').trim().toLowerCase() !== rawParam.toLowerCase());
+    saveLocalCustomAssessments(localExams);
+
+    return res.json({
+      success: true,
+      message: `Custom assessment '${rawParam}' deleted successfully.`
+    });
+  } catch (error) {
+    console.error('Error deleting custom assessment:', error);
     return res.status(500).json({ success: false, error: error.message });
   }
 });

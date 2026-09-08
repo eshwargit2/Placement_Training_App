@@ -2397,7 +2397,7 @@ textarea {
 .dash-stat-value {
   font-size: 28px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-heading, #0f172a);
   letter-spacing: -0.5px;
   line-height: 1.1;
   margin-bottom: 4px;
@@ -2767,5 +2767,92 @@ textarea {
     text-align: center;
     justify-content: center;
   }
+}
+
+/* Modal & Confirmation Dialog Styles */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 16px;
+  animation: modalFadeIn 0.15s ease-out;
+}
+
+.modal-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius);
+  animation: modalScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-container {
+  background: var(--card, #fff);
+  color: var(--text, #0f172a);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  animation: modalScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card-alt, #f8fafc);
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
 }
 

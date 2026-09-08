@@ -15,6 +15,7 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     .admin-hero {
       background: linear-gradient(135deg, #0b1329 0%, #1e1b4b 60%, #0f172a 100%);
@@ -207,13 +208,12 @@
       gap: 5px;
       cursor: pointer;
       transition: all 0.2s ease;
-    }
-
     .btn-delete-action:hover {
       background: #dc2626;
       color: #ffffff;
       border-color: #dc2626;
     }
+
   </style>
 </head>
 
@@ -241,7 +241,7 @@
         </p>
       </div>
 
-      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <span id="serverStatusBadge" class="status-badge-offline">
           <span class="status-dot"></span> Checking Server...
         </span>
@@ -252,6 +252,15 @@
             <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
           </svg>
           Refresh Data
+        </button>
+        <button onclick="openCustomExamModal()" class="ghost"
+          style="background:rgba(37,99,235,0.25); color:#93c5fd; border:1px solid rgba(147,197,253,0.4); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px; font-weight:700;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          <span>➕ Upload Excel &amp; Create Exam</span>
         </button>
         <button onclick="exportAdminCSV()" class="ghost"
           style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
@@ -274,6 +283,18 @@
             <polyline points="10 9 9 9 8 9" />
           </svg>
           Export PDF
+        </button>
+
+        <!-- Three-Dot Button: Directly Opens Database Cleanup & Records Management Popup Modal -->
+        <button id="btnAdminThreeDots" onclick="openDatabaseCleanupModal()" class="ghost"
+          style="padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.25); background:rgba(255,255,255,0.12); color:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.15s ease;"
+          title="Database Cleanup & Records Management">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1.5"></circle>
+            <circle cx="12" cy="5" r="1.5"></circle>
+            <circle cx="12" cy="19" r="1.5"></circle>
+          </svg>
         </button>
       </div>
     </div>
@@ -341,60 +362,6 @@
       </div>
     </div>
 
-    <!-- Database Cleanup & Records Management Toolbar -->
-    <div class="card"
-      style="margin-bottom: 20px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid #ef4444;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-        <div>
-          <h3 style="margin:0 0 4px; font-size:15px; display:flex; align-items:center; gap:8px; color:#ef4444;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              <line x1="10" y1="11" x2="10" y2="17" />
-              <line x1="14" y1="11" x2="14" y2="17" />
-            </svg>
-            Database Cleanup &amp; Records Management
-          </h3>
-          <p class="muted" style="margin:0; font-size:12.5px;">
-            Permanently delete assessment records by selecting a specific date, or purge all records from the Firebase
-            database.
-          </p>
-        </div>
-
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <!-- Specific Date Cleanup -->
-          <div
-            style="display:inline-flex; align-items:center; gap:6px; background:var(--card-alt); padding:5px 10px; border-radius:10px; border:1px solid var(--line);">
-            <label for="deleteDateInput"
-              style="font-size:12px; font-weight:700; color:var(--muted); margin:0;">Date:</label>
-            <input type="date" id="deleteDateInput"
-              style="padding:5px 8px; border-radius:6px; border:1px solid var(--line); font-size:12.5px; background:var(--input-bg); color:var(--text);">
-            <button onclick="deleteRecordsByDate()" class="btn-delete-action"
-              style="padding:6px 12px; font-size:12px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"
-              title="Delete all assessment records submitted on this date">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              </svg>
-              <span>Delete by Date</span>
-            </button>
-          </div>
-
-          <!-- Delete All Records -->
-          <button onclick="deleteAllRecords()" class="btn-delete-action"
-            style="padding:9px 16px; font-size:12.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); font-weight:700;"
-            title="Permanently delete all assessment records across all dates">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              <line x1="10" y1="11" x2="10" y2="17" />
-              <line x1="14" y1="11" x2="14" y2="17" />
-            </svg>
-            <span>Delete All Records</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- View Mode Switcher Tabs -->
     <div class="view-toggle-tabs">
       <button class="view-tab-btn active" id="tabBtnSubmissions" onclick="setViewMode('submissions')">
@@ -403,33 +370,51 @@
       <button class="view-tab-btn" id="tabBtnStudents" onclick="setViewMode('students')">
         👤 Group by Student Details (<span id="countStudentsTab">0</span>)
       </button>
+      <button class="view-tab-btn" id="tabBtnCustomExams" onclick="setViewMode('customExams')">
+        🎯 Custom &amp; Uploaded Exams (<span id="countCustomExamsTab">0</span>)
+      </button>
     </div>
 
     <!-- Filter & Content Card -->
     <div class="card">
-      <div class="dash-section-header">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
         <div>
-          <h2 style="margin:0 0 4px;" id="panelSectionTitle">Student Assessment Submissions</h2>
-          <p class="muted" style="margin:0;">Inspect individual candidate MCQ results and 3 coding programs stored in
-            the database.</p>
+          <h2 style="margin:0 0 4px; font-size:18px; font-weight:800;" id="panelSectionTitle">Student Assessment Submissions</h2>
+          <p class="muted" style="margin:0; font-size:13px;">Inspect individual candidate MCQ results, code submissions, and performance trends.</p>
         </div>
 
-        <div class="dash-filter-controls">
-          <div class="dash-search-box">
-            <span class="dash-search-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span id="filterResultsCount" class="badge badge-neutral" style="font-size:12px; padding:6px 12px;">
+            Showing 0 submissions
+          </span>
+          <button id="btnClearFilters" onclick="resetAllFilters()" class="ghost" style="display:none; padding:6px 12px; font-size:12px; border-radius:8px; color:#ef4444; font-weight:700;">
+            ✕ Reset Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div style="background:var(--card-alt); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:20px;">
+        <div style="display:grid; grid-template-columns: minmax(260px, 1fr) minmax(200px, 260px); gap:12px; align-items:center;">
+          
+          <!-- Unified Search Input -->
+          <div style="position:relative; min-width:240px;">
+            <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; display:flex;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </span>
             <input type="text" id="adminSearchInput" class="dash-search-input"
-              placeholder="Search student, roll number, topic..." oninput="applyFilters()">
+              placeholder="Search by student name, roll number, ID, topic..." oninput="onSearchInputChanged()"
+              style="padding-left:36px; padding-right:32px; width:100%; box-sizing:border-box;">
+            <button type="button" id="btnClearSearchInput" onclick="clearSearchInput()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:transparent; color:var(--muted); cursor:pointer; font-size:14px; display:none; padding:2px 6px;">✕</button>
           </div>
 
-          <select id="dayFilter" onchange="applyFilters()"
-            style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); font-size:13px; background:var(--input-bg); color:var(--text);">
-            <option value="all">All Days (1 - 33)</option>
-          </select>
+          <!-- Day Filter -->
+          <div>
+            <select id="dayFilter" onchange="applyFilters()"
+              style="width:100%; padding:9px 12px; border-radius:10px; border:1px solid var(--line); font-size:13px; background:var(--input-bg); color:var(--text);">
+              <option value="all">📅 All Days (1 - 33)</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -442,8 +427,196 @@
       <div id="studentsGroupedView" style="margin-top:16px; display:none;">
         <div id="studentsListContainer"></div>
       </div>
+
+      <!-- View 3: Custom & Uploaded Exams Bank -->
+      <div id="customExamsView" style="margin-top:16px; display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="margin:0 0 4px; font-size:16px; font-weight:800; color:var(--text-heading);">Published Custom Assessment Bank</h3>
+            <p class="muted" style="margin:0; font-size:12.5px;">Manage custom tests uploaded via Excel. Students can take these tests directly from their dashboard.</p>
+          </div>
+          <button onclick="openCustomExamModal()" class="hero-btn-primary" style="padding:8px 18px; font-size:13px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
+            <span>➕ Upload New Exam</span>
+          </button>
+        </div>
+        <div id="customExamsListContainer"></div>
+      </div>
     </div>
   </main>
+
+  <!-- Upload Excel & Create Custom Exam Modal -->
+  <div class="modal-overlay" id="customExamModal" onclick="if(event.target===this) closeCustomExamModal();">
+    <div class="modal-container" style="max-width:760px; max-height:90vh; display:flex; flex-direction:column;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:38px; height:38px; border-radius:10px; background:rgba(37,99,235,0.15); color:var(--primary); display:flex; align-items:center; justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="12" y1="18" x2="12" y2="12" />
+              <line x1="9" y1="15" x2="15" y2="15" />
+            </svg>
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:18px; font-weight:800; color:var(--text-heading);">Create Custom Exam &amp; Upload Excel</h3>
+            <small class="muted">Upload MCQs from an Excel or CSV file to publish as a live assessment.</small>
+          </div>
+        </div>
+        <button onclick="closeCustomExamModal()" class="ghost" style="padding:6px 10px; border-radius:8px;">✕</button>
+      </div>
+
+      <div class="modal-body" style="overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:18px;">
+        
+        <!-- Form Controls -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--text-heading);">
+              Exam Title <span style="color:#ef4444;">*</span>
+            </label>
+            <input type="text" id="examTitleInput" placeholder="e.g. TCS NQT Mock Test 2026"
+              style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-size:13.5px; background:var(--input-bg); color:var(--text); box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--text-heading);">
+              Topic / Subject Category
+            </label>
+            <input type="text" id="examTopicInput" placeholder="e.g. Quantitative &amp; Reasoning / Python"
+              style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-size:13.5px; background:var(--input-bg); color:var(--text); box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--text-heading);">
+              Time Limit (Minutes)
+            </label>
+            <select id="examDurationSelect"
+              style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-size:13.5px; background:var(--input-bg); color:var(--text); box-sizing:border-box;">
+              <option value="15">15 Minutes</option>
+              <option value="20" selected>20 Minutes (Default)</option>
+              <option value="30">30 Minutes</option>
+              <option value="45">45 Minutes</option>
+              <option value="60">60 Minutes (1 Hour)</option>
+              <option value="90">90 Minutes</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--text-heading);">
+              Sample Template Helper
+            </label>
+            <button type="button" onclick="downloadSampleExcelTemplate()" class="ghost"
+              style="width:100%; padding:9px 12px; border-radius:10px; border:1px dashed var(--primary); color:var(--primary); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Download Sample Excel/CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Excel Upload Drag & Drop Zone -->
+        <div>
+          <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--text-heading);">
+            Upload Questions Excel / CSV File <span style="color:#ef4444;">*</span>
+          </label>
+          <div id="excelDropZone" onclick="document.getElementById('excelExamFileInput').click()"
+            style="border:2px dashed var(--line); border-radius:12px; padding:24px; text-align:center; background:var(--card-alt); cursor:pointer; transition:all 0.2s ease;">
+            <div style="width:44px; height:44px; border-radius:50%; background:rgba(37,99,235,0.1); color:var(--primary); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </div>
+            <div style="font-weight:700; font-size:14px; color:var(--text-heading);" id="excelFileNameDisplay">Click to browse or drag &amp; drop Excel file (.xlsx / .csv)</div>
+            <p class="muted" style="margin:4px 0 0; font-size:12px;">Supports <b>.xlsx, .xls, and .csv</b> with columns: Question, Option A, Option B, Option C, Option D, Answer</p>
+            <input type="file" id="excelExamFileInput" accept=".xlsx, .xls, .csv" style="display:none;" onchange="handleExcelFileUpload(event)">
+          </div>
+        </div>
+
+        <!-- Parsed Questions Live Preview Container -->
+        <div id="parsedQuestionsPreviewContainer" style="display:none; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div style="font-weight:800; font-size:14px; color:var(--text-heading); display:flex; align-items:center; gap:8px;">
+              <span>Validated Questions Preview</span>
+              <span id="parsedQuestionsCountBadge" class="badge" style="background:#22c55e; color:#fff; font-weight:700;">0 Questions</span>
+            </div>
+            <span class="muted" style="font-size:12px;">Ready to publish to database</span>
+          </div>
+          <div id="parsedQuestionsTableWrap" style="max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:8px;"></div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="padding:16px 20px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:10px; background:var(--card-alt); border-radius:0 0 16px 16px;">
+        <button type="button" class="ghost" onclick="closeCustomExamModal()">Cancel</button>
+        <button type="button" id="btnPublishExam" onclick="publishCustomExam()" class="hero-btn-primary"
+          style="padding:10px 24px; font-weight:700; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
+          <span>🚀 Publish Exam to Database</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Database Cleanup & Records Management Modal -->
+  <div class="modal-overlay" id="cleanupModal" onclick="if(event.target===this) closeDatabaseCleanupModal();">
+    <div class="modal-container" style="max-width:600px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(239,68,68,0.15); color:#ef4444; display:flex; align-items:center; justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--text-heading);">Database Cleanup &amp; Records Management</h3>
+            <small class="muted">Manage and purge stored assessment records in Firebase</small>
+          </div>
+        </div>
+        <button onclick="closeDatabaseCleanupModal()" class="ghost" style="padding:6px 10px; border-radius:8px;">✕</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:20px;">
+        
+        <!-- Cleanup by Date Box -->
+        <div style="background:var(--card-alt); border:1px solid var(--line); border-radius:12px; padding:16px;">
+          <h4 style="margin:0 0 6px; font-size:14px; font-weight:700; color:var(--text-heading); display:flex; align-items:center; gap:6px;">
+            <span>📅 Delete Submissions by Specific Date</span>
+          </h4>
+          <p class="muted" style="margin:0 0 12px; font-size:12.5px;">
+            Remove all assessment records submitted on a single date without affecting other days.
+          </p>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <input type="date" id="deleteDateInput"
+              style="padding:8px 12px; border-radius:8px; border:1px solid var(--line); font-size:13px; background:var(--input-bg); color:var(--text); flex:1; min-width:180px;">
+            <button onclick="deleteRecordsByDate()" class="btn-delete-action"
+              style="padding:8px 16px; font-size:13px; font-weight:700; border-radius:8px;">
+              Delete by Date
+            </button>
+          </div>
+        </div>
+
+        <!-- Danger Zone: Purge All Records -->
+        <div style="background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:16px;">
+          <h4 style="margin:0 0 6px; font-size:14px; font-weight:700; color:#ef4444; display:flex; align-items:center; gap:6px;">
+            <span>⚠️ Danger Zone: Delete All Records</span>
+          </h4>
+          <p class="muted" style="margin:0 0 12px; font-size:12.5px;">
+            Permanently deletes all assessment records across all days from the database. Requires typed confirmation.
+          </p>
+          <button onclick="deleteAllRecords()" class="btn-delete-action"
+            style="padding:10px 18px; font-size:13px; font-weight:700; border-radius:8px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); width:100%; justify-content:center;">
+            <span>🗑️ Purge All Assessment Records</span>
+          </button>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="ghost" onclick="closeDatabaseCleanupModal()" style="padding:8px 18px; font-weight:600; border-radius:8px;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Inspection Modal -->
   <div class="modal-overlay" id="inspectModal">
@@ -487,6 +660,40 @@
 
     renderHeader("admin");
 
+    function openDatabaseCleanupModal() {
+      const modal = document.getElementById("cleanupModal");
+      if (modal) modal.classList.add("active");
+    }
+
+    function closeDatabaseCleanupModal() {
+      const modal = document.getElementById("cleanupModal");
+      if (modal) modal.classList.remove("active");
+    }
+
+    // Search & Filter Helpers
+    function onSearchInputChanged() {
+      const q = document.getElementById("adminSearchInput")?.value || "";
+      const clearBtn = document.getElementById("btnClearSearchInput");
+      if (clearBtn) clearBtn.style.display = q ? "block" : "none";
+      applyFilters();
+    }
+
+    function clearSearchInput() {
+      const input = document.getElementById("adminSearchInput");
+      if (input) {
+        input.value = "";
+        onSearchInputChanged();
+      }
+    }
+
+    function resetAllFilters() {
+      const input = document.getElementById("adminSearchInput");
+      if (input) input.value = "";
+      const dayEl = document.getElementById("dayFilter");
+      if (dayEl) dayEl.value = "all";
+      onSearchInputChanged();
+    }
+
     // Populate day filter
     const daySelect = document.getElementById("dayFilter");
     for (let i = 1; i <= 33; i++) {
@@ -498,6 +705,7 @@
 
     let allSubmissions = [];
     let allRegisteredStudents = [];
+    let allCustomExams = [];
     let currentView = 'submissions';
     const API_BASE = (typeof getApiBase === 'function' ? getApiBase() : 'https://placement-server-iota.vercel.app');
 
@@ -505,11 +713,15 @@
       currentView = mode;
       document.getElementById("tabBtnSubmissions").classList.toggle("active", mode === 'submissions');
       document.getElementById("tabBtnStudents").classList.toggle("active", mode === 'students');
+      document.getElementById("tabBtnCustomExams").classList.toggle("active", mode === 'customExams');
       document.getElementById("submissionsTableView").style.display = mode === 'submissions' ? 'block' : 'none';
       document.getElementById("studentsGroupedView").style.display = mode === 'students' ? 'block' : 'none';
-      document.getElementById("panelSectionTitle").textContent = mode === 'submissions'
-        ? "All Student Assessment Submissions"
-        : "Student Accounts & Firebase Profiles Management";
+      document.getElementById("customExamsView").style.display = mode === 'customExams' ? 'block' : 'none';
+
+      document.getElementById("panelSectionTitle").textContent =
+        mode === 'submissions' ? "All Student Assessment Submissions" :
+        (mode === 'students' ? "Student Accounts & Firebase Profiles Management" :
+        "Custom & Published Assessment Bank");
       applyFilters();
     }
 
@@ -562,6 +774,23 @@
         console.warn("Could not fetch students list:", err.message);
       }
 
+      // 4. Fetch published custom assessments
+      try {
+        const cRes = await fetch(`${API_BASE}/api/custom-assessments`);
+        const cData = await cRes.json();
+        if (cData && Array.isArray(cData.customAssessments)) {
+          allCustomExams = cData.customAssessments;
+          if (typeof state !== 'undefined') {
+            state.customAssessments = cData.customAssessments.slice();
+            localStorage.setItem("placementPortal_customAssessments", JSON.stringify(cData.customAssessments));
+            if (typeof save === 'function') save();
+          }
+        }
+      } catch (cErr) {
+        console.warn("Could not fetch custom assessments:", cErr.message);
+        allCustomExams = (typeof state !== 'undefined' && Array.isArray(state.customAssessments)) ? state.customAssessments : [];
+      }
+
       updateOverviewStats();
       applyFilters();
     }
@@ -577,6 +806,9 @@
       document.getElementById("statUniqueStudents").textContent = uniqueIds.size;
       document.getElementById("countStudentsTab").textContent = uniqueIds.size;
 
+      const customCountEl = document.getElementById("countCustomExamsTab");
+      if (customCountEl) customCountEl.textContent = allCustomExams.length;
+
       const avg = allSubmissions.length
         ? Math.round(allSubmissions.reduce((acc, a) => acc + Number(a.percentage || 0), 0) / allSubmissions.length)
         : 0;
@@ -584,26 +816,46 @@
     }
 
     function applyFilters() {
-      const q = (document.getElementById("adminSearchInput").value || "").toLowerCase().trim();
-      const selectedDay = document.getElementById("dayFilter").value;
+      const q = (document.getElementById("adminSearchInput")?.value || "").toLowerCase().trim();
+      const selectedDay = document.getElementById("dayFilter")?.value || "all";
+
+      const isFiltered = (q !== "") || (selectedDay !== "all");
+      const resetBtn = document.getElementById("btnClearFilters");
+      if (resetBtn) resetBtn.style.display = isFiltered ? "inline-flex" : "none";
 
       let filtered = allSubmissions.filter(a => {
+        // Day filter
         if (selectedDay !== "all" && String(a.day) !== String(selectedDay)) return false;
+
+        // Text query search
         if (q) {
           const matchName = (a.studentName || "").toLowerCase().includes(q);
           const matchRoll = (a.rollNumber || "").toLowerCase().includes(q);
           const matchTopic = (a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : "")).toLowerCase().includes(q);
-          const matchDay = `day ${a.day}`.includes(q);
+          const matchExam = (a.examTitle || "").toLowerCase().includes(q);
+          const matchDay = `day ${a.day}`.includes(q) || `day${a.day}`.includes(q) || `d${a.day}` === q;
           const matchUser = (a.username || "").toLowerCase().includes(q);
-          if (!matchName && !matchRoll && !matchTopic && !matchDay && !matchUser) return false;
+          const matchId = String(a.studentId || "").toLowerCase().includes(q);
+          const matchDept = (a.department || "").toLowerCase().includes(q);
+          if (!matchName && !matchRoll && !matchTopic && !matchExam && !matchDay && !matchUser && !matchId && !matchDept) return false;
         }
         return true;
       });
 
+      // Default sorting: Newest submissions first
+      filtered.sort((a, b) => new Date(b.completedAt || b.date || 0) - new Date(a.completedAt || a.date || 0));
+
+      const countEl = document.getElementById("filterResultsCount");
+      if (countEl) {
+        countEl.textContent = `Showing ${filtered.length} of ${allSubmissions.length} submissions`;
+      }
+
       if (currentView === 'submissions') {
         renderSubmissionsTable(filtered);
-      } else {
+      } else if (currentView === 'students') {
         renderStudentsGrouped(filtered);
+      } else if (currentView === 'customExams') {
+        renderCustomExamsBank(q);
       }
     }
 
@@ -649,8 +901,13 @@
                       <small class="muted">Login: <b>${esc(item.username || item.studentId)}</b> · Roll: <b>${esc(item.rollNumber || "-")}</b> · ${esc(item.department || "CSE")} · ${esc(item.year || "4th Year")}</small>
                     </td>
                     <td>
-                      <b>Day ${item.day}</b>
-                      <div class="muted" style="font-size:12px;">${esc(topicName)}</div>
+                      ${(item.isCustomExam || item.customAssessmentId || !item.day) ? `
+                        <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-size:11px; font-weight:800;">🎯 Custom Exam</span>
+                        <div style="font-weight:700; color:var(--text-heading); font-size:13px; margin-top:2px;">${esc(item.examTitle || item.topic || "Custom Assessment")}</div>
+                      ` : `
+                        <b>Day ${item.day}</b>
+                        <div class="muted" style="font-size:12px;">${esc(topicName)}</div>
+                      `}
                     </td>
                     <td><span class="badge" style="background:var(--tag-bg); color:var(--muted);">#${item.attemptNumber || 1}</span></td>
                     <td>
@@ -1119,6 +1376,382 @@
         return;
       }
       exportAllRecordsPDF(allSubmissions, `VMKVEC_Assessment_Database_${Date.now()}.pdf`);
+    }
+
+    // ==========================================================================
+    // CUSTOM EXAMS & EXCEL UPLOAD MANAGEMENT
+    // ==========================================================================
+    let uploadedExamQuestions = [];
+
+    function openCustomExamModal() {
+      uploadedExamQuestions = [];
+      document.getElementById("examTitleInput").value = "";
+      document.getElementById("examTopicInput").value = "";
+      document.getElementById("examDurationSelect").value = "20";
+      document.getElementById("excelExamFileInput").value = "";
+      document.getElementById("excelFileNameDisplay").textContent = "Click to browse or drag & drop Excel file (.xlsx / .csv)";
+      document.getElementById("parsedQuestionsPreviewContainer").style.display = "none";
+      const modal = document.getElementById("customExamModal");
+      if (modal) modal.classList.add("active");
+    }
+
+    function closeCustomExamModal() {
+      const modal = document.getElementById("customExamModal");
+      if (modal) modal.classList.remove("active");
+    }
+
+    function downloadSampleExcelTemplate() {
+      const csvContent = "Question,Option A,Option B,Option C,Option D,Answer\n" +
+        '"What is the time complexity of binary search in a sorted array?","O(n)","O(log n)","O(n^2)","O(1)","B"\n' +
+        '"Which data structure follows the LIFO (Last In First Out) principle?","Queue","Stack","Linked List","Tree","B"\n' +
+        '"Which keyword is used to define a function in Python?","func","function","def","lambda","C"\n' +
+        '"What is the output of print(type([])) in Python?","<class \'list\'>","<class \'tuple\'>","<class \'dict\'>","<class \'set\'>","A"\n' +
+        '"What is the default port for HTTPS secure web traffic?","80","21","443","8080","C"\n';
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "Custom_Assessment_Questions_Template.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleExcelFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const fileNameDisplay = document.getElementById("excelFileNameDisplay");
+      if (fileNameDisplay) fileNameDisplay.textContent = `📄 ${file.name} (${Math.round(file.size / 1024)} KB)`;
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          if (typeof XLSX === 'undefined') {
+            alert("Excel parser library is still loading. Please try again in 2 seconds.");
+            return;
+          }
+
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+          if (!jsonRows || !jsonRows.length) {
+            alert("The uploaded Excel file appears to be empty.");
+            return;
+          }
+
+          uploadedExamQuestions = [];
+
+          jsonRows.forEach((rawRow, idx) => {
+            const row = {};
+            for (const k in rawRow) {
+              if (rawRow.hasOwnProperty(k)) {
+                const normKey = String(k).trim().toLowerCase().replace(/[\s_\-\.\:]+/g, '');
+                row[normKey] = rawRow[k];
+              }
+            }
+
+            const rawVals = Object.values(rawRow);
+            const qText = row["question"] || row["q"] || row["questions"] || row["questiontext"] || row["title"] || row["problem"] || rawVals[0] || "";
+            if (!String(qText).trim()) return;
+
+            const optA = row["optiona"] || row["a"] || row["opt1"] || row["option1"] || row["opta"] || row["opt_a"] || rawVals[1] || "";
+            const optB = row["optionb"] || row["b"] || row["opt2"] || row["option2"] || row["optb"] || row["opt_b"] || rawVals[2] || "";
+            const optC = row["optionc"] || row["c"] || row["opt3"] || row["option3"] || row["optc"] || row["opt_c"] || rawVals[3] || "";
+            const optD = row["optiond"] || row["d"] || row["opt4"] || row["option4"] || row["optd"] || row["opt_d"] || rawVals[4] || "";
+
+            let rawAns = String(row["answer"] || row["ans"] || row["correctanswer"] || row["correctoption"] || row["correct"] || rawVals[5] || "A").trim();
+            let ansLetter = "A";
+            const upperAns = rawAns.toUpperCase();
+
+            if (upperAns === "A" || upperAns === "OPTION A" || upperAns === "1" || upperAns.startsWith("A)")) ansLetter = "A";
+            else if (upperAns === "B" || upperAns === "OPTION B" || upperAns === "2" || upperAns.startsWith("B)")) ansLetter = "B";
+            else if (upperAns === "C" || upperAns === "OPTION C" || upperAns === "3" || upperAns.startsWith("C)")) ansLetter = "C";
+            else if (upperAns === "D" || upperAns === "OPTION D" || upperAns === "4" || upperAns.startsWith("D)")) ansLetter = "D";
+            else {
+              if (String(optB).trim() && rawAns.toLowerCase() === String(optB).trim().toLowerCase()) ansLetter = "B";
+              else if (String(optC).trim() && rawAns.toLowerCase() === String(optC).trim().toLowerCase()) ansLetter = "C";
+              else if (String(optD).trim() && rawAns.toLowerCase() === String(optD).trim().toLowerCase()) ansLetter = "D";
+              else ansLetter = "A";
+            }
+
+            uploadedExamQuestions.push({
+              number: idx + 1,
+              question: String(qText).trim(),
+              options: [
+                String(optA).trim() || "Option A",
+                String(optB).trim() || "Option B",
+                String(optC).trim() || "Option C",
+                String(optD).trim() || "Option D"
+              ],
+              answer: ansLetter
+            });
+          });
+
+          // Fallback: 2D array parsing if headers weren't named standard
+          if (!uploadedExamQuestions.length) {
+            const raw2D = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+            if (raw2D.length > 1) {
+              const dataRows = (raw2D[0] && String(raw2D[0][0] || '').toLowerCase().includes('question')) ? raw2D.slice(1) : raw2D;
+              dataRows.forEach((r, idx) => {
+                const qText = r[0];
+                if (!String(qText || '').trim()) return;
+                let rawAns = String(r[5] || 'A').trim().toUpperCase();
+                let ansLetter = ['A', 'B', 'C', 'D'].includes(rawAns) ? rawAns : 'A';
+                uploadedExamQuestions.push({
+                  number: idx + 1,
+                  question: String(qText).trim(),
+                  options: [
+                    String(r[1] || 'Option A').trim(),
+                    String(r[2] || 'Option B').trim(),
+                    String(r[3] || 'Option C').trim(),
+                    String(r[4] || 'Option D').trim()
+                  ],
+                  answer: ansLetter
+                });
+              });
+            }
+          }
+
+          if (!uploadedExamQuestions.length) {
+            alert("Could not detect valid questions in Excel file. Please ensure column headers match 'Question', 'Option A', 'Option B', 'Option C', 'Option D', and 'Answer'.");
+            return;
+          }
+
+          renderParsedQuestionsPreview();
+        } catch (err) {
+          console.error("Excel parse error:", err);
+          alert("Error reading Excel file: " + err.message);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    function renderParsedQuestionsPreview() {
+      const container = document.getElementById("parsedQuestionsPreviewContainer");
+      const badge = document.getElementById("parsedQuestionsCountBadge");
+      const tableWrap = document.getElementById("parsedQuestionsTableWrap");
+
+      if (!uploadedExamQuestions.length) {
+        if (container) container.style.display = "none";
+        return;
+      }
+
+      if (badge) badge.textContent = `✓ ${uploadedExamQuestions.length} Questions Ready`;
+      if (container) container.style.display = "block";
+
+      if (tableWrap) {
+        tableWrap.innerHTML = `
+          <table style="width:100%; border-collapse:collapse; font-size:12.5px;">
+            <thead>
+              <tr style="background:var(--card-alt); border-bottom:1px solid var(--line); text-align:left;">
+                <th style="padding:8px 10px; width:40px;">#</th>
+                <th style="padding:8px 10px;">Question Text</th>
+                <th style="padding:8px 10px;">Options (A / B / C / D)</th>
+                <th style="padding:8px 10px; width:70px; text-align:center;">Correct</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${uploadedExamQuestions.map((q, idx) => `
+                <tr style="border-bottom:1px solid var(--line);">
+                  <td style="padding:8px 10px; font-weight:700; color:var(--muted);">${idx + 1}</td>
+                  <td style="padding:8px 10px; font-weight:600; color:var(--text-heading);">${esc(q.question)}</td>
+                  <td style="padding:8px 10px; color:var(--text);">
+                    <div style="font-size:11.5px; line-height:1.4;">
+                      <b>A:</b> ${esc(q.options[0])} &nbsp;|&nbsp; <b>B:</b> ${esc(q.options[1])}<br>
+                      <b>C:</b> ${esc(q.options[2])} &nbsp;|&nbsp; <b>D:</b> ${esc(q.options[3])}
+                    </div>
+                  </td>
+                  <td style="padding:8px 10px; text-align:center;">
+                    <span class="badge" style="background:#22c55e; color:#fff; font-weight:800; padding:2px 8px;">${q.answer}</span>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    async function publishCustomExam() {
+      const title = (document.getElementById("examTitleInput")?.value || "").trim();
+      const topic = (document.getElementById("examTopicInput")?.value || title || "General Assessment").trim();
+      const duration = parseInt(document.getElementById("examDurationSelect")?.value || "20", 10);
+
+      if (!title) {
+        alert("Please enter an Exam Title before publishing.");
+        document.getElementById("examTitleInput")?.focus();
+        return;
+      }
+      if (!uploadedExamQuestions.length) {
+        alert("Please upload an Excel or CSV file with assessment questions.");
+        return;
+      }
+
+      const btn = document.getElementById("btnPublishExam");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳ Publishing to Database...</span>`;
+      }
+
+      const examPayload = {
+        id: "CUST_EXAM_" + Date.now(),
+        title,
+        topic,
+        durationMinutes: duration,
+        questions: uploadedExamQuestions,
+        totalQuestions: uploadedExamQuestions.length,
+        status: "active",
+        createdAt: new Date().toISOString(),
+        createdAtDisplay: new Date().toLocaleString(),
+        createdBy: "Admin"
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/custom-assessments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(examPayload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof state !== 'undefined') {
+            state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
+            state.customAssessments = state.customAssessments.filter(e => String(e.id) !== String(examPayload.id));
+            state.customAssessments.unshift(examPayload);
+            localStorage.setItem("placementPortal_customAssessments", JSON.stringify(state.customAssessments));
+            if (typeof save === 'function') save();
+          }
+          alert(`✓ Exam "${title}" with ${uploadedExamQuestions.length} questions published successfully!\n\nStudents can now take this assessment from their dashboard.`);
+          closeCustomExamModal();
+          await fetchAdminData();
+          setViewMode('customExams');
+        } else {
+          throw new Error(data.error || "Failed to publish exam");
+        }
+      } catch (err) {
+        console.warn("Server save error, storing in local portal state:", err.message);
+        if (typeof state !== 'undefined') {
+          state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
+          state.customAssessments = state.customAssessments.filter(e => String(e.id) !== String(examPayload.id));
+          state.customAssessments.unshift(examPayload);
+          localStorage.setItem("placementPortal_customAssessments", JSON.stringify(state.customAssessments));
+          if (typeof save === 'function') save();
+        }
+        alert(`✓ Exam "${title}" with ${uploadedExamQuestions.length} questions published locally.`);
+        closeCustomExamModal();
+        updateOverviewStats();
+        setViewMode('customExams');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>🚀 Publish Exam to Database</span>`;
+        }
+      }
+    }
+
+    async function deleteCustomExam(examId, examTitle) {
+      if (!confirm(`Are you sure you want to delete the custom assessment:\n\n"${examTitle}"?\n\nThis will remove it from student dashboards and Firebase database.`)) return;
+
+      const apiBase = (typeof getApiBase === 'function' ? getApiBase() : API_BASE);
+
+      try {
+        await fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(examId)}`, {
+          method: 'DELETE'
+        });
+      } catch (err) {
+        console.warn("Delete API error notice:", err.message);
+      }
+
+      // Always clear from local state and storage
+      if (typeof state !== 'undefined' && Array.isArray(state.customAssessments)) {
+        state.customAssessments = state.customAssessments.filter(e => String(e.id) !== String(examId) && String(e.title || '').trim().toLowerCase() !== String(examTitle || '').trim().toLowerCase());
+        localStorage.setItem("placementPortal_customAssessments", JSON.stringify(state.customAssessments));
+        if (typeof save === 'function') save();
+      }
+      allCustomExams = allCustomExams.filter(e => String(e.id) !== String(examId) && String(e.title || '').trim().toLowerCase() !== String(examTitle || '').trim().toLowerCase());
+      updateOverviewStats();
+      renderCustomExamsBank();
+      alert(`✓ Assessment "${examTitle}" deleted successfully from Firebase and portal.`);
+    }
+
+    function renderCustomExamsBank(searchQ) {
+      const container = document.getElementById("customExamsListContainer");
+      if (!container) return;
+
+      let list = allCustomExams.slice();
+      if (searchQ) {
+        const q = searchQ.toLowerCase().trim();
+        list = list.filter(e =>
+          (e.title || "").toLowerCase().includes(q) ||
+          (e.topic || "").toLowerCase().includes(q) ||
+          (e.id || "").toLowerCase().includes(q)
+        );
+      }
+
+      if (!list.length) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:40px 16px; background:var(--card-alt); border:1px dashed var(--line); border-radius:14px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:rgba(37,99,235,0.1); color:var(--primary); display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <p style="margin:0; font-weight:700; color:var(--text-heading); font-size:15px;">No Custom Assessments Created Yet</p>
+            <p class="muted" style="margin:4px 0 16px; font-size:13px;">Upload an Excel file with questions to create your first custom candidate exam.</p>
+            <button onclick="openCustomExamModal()" class="hero-btn-primary" style="padding:10px 22px; font-size:13.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
+              <span>➕ Upload Excel &amp; Create Exam</span>
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          ${list.map((exam, idx) => {
+            const attemptsForThisExam = allSubmissions.filter(a => String(a.customAssessmentId) === String(exam.id) || a.topic === exam.title || a.examTitle === exam.title);
+            const avgScore = attemptsForThisExam.length
+              ? Math.round(attemptsForThisExam.reduce((acc, a) => acc + Number(a.percentage || 0), 0) / attemptsForThisExam.length)
+              : null;
+
+            return `
+              <div style="background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; box-shadow:var(--shadow-sm);">
+                <div style="flex:1; min-width:260px;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                    <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-weight:800; font-size:11px;">🎯 Custom Assessment</span>
+                    <span class="badge" style="background:var(--tag-bg); color:var(--muted); font-size:11px;">⏱️ ${exam.durationMinutes || 20} min</span>
+                    <span class="badge done" style="font-size:11px;">${(exam.questions || []).length} MCQs</span>
+                  </div>
+                  <h4 style="margin:0 0 4px; font-size:16px; font-weight:800; color:var(--text-heading);">${esc(exam.title)}</h4>
+                  <p class="muted" style="margin:0; font-size:13px;">${esc(exam.topic || "General Assessment")} · Created ${esc(exam.createdAtDisplay || "Recently")}</p>
+                  
+                  <div style="margin-top:10px; display:flex; gap:14px; align-items:center; font-size:12px;" class="muted">
+                    <span>👥 Total Candidate Attempts: <b style="color:var(--text-heading);">${attemptsForThisExam.length}</b></span>
+                    ${avgScore !== null ? `<span>🏆 Avg Score: <b style="color:var(--text-heading);">${avgScore}%</b></span>` : ''}
+                  </div>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <a href="assessment.html?customId=${encodeURIComponent(exam.id)}" target="_blank" class="ghost" style="padding:8px 16px; font-size:12.5px; border-radius:8px; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Preview Test
+                  </a>
+                  <button onclick="deleteCustomExam('${esc(exam.id)}', '${esc(exam.title)}')" class="btn-delete-action" style="padding:8px 14px; font-size:12.5px; border-radius:8px;" title="Delete custom exam">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    Delete Exam
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
     }
 
     // Initial load
