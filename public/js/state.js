@@ -234,12 +234,7 @@ function getApiBase() {
   const custom = localStorage.getItem('CUSTOM_API_BASE');
   if (custom) return custom.replace(/\/+$/, '');
   
-  const h = window.location.hostname;
-  if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0') {
-    return 'http://localhost:5000';
-  }
-  
-  // Point to deployed Vercel backend
+  // Default to the live Vercel backend API URL
   return PROD_BACKEND_API;
 }
 
