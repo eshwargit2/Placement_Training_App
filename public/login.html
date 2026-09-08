@@ -43,9 +43,9 @@
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" required>
 
-        <button type="submit" style="width: 100%; padding: 13px; font-size: 15px; margin-top: 6px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
-          <span>Login to Portal</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        <button id="loginSubmitBtn" type="submit" style="width: 100%; padding: 13px; font-size: 15px; margin-top: 6px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+          <span id="loginBtnText">Login to Portal</span>
+          <svg id="loginBtnIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         </button>
       </form>
     </div>
@@ -65,33 +65,38 @@
       }
     }
 
-    function handleLogin() {
+    async function handleLogin() {
       const role = document.getElementById("role").value;
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value;
 
-      if ((role === "admin" || role === "trainer") && 
-          (u.toLowerCase() === "admin" || u.toLowerCase() === "trainer") && 
-          (p === "Trainer@Admin555" || p === "Admin@555" || p === "admin123")) {
-        state.role = "admin";
-        state.user = { name: "System Admin", id: "ADMIN" };
-        save();
-        window.location.href = "admin.html";
-        return;
-      }
+      const btn = document.getElementById("loginSubmitBtn");
+      const btnText = document.getElementById("loginBtnText");
+      const btnIcon = document.getElementById("loginBtnIcon");
 
-      const s = state.students.find(x => x.username === u && x.password === p);
-      if (s) {
-        state.role = "student";
-        state.user = s;
-        save();
-        if (!s.profileCompleted) {
-          window.location.href = "profile.html";
-        } else {
-          window.location.href = "dashboard.html";
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.textContent = "Validating with Server...";
+      if (btnIcon) btnIcon.style.display = "none";
+
+      try {
+        const result = await serverLogin(u, p, role);
+        if (result && result.success) {
+          if (btnText) btnText.textContent = "Success! Redirecting...";
+          if (result.role === "admin" || result.role === "trainer") {
+            window.location.href = "admin.html";
+          } else if (result.user && result.user.profileCompleted) {
+            window.location.href = "dashboard.html";
+          } else {
+            window.location.href = "profile.html";
+          }
+          return;
         }
-      } else {
-        alert("Invalid login credentials. Please check your username and password.");
+      } catch (err) {
+        alert(err.message || "Invalid login credentials. Please check your username and password.");
+      } finally {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = "Login to Portal";
+        if (btnIcon) btnIcon.style.display = "inline";
       }
     }
   </script>

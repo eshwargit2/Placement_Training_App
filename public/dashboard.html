@@ -155,249 +155,261 @@
 
     renderHeader("dashboard");
 
-    const user = state.user || {};
-    const myAttempts = state.attempts.filter(a => a.studentId === user.id);
-    const completed = new Set(myAttempts.map(a => a.day));
-    const byDay = {};
-    myAttempts.forEach(a => (byDay[a.day] ??= []).push(a));
-    const allStrong = [...new Set(myAttempts.flatMap(a => a.strongAreas || []))];
-    const allWeak = [...new Set(myAttempts.flatMap(a => a.weakAreas || []))];
-    const avg = myAttempts.length ? Math.round(myAttempts.reduce((n, a) => n + Number(a.percentage || 0), 0) / myAttempts.length) : 0;
-    const progressPct = Math.round((completed.size / curriculum.length) * 100);
+    let currentFilter = 'all';
+    let searchQuery = '';
 
-    // Initial avatar letters
-    const initials = (user.name || user.id || "ST")
-      .split(" ")
-      .map(w => w[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-
-    // 1. Render Student Hero Section
-    document.getElementById("studentHeroSection").innerHTML = `
-      <div class="dash-hero-content">
-        <div class="dash-user-section">
-          <div class="dash-avatar">${esc(initials)}</div>
-          <div class="dash-user-info">
-            <h1>Welcome back, ${esc(user.name || user.id || "Student")}</h1>
-            <p>Placement preparation active · Track your daily assessments and progress.</p>
-            <div class="dash-meta-pills">
-              <span class="dash-meta-pill">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
-                ID: <b>${esc(user.id)}</b>
-              </span>
-              <span class="dash-meta-pill">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16M2 7l10-5 10 5M4 7v15M20 7v15M8 11v6M12 11v6M16 11v6"/></svg>
-                Dept: <b>${esc(user.department || "CSE")}</b>
-              </span>
-              <span class="dash-meta-pill">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Year: <b>${esc(user.year || "IV Year")}</b>
-              </span>
-              <span class="dash-meta-pill">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
-                Roll: <b>${esc(user.rollNumber || "-")}</b>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="dash-hero-actions">
-          <a href="profile.html" class="ghost" style="background: rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:10px 18px; text-decoration:none; border-radius:10px; display:inline-flex; align-items:center; gap:8px; font-weight:600;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            Edit Profile
-          </a>
-        </div>
-      </div>
-    `;
-
-    // 2. Render Modern Performance Stats
-    document.getElementById("studentStatsGrid").innerHTML = `
-      <div class="dash-stat-card-modern">
-        <div class="dash-stat-top">
-          <div class="dash-stat-title">Assessments Completed</div>
-          <div class="dash-stat-icon-wrap dash-stat-icon-green">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-        </div>
-        <div class="dash-stat-value">${completed.size} <span style="font-size:16px; color:var(--muted); font-weight:500;">/ ${curriculum.length}</span></div>
-        <div class="muted">${curriculum.length - completed.size} days remaining</div>
-      </div>
-
-      <div class="dash-stat-card-modern">
-        <div class="dash-stat-top">
-          <div class="dash-stat-title">Total Attempts</div>
-          <div class="dash-stat-icon-wrap dash-stat-icon-blue">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          </div>
-        </div>
-        <div class="dash-stat-value">${myAttempts.length}</div>
-        <div class="muted">Practice tests taken</div>
-      </div>
-
-      <div class="dash-stat-card-modern">
-        <div class="dash-stat-top">
-          <div class="dash-stat-title">Average Score</div>
-          <div class="dash-stat-icon-wrap dash-stat-icon-purple">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          </div>
-        </div>
-        <div class="dash-stat-value" style="color: ${avg >= 75 ? '#059669' : (avg >= 50 ? '#d97706' : (myAttempts.length ? '#dc2626' : '#0f172a'))};">${avg}%</div>
-        <div class="muted">${myAttempts.length ? (avg >= 75 ? 'High Performance' : 'Keep practicing daily') : 'No attempts recorded'}</div>
-      </div>
-
-      <div class="dash-stat-card-modern">
-        <div class="dash-stat-top">
-          <div class="dash-stat-title">Curriculum Progress</div>
-          <div class="dash-stat-icon-wrap dash-stat-icon-amber">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-          </div>
-        </div>
-        <div class="dash-stat-value">${progressPct}%</div>
-        <div class="dash-progress-track">
-          <div class="dash-progress-fill" style="width: ${progressPct}%;"></div>
-        </div>
-      </div>
-    `;
-
-    // 3. Render Mastered / Focus Areas based on Right & Wrong Questions
-    const topicStats = {};
-
-    myAttempts.forEach(a => {
-      const topicName = a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : `Day ${a.day}`);
-      const key = `Day ${a.day}: ${topicName}`;
-      
-      if (!topicStats[key]) {
-        topicStats[key] = {
-          day: a.day,
-          topic: topicName,
-          attemptsCount: 0,
-          latestPercentage: Number(a.percentage || 0),
-          totalScore: 0,
-          totalPossible: 0,
-          correctQuestions: [],
-          incorrectQuestions: []
-        };
-      }
-      
-      const stat = topicStats[key];
-      stat.attemptsCount++;
-      stat.latestPercentage = Number(a.percentage || 0);
-      stat.totalScore += Number(a.score || 0);
-      stat.totalPossible += Number(a.total || 5);
-
-      const details = (a.mcqDetails && a.mcqDetails.length) ? a.mcqDetails : (typeof getAttemptDetails === 'function' ? getAttemptDetails(a) : []);
-      
-      details.forEach(d => {
-        const ok = (d.result === 'Correct' || d.answer === d.correct);
-        if (ok) {
-          if (!stat.correctQuestions.some(q => q.question === d.question)) {
-            stat.correctQuestions.push({
-              number: d.number,
-              question: d.question,
-              correct: d.correct
-            });
-          }
-        } else {
-          if (!stat.incorrectQuestions.some(q => q.question === d.question)) {
-            stat.incorrectQuestions.push({
-              number: d.number,
-              question: d.question,
-              yourAnswer: d.answer,
-              correct: d.correct
-            });
-          }
-        }
-      });
-    });
-
-    const masteredTopics = [];
-    const weakTopics = [];
-
-    Object.values(topicStats).forEach(t => {
-      const pct = Math.round((t.totalScore / (t.totalPossible || 1)) * 100);
-      if (pct >= 70 && t.correctQuestions.length > 0) {
-        masteredTopics.push({ ...t, pct });
-      }
-      if (pct < 75 || t.incorrectQuestions.length > 0) {
-        weakTopics.push({ ...t, pct });
-      }
-    });
-
-    // Render Mastered Topics with correct details
-    const strongPill = document.getElementById("countStrongPill");
-    if (strongPill) strongPill.textContent = `${masteredTopics.length} Topic${masteredTopics.length !== 1 ? 's' : ''}`;
-    
-    document.getElementById("strongAreasList").innerHTML = masteredTopics.length ? `
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        ${masteredTopics.map(t => `
-          <div class="dash-mastered-topic-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
-              <span class="dash-mastered-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
-              <span class="badge done" style="font-size:11px; font-weight:700;">✓ ${t.correctQuestions.length} Correct (${t.pct}%)</span>
-            </div>
-            <div class="dash-mastered-topic-detail">
-              <b>Mastered Concepts:</b> ${t.correctQuestions.slice(0, 2).map(q => esc(q.question)).join(" · ")}${t.correctQuestions.length > 2 ? ` (+${t.correctQuestions.length - 2} more)` : ''}
-            </div>
-          </div>
-        `).join("")}
-      </div>
-    ` : `<p class='muted' style='margin:0;'>Complete practice assessments with &ge;75% score to record mastered topics here.</p>`;
-
-    // Render Priority Focus & Weak Areas with wrong questions details
-    const weakPill = document.getElementById("countWeakPill");
-    if (weakPill) weakPill.textContent = `${weakTopics.length} Topic${weakTopics.length !== 1 ? 's' : ''}`;
-    
-    document.getElementById("weakAreasList").innerHTML = weakTopics.length ? `
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        ${weakTopics.map(t => `
-          <div class="dash-weak-topic-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
-              <span class="dash-weak-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; font-weight:700; font-size:11px;">⚠️ ${t.incorrectQuestions.length || 1} Missed</span>
-                <a href="assessment.html?day=${t.day}" class="ghost" style="padding:2px 8px; font-size:11px; border-radius:6px; text-decoration:none; font-weight:700;">Revise</a>
-              </div>
-            </div>
-            ${t.incorrectQuestions.length ? `
-              <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--line); font-size:12px;">
-                ${t.incorrectQuestions.slice(0, 2).map(q => `
-                  <div style="margin-bottom:4px;">
-                    <div class="dash-weak-topic-question">• ${esc(q.question)}</div>
-                    <div class="dash-weak-topic-answers">
-                      Selected: <span style="color:#ef4444; font-weight:700;">${esc(q.yourAnswer || 'Incorrect')}</span> &nbsp;|&nbsp; Correct: <span style="color:#22c55e; font-weight:700;">${esc(q.correct)}</span>
-                    </div>
-                  </div>
-                `).join("")}
-                ${t.incorrectQuestions.length > 2 ? `<div class="dash-weak-topic-foot">+${t.incorrectQuestions.length - 2} more missed question(s) to review</div>` : ''}
-              </div>
-            ` : `
-              <div class="dash-weak-topic-foot">Score was below 75%. Retake assessment to improve score and mastery.</div>
-            `}
-          </div>
-        `).join("")}
-      </div>
-    ` : `<p class='muted' style='margin:0;'>No weak areas identified. Great job keeping your scores up!</p>`;
-
-    // 4. Render Assessment History Table
-    const histEl = document.getElementById("assessmentHistoryTable");
-    
-    function updateUploadButtonVisibility() {
-      const uploadBtn = document.getElementById("btnUploadAllAssessments");
-      if (!uploadBtn) return;
-      const unsyncedCount = myAttempts.filter(a => !a.synced).length;
-      if (unsyncedCount > 0) {
-        uploadBtn.style.display = "inline-flex";
-        uploadBtn.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span>Upload to Database (${unsyncedCount})</span>
-        `;
-      } else {
-        uploadBtn.style.display = "none";
-      }
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById("syncStatusToast");
+      if (!toast) return;
+      toast.style.color = isSuccess ? "#059669" : "#dc2626";
+      toast.innerHTML = msg;
+      setTimeout(() => { if (toast) toast.innerHTML = ""; }, 5000);
     }
 
-    function renderAssessmentHistory() {
-      updateUploadButtonVisibility();
+    function getMyAttempts(user = state.user) {
+      if (!user) return [];
+      const userNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(user.id || user.username) : null;
+      const candidateKeys = (typeof getStudentCandidateKeys === 'function') ? getStudentCandidateKeys(user.username || user.id) : [String(user.id || '').toLowerCase(), String(user.username || '').toLowerCase()];
+
+      return (state.attempts || []).filter(a => {
+        if (!a) return false;
+        const aNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(a.studentId || a.username) : null;
+        if (typeof userNum === 'number' && typeof aNum === 'number' && userNum === aNum) return true;
+        const sId = String(a.studentId || '').toLowerCase();
+        const uName = String(a.username || '').toLowerCase();
+        return candidateKeys.includes(sId) || candidateKeys.includes(uName);
+      });
+    }
+
+    function renderDashboard() {
+      const user = state.user || {};
+      const myAttempts = getMyAttempts(user);
+      const completed = new Set(myAttempts.map(a => a.day));
+      const byDay = {};
+      myAttempts.forEach(a => (byDay[a.day] ??= []).push(a));
+      const avg = myAttempts.length ? Math.round(myAttempts.reduce((n, a) => n + Number(a.percentage || 0), 0) / myAttempts.length) : 0;
+      const progressPct = Math.round((completed.size / curriculum.length) * 100);
+
+      // Initial avatar letters
+      const initials = (user.name || user.username || user.id || "ST")
+        .split(" ")
+        .map(w => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+
+      // 1. Render Student Hero Section
+      document.getElementById("studentHeroSection").innerHTML = `
+        <div class="dash-hero-content">
+          <div class="dash-user-section">
+            <div class="dash-avatar">${esc(initials)}</div>
+            <div class="dash-user-info">
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <h1 style="margin:0;">Welcome back, ${esc(user.name || user.username || "Student")}</h1>
+                <span class="badge done" style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#34d399; font-size:11px; padding:3px 10px; border-radius:999px;">
+                  ● Firebase Cloud Active
+                </span>
+              </div>
+              <p style="margin:4px 0 10px;">Placement preparation active · Track your daily assessments and progress.</p>
+              <div class="dash-meta-pills">
+                <span class="dash-meta-pill">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+                  Login: <b>${esc(user.username || user.id)}</b>
+                </span>
+                <span class="dash-meta-pill">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16M2 7l10-5 10 5M4 7v15M20 7v15M8 11v6M12 11v6M16 11v6"/></svg>
+                  Dept: <b>${esc(user.department || "CSE")}</b>
+                </span>
+                <span class="dash-meta-pill">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Year: <b>${esc(user.year || "3rd Year")}</b>
+                </span>
+                <span class="dash-meta-pill">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+                  Roll: <b>${esc(user.rollNumber || "-")}</b>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="dash-hero-actions">
+            <a href="profile.html" class="ghost" style="background: rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:10px 18px; text-decoration:none; border-radius:10px; display:inline-flex; align-items:center; gap:8px; font-weight:600;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Edit Profile
+            </a>
+          </div>
+        </div>
+      `;
+
+      // 2. Render Modern Performance Stats
+      document.getElementById("studentStatsGrid").innerHTML = `
+        <div class="dash-stat-card-modern">
+          <div class="dash-stat-top">
+            <div class="dash-stat-title">Assessments Completed</div>
+            <div class="dash-stat-icon-wrap dash-stat-icon-green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+          <div class="dash-stat-value">${completed.size} <span style="font-size:16px; color:var(--muted); font-weight:500;">/ ${curriculum.length}</span></div>
+          <div class="muted">${curriculum.length - completed.size} days remaining</div>
+        </div>
+
+        <div class="dash-stat-card-modern">
+          <div class="dash-stat-top">
+            <div class="dash-stat-title">Total Attempts</div>
+            <div class="dash-stat-icon-wrap dash-stat-icon-blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+          </div>
+          <div class="dash-stat-value">${myAttempts.length}</div>
+          <div class="muted">Practice tests taken</div>
+        </div>
+
+        <div class="dash-stat-card-modern">
+          <div class="dash-stat-top">
+            <div class="dash-stat-title">Average Score</div>
+            <div class="dash-stat-icon-wrap dash-stat-icon-purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+          </div>
+          <div class="dash-stat-value" style="color: ${avg >= 75 ? '#059669' : (avg >= 50 ? '#d97706' : (myAttempts.length ? '#dc2626' : '#0f172a'))};">${avg}%</div>
+          <div class="muted">${myAttempts.length ? (avg >= 75 ? 'High Performance' : 'Keep practicing daily') : 'No attempts recorded'}</div>
+        </div>
+
+        <div class="dash-stat-card-modern">
+          <div class="dash-stat-top">
+            <div class="dash-stat-title">Curriculum Progress</div>
+            <div class="dash-stat-icon-wrap dash-stat-icon-amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+          </div>
+          <div class="dash-stat-value">${progressPct}%</div>
+          <div class="dash-progress-track">
+            <div class="dash-progress-fill" style="width: ${progressPct}%;"></div>
+          </div>
+        </div>
+      `;
+
+      // 3. Render Mastered / Focus Areas based on Right & Wrong Questions
+      const topicStats = {};
+
+      myAttempts.forEach(a => {
+        const topicName = a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : `Day ${a.day}`);
+        const key = `Day ${a.day}: ${topicName}`;
+        
+        if (!topicStats[key]) {
+          topicStats[key] = {
+            day: a.day,
+            topic: topicName,
+            attemptsCount: 0,
+            latestPercentage: Number(a.percentage || 0),
+            totalScore: 0,
+            totalPossible: 0,
+            correctQuestions: [],
+            incorrectQuestions: []
+          };
+        }
+        
+        const stat = topicStats[key];
+        stat.attemptsCount++;
+        stat.latestPercentage = Number(a.percentage || 0);
+        stat.totalScore += Number(a.score || 0);
+        stat.totalPossible += Number(a.total || 5);
+
+        const details = (a.mcqDetails && a.mcqDetails.length) ? a.mcqDetails : (typeof getAttemptDetails === 'function' ? getAttemptDetails(a) : []);
+        
+        details.forEach(d => {
+          const ok = (d.result === 'Correct' || d.answer === d.correct);
+          if (ok) {
+            if (!stat.correctQuestions.some(q => q.question === d.question)) {
+              stat.correctQuestions.push({
+                number: d.number,
+                question: d.question,
+                correct: d.correct
+              });
+            }
+          } else {
+            if (!stat.incorrectQuestions.some(q => q.question === d.question)) {
+              stat.incorrectQuestions.push({
+                number: d.number,
+                question: d.question,
+                yourAnswer: d.answer,
+                correct: d.correct
+              });
+            }
+          }
+        });
+      });
+
+      const strongTopics = Object.values(topicStats).filter(t => t.latestPercentage >= 75);
+      const weakTopics = Object.values(topicStats).filter(t => t.latestPercentage < 75);
+
+      document.getElementById("countStrongPill").textContent = `${strongTopics.length} Topics`;
+      document.getElementById("countWeakPill").textContent = `${weakTopics.length} Topics`;
+
+      document.getElementById("strongAreasList").innerHTML = strongTopics.length ? `
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${strongTopics.map(t => `
+            <div class="dash-strong-topic-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span class="dash-strong-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
+                <span class="dash-score-pill high" style="font-size:11px; padding:3px 8px;">${t.latestPercentage}% Accuracy</span>
+              </div>
+              ${t.correctQuestions.length ? `
+                <div style="font-size:12px; color:var(--muted); line-height:1.4;">
+                  ✓ Mastered ${t.correctQuestions.length} key concepts in this module.
+                </div>
+              ` : ''}
+            </div>
+          `).join("")}
+        </div>
+      ` : `<p class='muted' style='margin:0;'>No mastered topics yet (≥75% score). Complete daily tests to build your mastery log!</p>`;
+
+      document.getElementById("weakAreasList").innerHTML = weakTopics.length ? `
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${weakTopics.map(t => `
+            <div class="dash-weak-topic-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+                <span class="dash-weak-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
+                <div style="display:flex; gap:6px; align-items:center;">
+                  <span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; font-weight:700; font-size:11px;">⚠️ ${t.incorrectQuestions.length || 1} Missed</span>
+                  <a href="assessment.html?day=${t.day}" class="ghost" style="padding:2px 8px; font-size:11px; border-radius:6px; text-decoration:none; font-weight:700;">Revise</a>
+                </div>
+              </div>
+              ${t.incorrectQuestions.length ? `
+                <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--line); font-size:12px;">
+                  ${t.incorrectQuestions.slice(0, 2).map(q => `
+                    <div style="margin-bottom:4px;">
+                      <div class="dash-weak-topic-question">• ${esc(q.question)}</div>
+                      <div class="dash-weak-topic-answers">
+                        Selected: <span style="color:#ef4444; font-weight:700;">${esc(q.yourAnswer || 'Incorrect')}</span> &nbsp;|&nbsp; Correct: <span style="color:#22c55e; font-weight:700;">${esc(q.correct)}</span>
+                      </div>
+                    </div>
+                  `).join("")}
+                  ${t.incorrectQuestions.length > 2 ? `<div class="dash-weak-topic-foot">+${t.incorrectQuestions.length - 2} more missed question(s) to review</div>` : ''}
+                </div>
+              ` : `
+                <div class="dash-weak-topic-foot">Score was below 75%. Retake assessment to improve score and mastery.</div>
+              `}
+            </div>
+          `).join("")}
+        </div>
+      ` : `<p class='muted' style='margin:0;'>No weak areas identified. Great job keeping your scores up!</p>`;
+
+      // 4. Render Assessment History Table
+      const histEl = document.getElementById("assessmentHistoryTable");
+      const unsyncedCount = myAttempts.filter(a => !a.synced).length;
+      const uploadBtn = document.getElementById("btnUploadAllAssessments");
+      if (uploadBtn) {
+        if (unsyncedCount > 0) {
+          uploadBtn.style.display = "inline-flex";
+          uploadBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Upload to Database (${unsyncedCount})</span>
+          `;
+        } else {
+          uploadBtn.style.display = "none";
+        }
+      }
 
       if (myAttempts.length) {
         histEl.innerHTML = `
@@ -420,42 +432,17 @@
                   const pct = Number(a.percentage || 0);
                   const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
                   const isSynced = !!a.synced;
-
                   return `
                     <tr>
                       <td><b>Day ${a.day}</b> — ${esc(curriculum[a.day - 1] ? curriculum[a.day - 1][0] : '')}</td>
                       <td><span class="badge badge-neutral">#${(byDay[a.day] || []).indexOf(a) + 1}</span></td>
-                      <td>
-                        <span class="dash-score-pill ${scoreClass}">
-                          ${a.score}/${a.total} (${pct}%)
-                        </span>
-                      </td>
-                      <td>
-                        <span class="badge done" style="display:inline-flex; align-items:center; gap:4px;">
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                          Completed
-                        </span>
-                      </td>
+                      <td><span class="dash-score-pill ${scoreClass}">${a.score}/${a.total} (${pct}%)</span></td>
+                      <td><span class="badge done">Completed</span></td>
                       <td>${esc(a.completedAtDisplay || a.date || a.completedAt || "-")}</td>
+                      <td>${Math.ceil((a.completionSeconds || 0) / 60)} min</td>
+                      <td>${(a.strongAreas && a.strongAreas.length) ? a.strongAreas.map(s => `<span class="badge done" style="margin:2px;">${esc(s)}</span>`).join(" ") : "-"}</td>
                       <td>
-                        <span style="display:inline-flex; align-items:center; gap:4px;">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                          ${Math.ceil((a.completionSeconds || 0) / 60)} min
-                        </span>
-                      </td>
-                      <td>${(a.strongAreas && a.strongAreas.length) ? a.strongAreas.map(s => `<span class="badge done" style="margin:2px;">${esc(s)}</span>`).join(" ") : "<span class='muted'>-</span>"}</td>
-                      <td>
-                        ${isSynced ? `
-                          <span class="badge done" style="display:inline-flex; align-items:center; gap:5px; font-weight:700;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            Synced
-                          </span>
-                        ` : `
-                          <button onclick="uploadSingleAttempt('${esc(a.id)}')" id="btnSync_${esc(a.id)}" class="ghost" style="padding:5px 12px; font-size:12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-weight:600;">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            Upload
-                          </button>
-                        `}
+                        ${isSynced ? `<span class="badge done">Synced</span>` : `<button onclick="uploadSingleAttempt('${esc(a.id)}')" id="btnSync_${esc(a.id)}" class="ghost" style="padding:5px 12px; font-size:12px; border-radius:8px;">Upload</button>`}
                       </td>
                     </tr>
                   `;
@@ -467,147 +454,17 @@
       } else {
         histEl.innerHTML = `
           <div style="text-align:center; padding:32px 16px;">
-            <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; background:rgba(37, 99, 235, 0.1); color:#3b82f6; margin-bottom:12px;">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-            </div>
             <p style="margin:0; font-weight:700; color:var(--text-heading); font-size:16px;">No assessments attempted yet</p>
             <p class="muted" style="margin:4px 0 16px;">Pick any module from the 33-day roadmap below to take your first timed test.</p>
-            <a href="assessment.html?day=1" class="hero-btn-primary" style="text-decoration:none; padding:10px 20px; font-size:13.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
-              <span>Start Day 1 Assessment</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
           </div>
         `;
       }
-    }
 
-    renderAssessmentHistory();
+      // 5. Interactive Roadmap Rendering
+      document.getElementById("countCompleted").textContent = completed.size;
+      document.getElementById("countPending").textContent = curriculum.length - completed.size;
 
-    const API_BASE = 'https://placement-server-iota.vercel.app';
-
-    function showToast(msg, isSuccess = true) {
-      const toast = document.getElementById("syncStatusToast");
-      if (!toast) return;
-      toast.style.color = isSuccess ? "#059669" : "#dc2626";
-      toast.innerHTML = msg;
-      setTimeout(() => { toast.innerHTML = ""; }, 5000);
-    }
-
-    async function uploadSingleAttempt(attemptId) {
-      const attempt = myAttempts.find(a => String(a.id) === String(attemptId));
-      if (!attempt) return;
-
-      const btn = document.getElementById(`btnSync_${attemptId}`);
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = `Uploading...`;
-      }
-
-      try {
-        const res = await fetch(`${API_BASE}/api/assessments`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(attempt)
-        });
-        const data = await res.json();
-        if (data.success) {
-          attempt.synced = true;
-          // Update global state item as well
-          const stateAttempt = state.attempts.find(a => String(a.id) === String(attemptId));
-          if (stateAttempt) stateAttempt.synced = true;
-          save();
-
-          renderAssessmentHistory();
-          showToast(`✓ Day ${attempt.day} assessment successfully uploaded to database!`, true);
-        } else {
-          throw new Error(data.error || "Upload failed");
-        }
-      } catch (err) {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Retry`;
-        }
-        showToast(`⚠️ Upload failed: Could not connect to backend server.`, false);
-        alert(`Could not upload to backend server: ${err.message}\n\nPlease verify backend connectivity at ${API_BASE}`);
-      }
-    }
-
-    async function uploadAllAssessmentsToDatabase() {
-      const unsyncedAttempts = myAttempts.filter(a => !a.synced);
-      if (!unsyncedAttempts.length) {
-        showToast("✓ All assessment records are already synced!", true);
-        updateUploadButtonVisibility();
-        return;
-      }
-
-      const uploadBtn = document.getElementById("btnUploadAllAssessments");
-      if (uploadBtn) {
-        uploadBtn.disabled = true;
-        uploadBtn.innerHTML = `Uploading ${unsyncedAttempts.length} records...`;
-      }
-
-      let uploadedCount = 0;
-      let failedCount = 0;
-
-      for (const attempt of unsyncedAttempts) {
-        try {
-          const res = await fetch(`${API_BASE}/api/assessments`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(attempt)
-          });
-          const data = await res.json();
-          if (data.success) {
-            attempt.synced = true;
-            const stateAttempt = state.attempts.find(a => String(a.id) === String(attempt.id));
-            if (stateAttempt) stateAttempt.synced = true;
-            uploadedCount++;
-          } else {
-            failedCount++;
-          }
-        } catch (e) {
-          failedCount++;
-        }
-      }
-
-      save();
-      renderAssessmentHistory();
-
-      if (uploadBtn) {
-        uploadBtn.disabled = false;
-      }
-
-      if (failedCount === 0) {
-        showToast(`✓ All ${uploadedCount} assessment records uploaded to database!`, true);
-      } else {
-        showToast(`⚠️ Synced ${uploadedCount} records. (${failedCount} failed — check backend server)`, false);
-      }
-    }
-
-    // 5. Interactive Roadmap with Filtering & Search
-    let currentFilter = 'all';
-    let searchQuery = '';
-
-    document.getElementById("countCompleted").textContent = completed.size;
-    document.getElementById("countPending").textContent = curriculum.length - completed.size;
-
-    function setRoadmapFilter(filter) {
-      currentFilter = filter;
-      document.querySelectorAll(".dash-filter-btn").forEach(b => b.classList.remove("active"));
-      if (filter === 'all') document.getElementById("filterAll").classList.add("active");
-      if (filter === 'completed') document.getElementById("filterCompleted").classList.add("active");
-      if (filter === 'pending') document.getElementById("filterPending").classList.add("active");
-      renderRoadmap();
-    }
-
-    function filterRoadmap() {
-      searchQuery = (document.getElementById("roadmapSearch").value || "").toLowerCase().trim();
-      renderRoadmap();
-    }
-
-    function renderRoadmap() {
       const listEl = document.getElementById("roadmapList");
-      
       const filteredDays = curriculum.map((x, i) => {
         const dayNum = i + 1;
         const isDone = completed.has(dayNum);
@@ -633,66 +490,156 @@
             <p class="muted" style="margin:0;">No roadmap modules match the search / filter criteria.</p>
           </div>
         `;
+      } else {
+        listEl.innerHTML = filteredDays.map(item => {
+          const latest = item.attempts.slice(-1)[0];
+          const pct = latest ? Number(latest.percentage || 0) : 0;
+          const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
+          return `
+            <div class="dash-roadmap-card ${item.isDone ? 'completed' : 'pending'}">
+              <div class="dash-card-header-bar">
+                <div class="dash-day-badge"><b>Day ${item.dayNum}</b> — ${esc(item.title)}</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  ${item.isDone ? `<span class="badge done">Completed</span>` : `<span class="badge badge-pending">Pending</span>`}
+                </div>
+              </div>
+              <div class="dash-topic-body">
+                <div style="flex:1;">
+                  <div class="dash-topic-title">${esc(item.title)}</div>
+                  <div class="dash-topic-sub">${esc(item.sub)}</div>
+                  ${latest ? `<div style="margin-top:6px;"><span class="dash-score-pill ${scoreClass}">Latest Score: ${latest.percentage}%</span></div>` : ''}
+                </div>
+                <a href="assessment.html?day=${item.dayNum}" class="hero-btn-primary" style="text-decoration:none; padding:10px 20px; font-size:13.5px; white-space:nowrap; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
+                  <span>${item.isDone ? 'Retake' : 'Open'} Assessment</span>
+                </a>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    async function uploadSingleAttempt(attemptId) {
+      const user = state.user || {};
+      const myAttempts = getMyAttempts(user);
+      const attempt = myAttempts.find(a => String(a.id) === String(attemptId));
+      if (!attempt) return;
+
+      const btn = document.getElementById(`btnSync_${attemptId}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `Uploading...`;
+      }
+
+      const apiBase = getApiBase();
+      try {
+        const res = await fetch(`${apiBase}/api/assessments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(attempt)
+        });
+        const data = await res.json();
+        if (data.success) {
+          attempt.synced = true;
+          const stateAttempt = state.attempts.find(a => String(a.id) === String(attemptId));
+          if (stateAttempt) stateAttempt.synced = true;
+          save();
+
+          renderDashboard();
+          showToast(`✓ Day ${attempt.day} assessment successfully uploaded!`, true);
+        } else {
+          throw new Error(data.error || "Upload failed");
+        }
+      } catch (err) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `Retry`;
+        }
+        showToast(`⚠️ Upload failed: Could not connect to server.`, false);
+      }
+    }
+
+    async function uploadAllAssessmentsToDatabase() {
+      const user = state.user || {};
+      const myAttempts = getMyAttempts(user);
+      const unsyncedAttempts = myAttempts.filter(a => !a.synced);
+      if (!unsyncedAttempts.length) {
+        showToast("✓ All assessment records are already synced!", true);
         return;
       }
 
-      listEl.innerHTML = filteredDays.map(item => {
-        const latest = item.attempts.slice(-1)[0];
-        const pct = latest ? Number(latest.percentage || 0) : 0;
-        const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
+      const uploadBtn = document.getElementById("btnUploadAllAssessments");
+      if (uploadBtn) {
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = `Uploading...`;
+      }
 
-        return `
-          <div class="dash-roadmap-card ${item.isDone ? 'completed' : 'pending'}">
-            <div class="dash-card-header-bar">
-              <div class="dash-day-badge">
-                ${item.isDone ? 
-                  `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>` : 
-                  `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
-                }
-                <b>Day ${item.dayNum}</b> — ${esc(item.title)}
-              </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                ${item.isDone ? 
-                  `<span class="badge done" style="display:inline-flex; align-items:center; gap:4px;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    Completed
-                  </span>` : 
-                  `<span class="badge badge-pending">Pending</span>`
-                }
-                ${item.attempts.length ? 
-                  `<span class="badge badge-neutral">${item.attempts.length} attempt${item.attempts.length > 1 ? 's' : ''}</span>` : 
-                  ''
-                }
-              </div>
-            </div>
-            <div class="dash-topic-body">
-              <div style="flex:1;">
-                <div class="dash-topic-title">${esc(item.title)}</div>
-                <div class="dash-topic-sub">${esc(item.sub)}</div>
-                ${latest ? `
-                  <div style="margin-top:6px;">
-                    <span class="dash-score-pill ${scoreClass}">
-                      Latest Score: ${latest.percentage}% (${latest.score}/${latest.total}) · ${esc(latest.completedAtDisplay || latest.date || "")}
-                    </span>
-                  </div>
-                ` : ''}
-              </div>
-              <a href="assessment.html?day=${item.dayNum}" class="hero-btn-primary" style="text-decoration:none; padding:10px 20px; font-size:13.5px; white-space:nowrap; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
-                ${item.isDone ? 
-                  `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-                   <span>Retake Assessment</span>` : 
-                  `<span>Open Assessment</span>
-                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`
-                }
-              </a>
-            </div>
-          </div>
-        `;
-      }).join("");
+      let uploadedCount = 0;
+      let failedCount = 0;
+      const apiBase = getApiBase();
+
+      for (const attempt of unsyncedAttempts) {
+        try {
+          const res = await fetch(`${apiBase}/api/assessments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(attempt)
+          });
+          const data = await res.json();
+          if (data.success) {
+            attempt.synced = true;
+            const stateAttempt = state.attempts.find(a => String(a.id) === String(attempt.id));
+            if (stateAttempt) stateAttempt.synced = true;
+            uploadedCount++;
+          } else {
+            failedCount++;
+          }
+        } catch (e) {
+          failedCount++;
+        }
+      }
+
+      save();
+      renderDashboard();
+
+      if (uploadBtn) {
+        uploadBtn.disabled = false;
+      }
+
+      if (failedCount === 0) {
+        showToast(`✓ All ${uploadedCount} assessment records uploaded!`, true);
+      } else {
+        showToast(`⚠️ Synced ${uploadedCount} records. (${failedCount} failed)`, false);
+      }
     }
 
-    // Initial roadmap render
-    renderRoadmap();
+    function setRoadmapFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll(".dash-filter-btn").forEach(b => b.classList.remove("active"));
+      if (filter === 'all') document.getElementById("filterAll").classList.add("active");
+      if (filter === 'completed') document.getElementById("filterCompleted").classList.add("active");
+      if (filter === 'pending') document.getElementById("filterPending").classList.add("active");
+      renderDashboard();
+    }
+
+    function filterRoadmap() {
+      searchQuery = (document.getElementById("roadmapSearch").value || "").toLowerCase().trim();
+      renderDashboard();
+    }
+
+    // 1. Initial Render
+    renderDashboard();
+
+    // 2. Fetch Live Profile & Assessment Data from Backend Database (Firebase Firestore)
+    if (state.user) {
+      showToast("🔄 Connecting to Database...", true);
+      fetchStudentDashboardOnline(state.user.username || state.user.id).then(res => {
+        if (res && res.success) {
+          renderDashboard();
+          showToast("● Live Database Synchronized", true);
+        }
+      });
+    }
   </script>
 </body>
 </html>

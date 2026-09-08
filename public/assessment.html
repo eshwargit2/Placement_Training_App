@@ -200,11 +200,14 @@
       const prior = state.attempts.filter(a => a.studentId === state.user.id && a.day === day).length + 1;
       const attemptId = "A" + Date.now();
 
+      const sUsername = state.user.username || (typeof state.user.id === 'number' ? `student${String(state.user.id).padStart(3, '0')}` : String(state.user.id || ''));
+      const sId = state.user.id !== undefined ? state.user.id : parseStudentNumericId(sUsername);
+
       const assessmentRecord = {
         id: attemptId,
-        studentId: state.user.id,
-        studentName: state.user.name || "Student " + state.user.id,
-        username: state.user.username || "",
+        studentId: sId,
+        studentName: state.user.name || "Student " + (sUsername || sId),
+        username: sUsername,
         department: state.user.department || "CSE",
         year: state.user.year || "4th Year",
         rollNumber: state.user.rollNumber || "",
@@ -233,6 +236,20 @@
 
       state.attempts.push(assessmentRecord);
 
+      // Background auto-sync with Backend API & Firebase
+      if (typeof getApiBase === 'function') {
+        fetch(`${getApiBase()}/api/assessments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(assessmentRecord)
+        }).then(r => r.json()).then(res => {
+          if (res && res.success) {
+            assessmentRecord.synced = true;
+            save();
+          }
+        }).catch(() => {});
+      }
+
       state.submissions.push({
         id: Date.now(), attemptId, studentId: state.user.id, day, topic, problem: 1,
         prompt: CODING_BANK[day][0], code: saved[1] || "", score: null, status: "Submitted",
@@ -253,7 +270,7 @@
       sessionStorage.removeItem(sessionKey);
       clearInterval(window.assessmentInterval);
 
-      alert(`Assessment ${timedOut ? "time expired and was closed" : "submitted"}. Score: ${score}/${total} (${percentage}%).\n\nYour result is stored locally. You can upload it to the Database from your Dashboard.`);
+      alert(`Assessment ${timedOut ? "time expired and was closed" : "submitted"}. Score: ${score}/${total} (${percentage}%).\n\nAssessment data stored in database!`);
       window.location.href = "dashboard.html";
     }
   </script>

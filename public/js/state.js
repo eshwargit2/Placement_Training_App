@@ -200,3 +200,177 @@ function logout() {
   save();
   window.location.href = "index.html";
 }
+
+function parseStudentNumericId(u) {
+  if (u === null || u === undefined) return null;
+  const str = String(u).trim();
+  const match = str.match(/^student(\d+)$/i);
+  if (match) return parseInt(match[1], 10);
+  if (/^\d+$/.test(str)) return parseInt(str, 10);
+  return str;
+}
+
+function getStudentCandidateKeys(rawId) {
+  const keys = new Set();
+  if (rawId === null || rawId === undefined) return [];
+  const s = String(rawId).trim().toLowerCase();
+  if (s) keys.add(s);
+  const num = parseStudentNumericId(rawId);
+  if (typeof num === 'number' && !isNaN(num)) {
+    keys.add(String(num));
+    keys.add(`student${String(num).padStart(3, '0')}`);
+    keys.add(`student${num}`);
+  }
+  return Array.from(keys);
+}
+
+window.parseStudentNumericId = parseStudentNumericId;
+window.getStudentCandidateKeys = getStudentCandidateKeys;
+
+function getApiBase() {
+  if (window.API_BASE) return window.API_BASE;
+  const h = window.location.hostname;
+  const p = window.location.port;
+  if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0') {
+    return 'http://localhost:5000';
+  }
+  if (window.location.origin && !window.location.origin.includes('null') && !window.location.origin.startsWith('file:')) {
+    return window.location.origin;
+  }
+  return 'http://localhost:5000';
+}
+
+window.getApiBase = getApiBase;
+
+async function serverLogin(username, password, role) {
+  const u = String(username || '').trim();
+  const p = String(password || '').trim();
+  const r = String(role || 'student').toLowerCase();
+  const apiBase = getApiBase();
+
+  try {
+    const res = await fetch(`${apiBase}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p, role: r })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Server validation failed. Invalid username or password.');
+    }
+
+    state.role = data.role;
+    state.user = data.user;
+    if (data.role === 'student' && data.user) {
+      let sIdx = state.students.findIndex(s => s.username === data.user.username || s.id === data.user.id);
+      if (sIdx >= 0) {
+        state.students[sIdx] = Object.assign(state.students[sIdx], data.user);
+      } else {
+        state.students.push(data.user);
+      }
+    }
+    save();
+    return data;
+  } catch (err) {
+    console.error('Server login validation error:', err);
+    if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('net::ERR_CONNECTION_REFUSED'))) {
+      throw new Error(`Cannot connect to Backend Server at ${apiBase}.\nPlease ensure backend is running with "node Backend/server.js" on port 5000.`);
+    }
+    throw err;
+  }
+}
+
+async function deleteStudentAccountOnline(studentId) {
+  const sId = String(studentId || '').trim().toLowerCase();
+  const apiBase = getApiBase();
+
+  try {
+    const res = await fetch(`${apiBase}/api/admin/student/${encodeURIComponent(sId)}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to delete student account from server.');
+    }
+  } catch (err) {
+    console.warn('Server account delete notice:', err.message);
+  }
+
+  // Remove from local memory state
+  state.students = state.students.filter(s => s.username !== sId && String(s.id) !== sId);
+  state.attempts = state.attempts.filter(a => String(a.studentId).toLowerCase() !== sId && String(a.username).toLowerCase() !== sId);
+  save();
+  return true;
+}
+
+async function saveStudentProfileOnline(profileData) {
+  const apiBase = getApiBase();
+  const payload = Object.assign({}, state.user || {}, profileData);
+
+  try {
+    const res = await fetch(`${apiBase}/api/student/profile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to save student profile in database.');
+    }
+    state.user = Object.assign(state.user || {}, data.user);
+  } catch (err) {
+    console.warn('Failed to save to remote server, updating locally:', err.message);
+    state.user = Object.assign(state.user || {}, payload, { profileCompleted: true });
+  }
+
+  let s = state.students.find(x => x.username === state.user.username || x.id === state.user.id);
+  if (!s) {
+    s = state.user;
+    state.students.push(s);
+  } else {
+    Object.assign(s, state.user);
+  }
+  save();
+  return state.user;
+}
+
+async function fetchStudentDashboardOnline(studentIdOrUsername) {
+  const sId = studentIdOrUsername || (state.user ? (state.user.username || state.user.id) : null);
+  if (!sId) return null;
+
+  const apiBase = getApiBase();
+  try {
+    const res = await fetch(`${apiBase}/api/student/${encodeURIComponent(sId)}/dashboard`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.success) {
+      if (data.student) {
+        state.user = Object.assign(state.user || {}, data.student);
+        let sIdx = state.students.findIndex(s => s.username === data.student.username || s.id === data.student.id);
+        if (sIdx >= 0) state.students[sIdx] = Object.assign(state.students[sIdx], data.student);
+      }
+      if (Array.isArray(data.attempts)) {
+        const userNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(sId) : null;
+        const candidateKeys = (typeof getStudentCandidateKeys === 'function') ? getStudentCandidateKeys(sId) : [String(sId).toLowerCase()];
+
+        // Remove old cached records for this student
+        const otherAttempts = (state.attempts || []).filter(a => {
+          const aNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(a.studentId || a.username) : null;
+          if (typeof userNum === 'number' && typeof aNum === 'number' && userNum === aNum) return false;
+          const aSId = String(a.studentId || '').toLowerCase();
+          const aUName = String(a.username || '').toLowerCase();
+          return !candidateKeys.includes(aSId) && !candidateKeys.includes(aUName);
+        });
+
+        const liveAttempts = data.attempts.map(a => Object.assign({}, a, { synced: true }));
+        state.attempts = [...otherAttempts, ...liveAttempts];
+      }
+      save();
+      return data;
+    }
+  } catch (err) {
+    console.warn('Dashboard fetch notice:', err.message);
+  }
+  return null;
+}

@@ -112,12 +112,18 @@ function exportAllAssessmentRecords() {
 }
 
 function exportStudentRecords(id) {
-  const st = (typeof state !== 'undefined' && state.students) ? state.students.find(x => x.id === id) : null;
-  if (!st) return;
+  const currentId = id || (typeof state !== 'undefined' && state.user ? (state.user.username || state.user.id) : null);
+  const userNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(currentId) : currentId;
+  const st = (typeof state !== 'undefined' && state.students) ? (state.students.find(x => x.id === currentId || x.username === currentId || parseStudentNumericId(x.id) === userNum) || (state.user || {})) : (state.user || {});
   const rows = [];
-  const attempts = (typeof state !== 'undefined' && state.attempts) ? state.attempts.filter(a => a.studentId === id) : [];
+  const attempts = (typeof state !== 'undefined' && state.attempts) ? state.attempts.filter(a => {
+    if (!a) return false;
+    const aNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(a.studentId || a.username) : null;
+    if (userNum && aNum && userNum === aNum) return true;
+    return String(a.studentId) === String(currentId) || String(a.username) === String(st.username || currentId);
+  }) : [];
   attempts.forEach(a => rows.push(...flattenAttemptRows(a)));
-  downloadExcel((st.rollNumber || st.username) + "_complete_assessment_records.xls", EXPORT_HEADERS, rows);
+  downloadExcel((st.rollNumber || st.username || currentId) + "_complete_assessment_records.xls", EXPORT_HEADERS, rows);
 }
 
 function exportAttemptExcel(id) {
@@ -657,10 +663,16 @@ function exportAttemptPDF(id) {
 }
 
 function exportStudentPDF(id) {
-  const currentId = id || (typeof state !== 'undefined' && state.user ? state.user.id : null);
-  const st = (typeof state !== 'undefined' && state.students) ? (state.students.find(x => x.id === currentId) || state.user || {}) : (state.user || {});
+  const currentId = id || (typeof state !== 'undefined' && state.user ? (state.user.username || state.user.id) : null);
+  const userNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(currentId) : currentId;
+  const st = (typeof state !== 'undefined' && state.students) ? (state.students.find(x => x.id === currentId || x.username === currentId || parseStudentNumericId(x.id) === userNum) || (state.user || {})) : (state.user || {});
   const rawAttempts = (typeof state !== 'undefined' && state.attempts) ? state.attempts : [];
-  const aa = rawAttempts.filter(a => String(a.studentId) === String(currentId) || String(a.username) === String(st.username));
+  const aa = rawAttempts.filter(a => {
+    if (!a) return false;
+    const aNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(a.studentId || a.username) : null;
+    if (userNum && aNum && userNum === aNum) return true;
+    return String(a.studentId) === String(currentId) || String(a.username) === String(st.username || currentId);
+  });
   if (!aa.length) {
     alert("No assessment records found to export for this student.");
     return;

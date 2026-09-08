@@ -71,7 +71,9 @@
         </div>
 
         <div id="formActions" style="margin-top:24px; display:flex; gap:12px;">
-          <button type="submit" style="flex:1; padding:14px; font-size:15px;">💾 Save & Continue</button>
+          <button id="saveProfileBtn" type="submit" style="flex:1; padding:14px; font-size:15px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+            <span id="saveBtnText">💾 Save & Continue</span>
+          </button>
         </div>
       </form>
     </div>
@@ -139,7 +141,7 @@
       if (err) err.textContent = msg;
     }
 
-    function saveStudentProfile() {
+    async function saveStudentProfile() {
       const nameEl = document.getElementById("pname");
       const deptEl = document.getElementById("pdept");
       const yearEl = document.getElementById("pyear");
@@ -178,15 +180,29 @@
 
       if (hasError) return;
 
-      let s = state.students.find(x => x.id === state.user.id);
-      if (!s) {
-        s = state.user;
-        state.students.push(s);
+      const btn = document.getElementById("saveProfileBtn");
+      const btnText = document.getElementById("saveBtnText");
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.textContent = "Saving to Database...";
+
+      try {
+        await saveStudentProfileOnline({
+          name,
+          department,
+          year,
+          rollNumber: roll,
+          profileCompleted: true
+        });
+
+        if (btnText) btnText.textContent = "Saved! Redirecting...";
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        alert("Notice: " + (err.message || "Saved locally."));
+        window.location.href = "dashboard.html";
+      } finally {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = "💾 Save & Continue";
       }
-      Object.assign(s, { name, department, year, rollNumber: roll, profileCompleted: true });
-      state.user = s;
-      save();
-      window.location.href = "dashboard.html";
     }
   </script>
 </body>
