@@ -143,29 +143,10 @@ function saveLocalStudents(map) {
   }
 }
 
-// Normalize student ID helper (e.g., student010 -> 10, "10" -> 10, 10 -> 10)
+// Normalize student ID helper (e.g., student001 -> 1, or string)
 function parseStudentNumericId(u) {
-  if (u === null || u === undefined) return null;
-  const str = String(u).trim();
-  const match = str.match(/^student(\d+)$/i);
-  if (match) return parseInt(match[1], 10);
-  if (/^\d+$/.test(str)) return parseInt(str, 10);
-  return str;
-}
-
-// Helper to return all possible key variations for a student (e.g. 'student010', '10', 'student10')
-function getStudentCandidateKeys(rawId) {
-  const keys = new Set();
-  if (rawId === null || rawId === undefined) return [];
-  const s = String(rawId).trim().toLowerCase();
-  if (s) keys.add(s);
-  const num = parseStudentNumericId(rawId);
-  if (typeof num === 'number' && !isNaN(num)) {
-    keys.add(String(num));
-    keys.add(`student${String(num).padStart(3, '0')}`);
-    keys.add(`student${num}`);
-  }
-  return Array.from(keys);
+  const match = String(u || '').match(/^student(\d+)$/i);
+  return match ? parseInt(match[1], 10) : u;
 }
 
 // ==========================================================================
@@ -223,7 +204,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (r === 'admin' || r === 'trainer') {
       const uLower = u.toLowerCase();
       if ((uLower === 'admin' || uLower === 'trainer') &&
-          (p === 'Trainer@Admin555' || p === 'Admin@555' || p === 'admin123')) {
+        (p === 'Trainer@Admin555' || p === 'Admin@555' || p === 'admin123')) {
         return res.json({
           success: true,
           role: 'admin',
@@ -236,31 +217,21 @@ app.post('/api/auth/login', async (req, res) => {
     // Student Login Verification
     const uLower = u.toLowerCase();
     const numericId = parseStudentNumericId(uLower);
-    const candidateKeys = getStudentCandidateKeys(uLower);
 
     let studentData = null;
 
-    // 1. Query Firebase Firestore if connected across candidate keys
+    // 1. Query Firebase Firestore if connected
     if (firestoreDb) {
       try {
-        for (const key of candidateKeys) {
-          const studentDocRef = firestoreDb.collection('students').doc(key);
-          const docSnap = await studentDocRef.get();
+        const studentDocRef = firestoreDb.collection('students').doc(uLower);
+        const docSnap = await studentDocRef.get();
 
-          if (docSnap.exists) {
-            const d = docSnap.data();
-            if (!studentData) {
-              studentData = d;
-            } else {
-              // Merge with richer profile if available
-              studentData = Object.assign({}, studentData, d);
-            }
-          }
-        }
-
-        if (!studentData) {
+        if (docSnap.exists) {
+          studentData = docSnap.data();
+        } else {
+          // Check by query if doc ID was numeric
           const querySnap = await firestoreDb.collection('students')
-            .where('username', 'in', candidateKeys.slice(0, 10)).limit(1).get();
+            .where('username', '==', uLower).limit(1).get();
           if (!querySnap.empty) {
             studentData = querySnap.docs[0].data();
           }
@@ -273,12 +244,7 @@ app.post('/api/auth/login', async (req, res) => {
     // 2. Fallback to local students store if not in Firestore
     if (!studentData) {
       const localStudents = getLocalStudents();
-      for (const key of candidateKeys) {
-        if (localStudents[key]) {
-          studentData = localStudents[key];
-          break;
-        }
-      }
+      studentData = localStudents[uLower] || null;
     }
 
     // 3. Handle Existing Student Account
@@ -288,8 +254,6 @@ app.post('/api/auth/login', async (req, res) => {
         return res.status(401).json({ success: false, error: 'Invalid password. Please try again.' });
       }
 
-      const isCompleted = (studentData.profileCompleted !== undefined) ? !!studentData.profileCompleted : (!!studentData.name && !!studentData.rollNumber);
-
       return res.json({
         success: true,
         role: 'student',
@@ -298,12 +262,12 @@ app.post('/api/auth/login', async (req, res) => {
           id: studentData.id || numericId,
           username: studentData.username || uLower,
           name: studentData.name || '',
-          department: studentData.department || 'Computer Science and Engineering (CSE)',
-          year: studentData.year || '4th Year',
+          department: studentData.department || '',
+          year: studentData.year || '',
           rollNumber: studentData.rollNumber || '',
-          reg: studentData.reg || `REG${String(numericId).padStart(3, '0')}`,
-          batch: studentData.batch || 'BATCH-A',
-          profileCompleted: isCompleted,
+          reg: studentData.reg || '',
+          batch: studentData.batch || '',
+          profileCompleted: !!studentData.profileCompleted,
           lastActive: studentData.lastActive || null
         }
       });
@@ -446,7 +410,7 @@ app.get('/api/student/profile/:studentId', async (req, res) => {
             studentData = querySnap.docs[0].data();
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (!studentData) {
@@ -473,102 +437,46 @@ app.get('/api/student/profile/:studentId', async (req, res) => {
 app.get('/api/student/:studentId/dashboard', async (req, res) => {
   try {
     const rawId = String(req.params.studentId || '').trim().toLowerCase();
-    const candidateKeys = getStudentCandidateKeys(rawId);
-    const numericId = parseStudentNumericId(rawId);
     let studentData = null;
-    let attemptsMap = new Map();
+    let attempts = [];
 
-    // 1. Fetch Student Profile & Subcollection Assessments from Firestore
+    // 1. Fetch Student Profile from Firestore
     if (firestoreDb) {
       try {
-        // Merge profile info across all candidate keys
-        for (const key of candidateKeys) {
-          const docSnap = await firestoreDb.collection('students').doc(key).get();
-          if (docSnap.exists) {
-            const d = docSnap.data();
-            studentData = Object.assign({}, studentData || {}, d);
-          }
+        const docSnap = await firestoreDb.collection('students').doc(rawId).get();
+        if (docSnap.exists) {
+          studentData = docSnap.data();
         }
 
-        // Check by query if profile not found by doc id
-        if (!studentData) {
-          const qSnap = await firestoreDb.collection('students')
-            .where('username', 'in', candidateKeys.slice(0, 10)).limit(1).get();
-          if (!qSnap.empty) {
-            studentData = qSnap.docs[0].data();
-          }
-        }
+        // Fetch student's assessments from subcollection
+        const subSnap = await firestoreDb.collection('students').doc(rawId)
+          .collection('assessments').orderBy('completedAt', 'desc').get();
+        subSnap.forEach(d => attempts.push(d.data()));
 
-        // Fetch subcollection assessments for all candidate keys
-        for (const key of candidateKeys) {
-          try {
-            const subSnap = await firestoreDb.collection('students').doc(key)
-              .collection('assessments').get();
-            subSnap.forEach(d => {
-              const data = d.data();
-              if (data && (data.id || d.id)) attemptsMap.set(String(data.id || d.id), data);
-            });
-          } catch (subErr) {}
+        // Also query global collection if subcollection was empty
+        if (!attempts.length) {
+          const globalSnap = await firestoreDb.collection('assessments')
+            .where('username', '==', rawId).get();
+          globalSnap.forEach(d => attempts.push(d.data()));
         }
-
-        // Also query global assessments collection for any matching record
-        const sRoll = String((studentData && studentData.rollNumber) || '').trim();
-        const globalDocs = await firestoreDb.collection('assessments').get();
-        globalDocs.forEach(d => {
-          const a = d.data();
-          if (!a) return;
-          const aNum = parseStudentNumericId(a.studentId || a.username);
-          const aSId = String(a.studentId || '').toLowerCase();
-          const aUName = String(a.username || '').toLowerCase();
-          const aRoll = String(a.rollNumber || '').trim();
-          if (
-            (typeof numericId === 'number' && typeof aNum === 'number' && numericId === aNum) ||
-            candidateKeys.includes(aSId) ||
-            candidateKeys.includes(aUName) ||
-            (sRoll && aRoll && sRoll === aRoll)
-          ) {
-            attemptsMap.set(String(a.id || d.id), a);
-          }
-        });
       } catch (fbErr) {
         console.warn('Firestore dashboard query error:', fbErr.message);
       }
     }
 
-    // 2. Fallback to Local Storage for Profile
+    // 2. Fallback to Local Storage
     if (!studentData) {
       const localStudents = getLocalStudents();
-      for (const key of candidateKeys) {
-        if (localStudents[key]) {
-          studentData = localStudents[key];
-          break;
-        }
-      }
+      studentData = localStudents[rawId] || null;
     }
 
-    // 3. Merge with Local Assessments
-    const sRollLocal = String((studentData && studentData.rollNumber) || '').trim();
-    const localAssessments = getLocalAssessments();
-    localAssessments.forEach(a => {
-      if (!a) return;
-      const aNum = parseStudentNumericId(a.studentId || a.username);
-      const aSId = String(a.studentId || '').toLowerCase();
-      const aUName = String(a.username || '').toLowerCase();
-      const aRoll = String(a.rollNumber || '').trim();
-      if (
-        (typeof numericId === 'number' && typeof aNum === 'number' && numericId === aNum) ||
-        candidateKeys.includes(aSId) ||
-        candidateKeys.includes(aUName) ||
-        (sRollLocal && aRoll && sRollLocal === aRoll)
-      ) {
-        if (!attemptsMap.has(String(a.id))) {
-          attemptsMap.set(String(a.id), a);
-        }
-      }
-    });
-
-    const attempts = Array.from(attemptsMap.values());
-    attempts.sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+    if (!attempts.length) {
+      const localAssessments = getLocalAssessments();
+      attempts = localAssessments.filter(a =>
+        String(a.studentId).toLowerCase() === rawId ||
+        String(a.username).toLowerCase() === rawId
+      );
+    }
 
     return res.json({
       success: true,
@@ -582,71 +490,20 @@ app.get('/api/student/:studentId/dashboard', async (req, res) => {
   }
 });
 
-// 1.5 Get All / Filtered Assessments API
-app.get('/api/assessments', async (req, res) => {
-  try {
-    const { studentId, username, day } = req.query;
-    let list = [];
-
-    if (firestoreDb) {
-      try {
-        const snapshot = await firestoreDb.collection('assessments').orderBy('completedAt', 'desc').get();
-        snapshot.forEach(doc => list.push(doc.data()));
-      } catch (fbErr) {
-        list = getLocalAssessments();
-      }
-    } else {
-      list = getLocalAssessments();
-    }
-
-    if (studentId || username) {
-      const targetId = studentId || username;
-      const candidateKeys = getStudentCandidateKeys(targetId);
-      const targetNum = parseStudentNumericId(targetId);
-      list = list.filter(a => {
-        const aNum = parseStudentNumericId(a.studentId || a.username);
-        const aSId = String(a.studentId || '').toLowerCase();
-        const aUName = String(a.username || '').toLowerCase();
-        return (
-          (typeof targetNum === 'number' && typeof aNum === 'number' && targetNum === aNum) ||
-          candidateKeys.includes(aSId) ||
-          candidateKeys.includes(aUName)
-        );
-      });
-    }
-
-    if (day && day !== 'all') {
-      list = list.filter(a => String(a.day) === String(day));
-    }
-
-    return res.json({
-      success: true,
-      count: list.length,
-      databaseMode,
-      assessments: list
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
-  }
-});
-
 // 2. Submit Assessment (Called by Student upon completing assessment)
 app.post('/api/assessments', async (req, res) => {
   try {
     const payload = req.body;
 
-    if (!payload || !payload.day || (!payload.studentId && !payload.username)) {
+    if (!payload || !payload.day || !payload.studentId) {
       return res.status(400).json({ success: false, error: 'Missing required assessment submission fields (day, studentId).' });
     }
 
-    const numericId = parseStudentNumericId(payload.studentId || payload.username);
-    const standardUsername = payload.username || (typeof numericId === 'number' ? `student${String(numericId).padStart(3, '0')}` : String(payload.studentId));
-
     const assessmentRecord = {
       id: payload.id || 'ASM_' + Date.now(),
-      studentId: payload.studentId ?? numericId,
+      studentId: payload.studentId,
       studentName: payload.studentName || 'Unknown Student',
-      username: standardUsername,
+      username: payload.username || '',
       department: payload.department || 'CSE',
       year: payload.year || '4th Year',
       rollNumber: payload.rollNumber || '',
@@ -678,31 +535,30 @@ app.post('/api/assessments', async (req, res) => {
     // Store in Firebase Firestore if configured
     if (firestoreDb) {
       try {
+        const studentDocId = String(assessmentRecord.studentId || assessmentRecord.username || assessmentRecord.rollNumber || 'student');
+
         // 1. Save in global 'assessments' collection
         await firestoreDb.collection('assessments').doc(assessmentRecord.id).set(assessmentRecord);
 
-        // 2. Save in student-specific subcollection across all candidate keys
-        const candidateKeys = getStudentCandidateKeys(standardUsername);
-        for (const k of candidateKeys) {
-          try {
-            await firestoreDb.collection('students').doc(k)
-              .collection('assessments').doc(assessmentRecord.id).set(assessmentRecord);
-            await firestoreDb.collection('students').doc(k).set({
-              studentId: assessmentRecord.studentId,
-              name: assessmentRecord.studentName,
-              username: assessmentRecord.username,
-              department: assessmentRecord.department,
-              year: assessmentRecord.year,
-              rollNumber: assessmentRecord.rollNumber,
-              lastActive: assessmentRecord.completedAt,
-              lastActiveDisplay: assessmentRecord.completedAtDisplay,
-              lastAssessmentDay: assessmentRecord.day,
-              lastScore: assessmentRecord.percentage
-            }, { merge: true });
-          } catch (kErr) {}
-        }
+        // 2. Save in student-specific subcollection: students/{studentDocId}/assessments/{assessmentId}
+        await firestoreDb.collection('students').doc(studentDocId)
+          .collection('assessments').doc(assessmentRecord.id).set(assessmentRecord);
 
-        console.log(`[Firebase Firestore] Stored assessment ${assessmentRecord.id} under candidate student keys (${candidateKeys.join(', ')}) and global collection.`);
+        // 3. Update student parent summary document
+        await firestoreDb.collection('students').doc(studentDocId).set({
+          studentId: assessmentRecord.studentId,
+          name: assessmentRecord.studentName,
+          username: assessmentRecord.username,
+          department: assessmentRecord.department,
+          year: assessmentRecord.year,
+          rollNumber: assessmentRecord.rollNumber,
+          lastActive: assessmentRecord.completedAt,
+          lastActiveDisplay: assessmentRecord.completedAtDisplay,
+          lastAssessmentDay: assessmentRecord.day,
+          lastScore: assessmentRecord.percentage
+        }, { merge: true });
+
+        console.log(`[Firebase Firestore] Stored assessment ${assessmentRecord.id} under student ${studentDocId} and global collection.`);
       } catch (fbErr) {
         console.error('Firebase save error, falling back to local file:', fbErr.message);
       }
@@ -789,48 +645,26 @@ app.get('/api/admin/students', async (req, res) => {
   try {
     const studentMap = {};
 
-    function resolveStudentKey(obj, fallbackId) {
-      const u = obj.username || obj.studentId || obj.id || fallbackId;
-      const num = parseStudentNumericId(u);
-      if (typeof num === 'number' && !isNaN(num)) {
-        return `student${String(num).padStart(3, '0')}`;
-      }
-      return String(u || '').toLowerCase().trim();
-    }
-
     // 1. Fetch registered students from Firestore
     if (firestoreDb) {
       try {
         const studentDocsSnap = await firestoreDb.collection('students').get();
         studentDocsSnap.forEach(doc => {
           const s = doc.data();
-          const sKey = resolveStudentKey(s, doc.id);
-          const num = parseStudentNumericId(s.username || s.studentId || s.id || doc.id);
-          const sId = (typeof num === 'number') ? num : (s.id || sKey);
-
-          if (!studentMap[sKey]) {
-            studentMap[sKey] = {
-              studentId: sId,
-              name: s.name || '',
-              username: s.username || sKey,
-              department: s.department || 'Computer Science and Engineering (CSE)',
-              year: s.year || '4th Year',
-              rollNumber: s.rollNumber || '',
-              reg: s.reg || `REG${String(num || '000').padStart(3, '0')}`,
-              profileCompleted: !!s.profileCompleted,
-              attemptsCount: 0,
-              daysCompleted: new Set(),
-              scores: [],
-              latestAttemptAt: s.updatedAtDisplay || s.lastActive || s.updatedAt || null
-            };
-          } else {
-            // Merge with more complete fields if present
-            if (!studentMap[sKey].name && s.name) studentMap[sKey].name = s.name;
-            if (!studentMap[sKey].rollNumber && s.rollNumber) studentMap[sKey].rollNumber = s.rollNumber;
-            if (s.profileCompleted) studentMap[sKey].profileCompleted = true;
-            if (s.department && s.department !== 'CSE') studentMap[sKey].department = s.department;
-            if (s.reg) studentMap[sKey].reg = s.reg;
-          }
+          const sId = s.username || s.studentId || doc.id;
+          studentMap[sId] = {
+            studentId: s.id || sId,
+            name: s.name || '',
+            username: s.username || sId,
+            department: s.department || '',
+            year: s.year || '',
+            rollNumber: s.rollNumber || '',
+            profileCompleted: !!s.profileCompleted,
+            attemptsCount: 0,
+            daysCompleted: new Set(),
+            scores: [],
+            latestAttemptAt: s.updatedAtDisplay || s.lastActive || s.updatedAt || null
+          };
         });
       } catch (fbErr) {
         console.warn('Firebase students fetch error:', fbErr.message);
@@ -840,29 +674,24 @@ app.get('/api/admin/students', async (req, res) => {
     // 2. Fetch local students
     const localStudents = getLocalStudents();
     Object.values(localStudents).forEach(s => {
-      const sKey = resolveStudentKey(s, s.id || s.username);
-      const num = parseStudentNumericId(s.username || s.studentId || s.id);
-      const sId = (typeof num === 'number') ? num : (s.id || sKey);
-
-      if (!studentMap[sKey]) {
-        studentMap[sKey] = {
-          studentId: sId,
+      const sId = s.username || s.studentId || s.id;
+      if (!studentMap[sId]) {
+        studentMap[sId] = {
+          studentId: s.id || sId,
           name: s.name || '',
-          username: s.username || sKey,
-          department: s.department || 'Computer Science and Engineering (CSE)',
-          year: s.year || '4th Year',
+          username: s.username || sId,
+          department: s.department || '',
+          year: s.year || '',
           rollNumber: s.rollNumber || '',
-          reg: s.reg || `REG${String(num || '000').padStart(3, '0')}`,
           profileCompleted: !!s.profileCompleted,
           attemptsCount: 0,
           daysCompleted: new Set(),
           scores: [],
           latestAttemptAt: s.updatedAtDisplay || s.lastActive || null
         };
-      } else {
-        if (!studentMap[sKey].name && s.name) studentMap[sKey].name = s.name;
-        if (!studentMap[sKey].rollNumber && s.rollNumber) studentMap[sKey].rollNumber = s.rollNumber;
-        if (s.profileCompleted) studentMap[sKey].profileCompleted = true;
+      } else if (!studentMap[sId].name && s.name) {
+        studentMap[sId].name = s.name;
+        studentMap[sId].rollNumber = s.rollNumber;
       }
     });
 
@@ -880,19 +709,15 @@ app.get('/api/admin/students', async (req, res) => {
     }
 
     assessmentList.forEach(a => {
-      const sKey = resolveStudentKey(a, a.username || a.studentId);
-      const num = parseStudentNumericId(a.username || a.studentId);
-      const sId = (typeof num === 'number') ? num : (a.studentId || sKey);
-
-      if (!studentMap[sKey]) {
-        studentMap[sKey] = {
-          studentId: sId,
+      const sId = a.username || a.studentId || 'unknown';
+      if (!studentMap[sId]) {
+        studentMap[sId] = {
+          studentId: a.studentId,
           name: a.studentName || '',
-          username: a.username || sKey,
-          department: a.department || 'Computer Science and Engineering (CSE)',
-          year: a.year || '4th Year',
+          username: a.username || sId,
+          department: a.department || '',
+          year: a.year || '',
           rollNumber: a.rollNumber || '',
-          reg: `REG${String(num || '000').padStart(3, '0')}`,
           profileCompleted: true,
           attemptsCount: 0,
           daysCompleted: new Set(),
@@ -900,14 +725,14 @@ app.get('/api/admin/students', async (req, res) => {
           latestAttemptAt: a.completedAtDisplay || a.completedAt
         };
       }
-      studentMap[sKey].attemptsCount++;
-      studentMap[sKey].daysCompleted.add(a.day);
-      studentMap[sKey].scores.push(Number(a.percentage || 0));
+      studentMap[sId].attemptsCount++;
+      studentMap[sId].daysCompleted.add(a.day);
+      studentMap[sId].scores.push(Number(a.percentage || 0));
       if (a.completedAtDisplay || a.completedAt) {
-        studentMap[sKey].latestAttemptAt = a.completedAtDisplay || a.completedAt;
+        studentMap[sId].latestAttemptAt = a.completedAtDisplay || a.completedAt;
       }
-      if (!studentMap[sKey].name && a.studentName) studentMap[sKey].name = a.studentName;
-      if (!studentMap[sKey].rollNumber && a.rollNumber) studentMap[sKey].rollNumber = a.rollNumber;
+      if (!studentMap[sId].name && a.studentName) studentMap[sId].name = a.studentName;
+      if (!studentMap[sId].rollNumber && a.rollNumber) studentMap[sId].rollNumber = a.rollNumber;
     });
 
     const students = Object.values(studentMap).map(s => {
@@ -925,15 +750,6 @@ app.get('/api/admin/students', async (req, res) => {
         averageScore: avgScore,
         latestActivity: s.latestAttemptAt
       };
-    });
-
-    students.sort((a, b) => {
-      const numA = parseStudentNumericId(a.username || a.studentId);
-      const numB = parseStudentNumericId(b.username || b.studentId);
-      if (typeof numA === 'number' && typeof numB === 'number' && !isNaN(numA) && !isNaN(numB)) {
-        return numA - numB;
-      }
-      return String(a.username || a.studentId).localeCompare(String(b.username || b.studentId), undefined, { numeric: true });
     });
 
     return res.json({
@@ -993,7 +809,7 @@ app.get('/api/admin/assessment/:id', async (req, res) => {
         if (doc.exists) {
           record = doc.data();
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (!record) {
@@ -1022,17 +838,14 @@ app.delete('/api/admin/assessment/:id', async (req, res) => {
       try {
         const docRef = firestoreDb.collection('assessments').doc(id);
         const docSnap = await docRef.get();
-        const sId = studentId || (docSnap.exists ? (docSnap.data().username || docSnap.data().studentId) : null);
+        const sId = studentId || (docSnap.exists ? docSnap.data().studentId : null);
 
         await docRef.delete();
 
         if (sId) {
-          const keys = getStudentCandidateKeys(sId);
-          for (const k of keys) {
-            try {
-              await firestoreDb.collection('students').doc(k).collection('assessments').doc(id).delete();
-            } catch (errSub) {}
-          }
+          try {
+            await firestoreDb.collection('students').doc(sId).collection('assessments').doc(id).delete();
+          } catch (errSub) { }
         }
       } catch (e) {
         console.error('Firestore delete error:', e.message);
@@ -1050,185 +863,36 @@ app.delete('/api/admin/assessment/:id', async (req, res) => {
   }
 });
 
-// 6.1 Admin API - Bulk Delete Assessments (All or by specific Date)
-app.delete('/api/admin/assessments', async (req, res) => {
-  try {
-    const isAll = String(req.query.all || (req.body && req.body.all) || '').toLowerCase() === 'true';
-    const targetDate = String(req.query.date || (req.body && req.body.date) || '').trim();
-
-    if (!isAll && !targetDate) {
-      return res.status(400).json({ success: false, error: 'Please specify either ?all=true or ?date=YYYY-MM-DD to delete assessment records.' });
-    }
-
-    let deletedCount = 0;
-
-    if (firestoreDb) {
-      try {
-        if (isAll) {
-          // 1. Delete ALL from global assessments collection
-          const assessmentsSnap = await firestoreDb.collection('assessments').get();
-          deletedCount = assessmentsSnap.size;
-          for (let i = 0; i < assessmentsSnap.docs.length; i += 400) {
-            const chunk = assessmentsSnap.docs.slice(i, i + 400);
-            const batch = firestoreDb.batch();
-            chunk.forEach(doc => batch.delete(doc.ref));
-            await batch.commit();
-          }
-
-          // 2. Delete ALL assessments from EVERY student subcollection in Firestore
-          const studentsSnap = await firestoreDb.collection('students').get();
-          for (const studentDoc of studentsSnap.docs) {
-            try {
-              const subSnap = await studentDoc.ref.collection('assessments').get();
-              if (!subSnap.empty) {
-                for (let j = 0; j < subSnap.docs.length; j += 400) {
-                  const subChunk = subSnap.docs.slice(j, j + 400);
-                  const subBatch = firestoreDb.batch();
-                  subChunk.forEach(d => subBatch.delete(d.ref));
-                  await subBatch.commit();
-                }
-              }
-              await studentDoc.ref.set({
-                lastAssessmentDay: null,
-                lastScore: null
-              }, { merge: true });
-            } catch (sErr) {}
-          }
-        } else if (targetDate) {
-          // Date-specific deletion
-          const assessmentsSnap = await firestoreDb.collection('assessments').get();
-          const docsToDelete = [];
-
-          assessmentsSnap.forEach(doc => {
-            const data = doc.data();
-            const cDate = data.completedAt ? new Date(data.completedAt).toISOString().slice(0, 10) : '';
-            const disp = String(data.completedAtDisplay || data.date || '');
-            if (cDate === targetDate || (data.completedAt && data.completedAt.startsWith(targetDate)) || disp.includes(targetDate)) {
-              docsToDelete.push({ id: doc.id, studentId: data.studentId || data.username });
-            }
-          });
-
-          deletedCount = docsToDelete.length;
-
-          for (let i = 0; i < docsToDelete.length; i += 400) {
-            const chunk = docsToDelete.slice(i, i + 400);
-            const batch = firestoreDb.batch();
-            for (const item of chunk) {
-              batch.delete(firestoreDb.collection('assessments').doc(item.id));
-              if (item.studentId) {
-                const keys = getStudentCandidateKeys(item.studentId);
-                for (const k of keys) {
-                  batch.delete(firestoreDb.collection('students').doc(k).collection('assessments').doc(item.id));
-                }
-              }
-            }
-            await batch.commit();
-          }
-        }
-
-        console.log(`[Firebase Firestore] Bulk deleted ${deletedCount} assessment records (${isAll ? 'ALL' : 'Date: ' + targetDate})`);
-      } catch (fbErr) {
-        console.error('Firebase bulk delete error:', fbErr.message);
-      }
-    }
-
-    // Local file synchronization
-    let localList = getLocalAssessments();
-    const initialLocalCount = localList.length;
-
-    if (isAll) {
-      deletedCount = Math.max(deletedCount, initialLocalCount);
-      saveLocalAssessments([]);
-    } else if (targetDate) {
-      const remaining = localList.filter(a => {
-        const cDate = a.completedAt ? new Date(a.completedAt).toISOString().slice(0, 10) : '';
-        const disp = String(a.completedAtDisplay || a.date || '');
-        const match = (cDate === targetDate || (a.completedAt && a.completedAt.startsWith(targetDate)) || disp.includes(targetDate));
-        return !match;
-      });
-      const localDeleted = initialLocalCount - remaining.length;
-      deletedCount = Math.max(deletedCount, localDeleted);
-      saveLocalAssessments(remaining);
-    }
-
-    const message = isAll
-      ? `Successfully deleted all ${deletedCount} assessment records from the database.`
-      : `Successfully deleted ${deletedCount} assessment records for date ${targetDate}.`;
-
-    return res.json({
-      success: true,
-      deletedCount,
-      message
-    });
-  } catch (error) {
-    console.error('Error during bulk assessment deletion:', error);
-    return res.status(500).json({ success: false, error: error.message });
-  }
-});
-
 // 7. Admin API - Delete Student Account and all associated data from Firebase
 app.delete('/api/admin/student/:studentId', async (req, res) => {
   try {
-    const rawId = String(req.params.studentId || '').trim().toLowerCase();
-    if (!rawId) {
+    const sId = String(req.params.studentId || '').trim().toLowerCase();
+    if (!sId) {
       return res.status(400).json({ success: false, error: 'Student ID or username is required.' });
     }
 
-    const candidateKeys = getStudentCandidateKeys(rawId);
-    const numericId = parseStudentNumericId(rawId);
-
     if (firestoreDb) {
       try {
-        // 1. Delete ALL matching student profile documents and subcollections from Firestore
-        for (const key of candidateKeys) {
-          try {
-            await firestoreDb.collection('students').doc(key).delete();
-          } catch (e) {}
+        // 1. Delete student profile document from Firestore
+        await firestoreDb.collection('students').doc(sId).delete();
 
-          try {
-            const subSnap = await firestoreDb.collection('students').doc(key).collection('assessments').get();
-            if (!subSnap.empty) {
-              const batch = firestoreDb.batch();
-              subSnap.forEach(doc => batch.delete(doc.ref));
-              await batch.commit();
-            }
-          } catch (e) {}
+        // 2. Delete all assessments in student's subcollection
+        const subSnap = await firestoreDb.collection('students').doc(sId).collection('assessments').get();
+        if (!subSnap.empty) {
+          const batch = firestoreDb.batch();
+          subSnap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
         }
 
-        // Query students where username or id matches
-        const qSnap = await firestoreDb.collection('students')
-          .where('username', 'in', candidateKeys.slice(0, 10)).get();
-        if (!qSnap.empty) {
-          for (const doc of qSnap.docs) {
-            await doc.ref.delete();
-          }
-        }
-
-        // 2. Delete from global assessments collection
-        const globalSnap = await firestoreDb.collection('assessments').get();
+        // 3. Delete from global assessments collection
+        const globalSnap = await firestoreDb.collection('assessments').where('username', '==', sId).get();
         if (!globalSnap.empty) {
-          const batchGlobal = firestoreDb.batch();
-          let countG = 0;
-          globalSnap.forEach(doc => {
-            const data = doc.data();
-            const aNum = parseStudentNumericId(data.studentId || data.username);
-            const aSId = String(data.studentId || '').toLowerCase();
-            const aUName = String(data.username || '').toLowerCase();
-            if (
-              (typeof numericId === 'number' && typeof aNum === 'number' && numericId === aNum) ||
-              candidateKeys.includes(aSId) ||
-              candidateKeys.includes(aUName)
-            ) {
-              batchGlobal.delete(doc.ref);
-              countG++;
-            }
-          });
-          if (countG > 0) {
-            await batchGlobal.commit();
-          }
+          const batch2 = firestoreDb.batch();
+          globalSnap.forEach(doc => batch2.delete(doc.ref));
+          await batch2.commit();
         }
 
-        console.log(`[Firebase Firestore] Deleted student account candidate keys (${candidateKeys.join(', ')}) and associated records.`);
+        console.log(`[Firebase Firestore] Deleted student account ${sId} and associated records.`);
       } catch (fbErr) {
         console.error('Firebase delete student error:', fbErr.message);
       }
@@ -1236,27 +900,19 @@ app.delete('/api/admin/student/:studentId', async (req, res) => {
 
     // Clean from local storage store as well
     const localStudents = getLocalStudents();
-    for (const key of candidateKeys) {
-      delete localStudents[key];
-    }
+    delete localStudents[sId];
     saveLocalStudents(localStudents);
 
     let localAssessments = getLocalAssessments();
-    localAssessments = localAssessments.filter(a => {
-      const aNum = parseStudentNumericId(a.studentId || a.username);
-      const aSId = String(a.studentId || '').toLowerCase();
-      const aUName = String(a.username || '').toLowerCase();
-      return !(
-        (typeof numericId === 'number' && typeof aNum === 'number' && numericId === aNum) ||
-        candidateKeys.includes(aSId) ||
-        candidateKeys.includes(aUName)
-      );
-    });
+    localAssessments = localAssessments.filter(a =>
+      String(a.studentId).toLowerCase() !== sId &&
+      String(a.username).toLowerCase() !== sId
+    );
     saveLocalAssessments(localAssessments);
 
     return res.json({
       success: true,
-      message: `Student account ${rawId} and all associated records (${candidateKeys.join(', ')}) deleted successfully.`
+      message: `Student account ${sId} and all associated assessment records deleted successfully.`
     });
   } catch (error) {
     console.error('Error deleting student account:', error);
