@@ -594,16 +594,24 @@ function exportAttemptPDF(id) {
   const dept = String(a.department ?? st.department ?? "CSE").trim();
   const yr = String(a.year ?? st.year ?? "4th Year").trim();
   const sid = String(a.studentId ?? st.id ?? "-").trim();
-  const topicName = a.topic || (typeof curriculum !== 'undefined' && curriculum[a.day - 1] ? curriculum[a.day - 1][0] : `Day ${a.day} Assessment`);
+  const isCustom = !!(a.isCustomExam || a.customAssessmentId || !a.day);
+  const topicName = a.topic || (typeof curriculum !== 'undefined' && a.day && curriculum[a.day - 1] ? curriculum[a.day - 1][0] : (a.examTitle || `Custom Assessment`));
+  const reportAssessmentTitle = isCustom ? `${esc(a.examTitle || a.topic || "Custom Assessment")}` : `Day ${a.day} — ${esc(topicName)}`;
 
   const metaHtml = `
     <div><b>Student:</b> ${esc(studentName)}</div>
     <div><b>Roll No:</b> ${esc(rollNo)}</div>
     <div><b>Dept:</b> ${esc(dept)} (${esc(yr)})</div>
-    <div><b>Assessment:</b> Day ${a.day} — ${esc(topicName)}</div>
+    <div><b>Assessment:</b> ${reportAssessmentTitle}</div>
     <div><b>Score:</b> ${a.score}/${a.total || 5} (${a.percentage}%)</div>
     <div><b>Date:</b> ${esc(a.completedAtDisplay || a.date || "-")}</div>
   `;
+
+  const hasCoding = !isCustom && Boolean(
+    (a.day && typeof CODING_BANK !== 'undefined' && CODING_BANK[a.day]) ||
+    a.program1 || a.program2 || a.program3 ||
+    a.program1Prompt || a.program2Prompt || a.program3Prompt
+  );
 
   let contentHtml = `
     <div class="student-card">
@@ -619,10 +627,10 @@ function exportAttemptPDF(id) {
       </div>
       <div class="assessment-item">
         <div class="assessment-header-bar">
-          <h3 class="assessment-title-text">Day ${a.day}: ${esc(topicName)}</h3>
+          <h3 class="assessment-title-text">${isCustom ? `${esc(a.examTitle || a.topic || "Custom Assessment")}` : `Day ${a.day}: ${esc(topicName)}`}</h3>
           <div>${getScorePillHtml(a.percentage)}</div>
         </div>
-        <h4 style="margin:12px 0 8px; font-size:13.5px; color:#1e3a8a;">1. MCQ Conceptual Evaluation</h4>
+        <h4 style="margin:12px 0 8px; font-size:13.5px; color:#1e3a8a;">${hasCoding ? '1. MCQ Conceptual Evaluation' : 'MCQ Conceptual Evaluation'}</h4>
         ${getAttemptDetails(a).map(d => `
           <div class="mcq-box">
             <div class="mcq-q-title">
@@ -635,28 +643,30 @@ function exportAttemptPDF(id) {
           </div>
         `).join("")}
 
-        <h4 style="margin:20px 0 8px; font-size:13.5px; color:#1e3a8a;">2. Candidate Coding Submissions</h4>
-        ${[1, 2, 3].map(n => {
-          const sub = (typeof state !== 'undefined' && state.submissions ? state.submissions.find(x => x.studentId === a.studentId && x.day === a.day && x.problem === n && (x.attemptNumber || 1) === (a.attemptNumber || 1)) : null);
-          const pPrompt = a["program" + n + "Prompt"] || sub?.prompt || (typeof CODING_BANK !== 'undefined' && CODING_BANK[a.day]?.[n - 1]) || `Program ${n}`;
-          const pCode = a["program" + n] || sub?.code || "// No code saved";
-          const pStatus = sub?.status || (a["program" + n] ? "Submitted" : "Not Provided");
-          return `
-            <div class="prog-title">
-              <span><b>Challenge ${n}:</b> ${esc(pPrompt)}</span>
-              <span class="badge-correct" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">${esc(pStatus)}</span>
-            </div>
-            <div class="code-wrapper">${esc(pCode)}</div>
-            ${sub?.feedback ? `<div class="mcq-subtext" style="color:#1e3a8a; margin-bottom:12px;"><b>Trainer Feedback:</b> ${esc(sub.feedback)}</div>` : ''}
-          `;
-        }).join("")}
+        ${hasCoding ? `
+          <h4 style="margin:20px 0 8px; font-size:13.5px; color:#1e3a8a;">2. Candidate Coding Submissions</h4>
+          ${[1, 2, 3].map(n => {
+            const sub = (typeof state !== 'undefined' && state.submissions ? state.submissions.find(x => x.studentId === a.studentId && x.day === a.day && x.problem === n && (x.attemptNumber || 1) === (a.attemptNumber || 1)) : null);
+            const pPrompt = a["program" + n + "Prompt"] || sub?.prompt || (typeof CODING_BANK !== 'undefined' && CODING_BANK[a.day]?.[n - 1]) || `Program ${n}`;
+            const pCode = a["program" + n] || sub?.code || "// No code saved";
+            const pStatus = sub?.status || (a["program" + n] ? "Submitted" : "Not Provided");
+            return `
+              <div class="prog-title">
+                <span><b>Challenge ${n}:</b> ${esc(pPrompt)}</span>
+                <span class="badge-correct" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">${esc(pStatus)}</span>
+              </div>
+              <div class="code-wrapper">${esc(pCode)}</div>
+              ${sub?.feedback ? `<div class="mcq-subtext" style="color:#1e3a8a; margin-bottom:12px;"><b>Trainer Feedback:</b> ${esc(sub.feedback)}</div>` : ''}
+            `;
+          }).join("")}
+        ` : ''}
       </div>
     </div>
   `;
 
   openColoredPDFReport(
-    `${studentName} — Day ${a.day} Assessment Report`,
-    `Individual Candidate Complete Assessment & Code Evaluation`,
+    `${studentName} — ${isCustom ? (a.examTitle || a.topic || "Custom Assessment") : `Day ${a.day} Assessment`} Report`,
+    `Individual Candidate Complete Assessment Evaluation`,
     metaHtml,
     contentHtml
   );
@@ -779,14 +789,21 @@ function exportAllRecordsPDF(customList, filename) {
   groupedStudents.forEach(st => {
     let assessmentsHtml = "";
     st.assessments.forEach((a, aIdx) => {
-      const topicName = a.topic || (typeof curriculum !== 'undefined' && curriculum[a.day - 1] ? curriculum[a.day - 1][0] : `Assessment Day ${a.day}`);
+      const isCust = !!(a.isCustomExam || a.customAssessmentId || !a.day);
+      const topicName = a.topic || (typeof curriculum !== 'undefined' && a.day && curriculum[a.day - 1] ? curriculum[a.day - 1][0] : (a.examTitle || `Custom Assessment`));
+      const testTitle = isCust ? `${esc(a.examTitle || a.topic || 'Custom Assessment')}` : `Day ${a.day}: ${esc(topicName)}`;
       const mcqDetails = getAttemptDetails(a);
+      const hasCoding = !isCust && Boolean(
+        (a.day && typeof CODING_BANK !== 'undefined' && CODING_BANK[a.day]) ||
+        a.program1 || a.program2 || a.program3 ||
+        a.program1Prompt || a.program2Prompt || a.program3Prompt
+      );
 
       assessmentsHtml += `
         <div class="assessment-item">
           <div class="assessment-header-bar">
             <div>
-              <span class="assessment-title-text">[Test #${aIdx + 1}] Day ${a.day}: ${esc(topicName)}</span>
+              <span class="assessment-title-text">[Test #${aIdx + 1}] ${testTitle}</span>
               <span style="color:#64748b; font-size:12px; margin-left:8px;">(Attempt #${a.attemptNumber || 1})</span>
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
@@ -796,7 +813,7 @@ function exportAllRecordsPDF(customList, filename) {
           </div>
 
           <!-- MCQs -->
-          <h4 style="margin:10px 0 6px; font-size:13px; color:#1e3a8a;">1. MCQ Responses &amp; Verification</h4>
+          <h4 style="margin:10px 0 6px; font-size:13px; color:#1e3a8a;">${hasCoding ? '1. MCQ Responses &amp; Verification' : 'MCQ Responses &amp; Verification'}</h4>
           ${mcqDetails.map(d => `
             <div class="mcq-box">
               <div class="mcq-q-title">
@@ -808,22 +825,24 @@ function exportAllRecordsPDF(customList, filename) {
             </div>
           `).join("")}
 
-          <!-- Coding Challenges -->
-          <h4 style="margin:16px 0 6px; font-size:13px; color:#1e3a8a;">2. Candidate Coding Submissions (3 Programs)</h4>
-          ${[1, 2, 3].map(n => {
-            const sub = (typeof state !== 'undefined' && state.submissions ? state.submissions.find(x => x.studentId === a.studentId && x.day === a.day && x.problem === n && (x.attemptNumber || 1) === (a.attemptNumber || 1)) : null);
-            const pPrompt = a["program" + n + "Prompt"] || sub?.prompt || (typeof CODING_BANK !== 'undefined' && CODING_BANK[a.day]?.[n - 1]) || `Program ${n}`;
-            const pCode = a["program" + n] || sub?.code || "// No code saved";
-            const pStatus = sub?.status || (a["program" + n] ? "Submitted" : "Not Provided");
-            return `
-              <div class="prog-title">
-                <span><b>Challenge ${n}:</b> ${esc(pPrompt)}</span>
-                <span class="badge-correct" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">${esc(pStatus)}</span>
-              </div>
-              <div class="code-wrapper">${esc(pCode)}</div>
-              ${sub?.feedback ? `<div class="mcq-subtext" style="color:#1e3a8a; margin-bottom:12px;"><b>Trainer Feedback:</b> ${esc(sub.feedback)}</div>` : ''}
-            `;
-          }).join("")}
+          <!-- Coding Challenges (only if assessment includes coding) -->
+          ${hasCoding ? `
+            <h4 style="margin:16px 0 6px; font-size:13px; color:#1e3a8a;">2. Candidate Coding Submissions (3 Programs)</h4>
+            ${[1, 2, 3].map(n => {
+              const sub = (typeof state !== 'undefined' && state.submissions ? state.submissions.find(x => x.studentId === a.studentId && x.day === a.day && x.problem === n && (x.attemptNumber || 1) === (a.attemptNumber || 1)) : null);
+              const pPrompt = a["program" + n + "Prompt"] || sub?.prompt || (typeof CODING_BANK !== 'undefined' && CODING_BANK[a.day]?.[n - 1]) || `Program ${n}`;
+              const pCode = a["program" + n] || sub?.code || "// No code saved";
+              const pStatus = sub?.status || (a["program" + n] ? "Submitted" : "Not Provided");
+              return `
+                <div class="prog-title">
+                  <span><b>Challenge ${n}:</b> ${esc(pPrompt)}</span>
+                  <span class="badge-correct" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">${esc(pStatus)}</span>
+                </div>
+                <div class="code-wrapper">${esc(pCode)}</div>
+                ${sub?.feedback ? `<div class="mcq-subtext" style="color:#1e3a8a; margin-bottom:12px;"><b>Trainer Feedback:</b> ${esc(sub.feedback)}</div>` : ''}
+              `;
+            }).join("")}
+          ` : ''}
         </div>
       `;
     });

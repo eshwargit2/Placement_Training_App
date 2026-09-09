@@ -82,6 +82,7 @@
 
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
+  <script src="js/highlighter.js"></script>
   <script>
     if (!requireAuth("student")) {
       // redirected
@@ -195,22 +196,81 @@
         const n = idx + 1;
         return `
           <div class="coding-card">
-            <div class="between">
+            <div class="coding-card-header">
               <div class="q-title" style="margin-bottom:0;">
                 <span class="q-num" style="background:#0284c7;">Program ${n}</span>
                 <span>Problem Statement</span>
               </div>
-              <div class="actions">
-                <button type="button" onclick="saveProgram(${n})">💾 Save Program ${n}</button>
+              <div class="coding-card-actions">
+                <button type="button" id="btnRun${n}" onclick="runProgramCode(${n})" class="btn-run-code" title="Execute Python solution live via Zoho Catalyst">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  <span>▶ Run Code</span>
+                </button>
+                <button type="button" onclick="saveProgram(${n})" class="btn-save-prog" title="Save this program to your assessment submission">
+                  💾 Save Program ${n}
+                </button>
                 <span id="save${n}" class="badge done"></span>
               </div>
             </div>
+
             <div class="coding-prompt">${esc(promptText || "")}</div>
-            <label for="code${n}" style="font-weight:600;font-size:13px;color:#475569;display:block;margin-top:10px;">Program ${n} Solution Code (Python):</label>
-            <textarea id="code${n}" class="code-editor" placeholder="# Write your Python solution for Program ${n} here..."></textarea>
+
+            <div class="coding-editor-topbar">
+              <span class="coding-lang-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Python 3.x Solution Editor
+              </span>
+              <span class="coding-hint-text">💡 Press <b>Tab</b> to indent · <b>Ctrl+Enter</b> to Run</span>
+            </div>
+
+            <div class="code-editor-container" id="codeWrap${n}">
+              <div class="code-editor-line-numbers" id="lineNums${n}">1</div>
+              <div class="code-editor-wrapper">
+                <pre class="code-highlight-layer" id="highlightLayer${n}" aria-hidden="true"><code id="highlightCode${n}"></code></pre>
+                <textarea id="code${n}" class="code-editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="# Write your Python code for Program ${n} here...&#10;# Example:&#10;def solution():&#10;    print('Hello World')&#10;&#10;solution()"></textarea>
+              </div>
+            </div>
+
+            <!-- Execution Console Terminal Box -->
+            <div class="term-box">
+              <div class="term-topbar">
+                <div class="term-topbar-left">
+                  <span class="term-dots">
+                    <span class="term-dot red"></span>
+                    <span class="term-dot yellow"></span>
+                    <span class="term-dot green"></span>
+                  </span>
+                  <span class="term-title">EXECUTION CONSOLE</span>
+                  <span id="status${n}" class="term-status-badge">Ready</span>
+                </div>
+                <div class="term-topbar-actions">
+                  <button type="button" id="btnCopyOut${n}" onclick="copyOutputConsole(${n})" class="term-action-btn" title="Copy console output text">
+                    📋 Copy
+                  </button>
+                  <button type="button" onclick="clearOutputConsole(${n})" class="term-action-btn" title="Clear console output">
+                    🗑️ Clear
+                  </button>
+                </div>
+              </div>
+
+              <!-- Real-time Console Output Container -->
+              <div id="output${n}" class="term-output-body"><span class="term-muted">Console idle. Click "▶ Run Code" above to execute this program live.</span></div>
+            </div>
           </div>
         `;
       }).join("");
+
+      setupCodeEditorKeyHandlers();
+
+      cs.forEach((_, idx) => {
+        const n = idx + 1;
+        const textarea = document.getElementById("code" + n);
+        const hlCode = document.getElementById("highlightCode" + n);
+        const lineNums = document.getElementById("lineNums" + n);
+        if (textarea && typeof attachEditorHighlighter === 'function') {
+          attachEditorHighlighter(textarea, hlCode, lineNums);
+        }
+      });
     }
 
     // Session Timer & Autosave Setup
@@ -227,7 +287,10 @@
         const el = document.getElementById("save" + n);
         if (el) el.textContent = sess.saved && sess.saved[n] ? "Saved ✓" : "";
         const code = document.getElementById("code" + n);
-        if (code) code.value = (sess.saved && sess.saved[n]) || "";
+        if (code) {
+          code.value = (sess.saved && sess.saved[n]) || "";
+          code.dispatchEvent(new Event("input"));
+        }
       });
     }
 
@@ -246,6 +309,299 @@
     }
     tick();
     window.assessmentInterval = setInterval(tick, 1000);
+
+    function setupCodeEditorKeyHandlers() {
+      document.querySelectorAll(".code-editor").forEach(el => {
+        el.addEventListener("keydown", function(e) {
+          if (e.key === "Tab") {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 4;
+            this.dispatchEvent(new Event("input"));
+          } else if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            e.preventDefault();
+            const progNum = this.id.replace("code", "");
+            if (progNum) runProgramCode(parseInt(progNum, 10));
+          }
+        });
+      });
+    }
+
+    function toggleCustomInput(n) {
+      const wrap = document.getElementById("inputWrap" + n);
+      const btn = document.getElementById("btnToggleInput" + n);
+      if (!wrap) return;
+      const isHidden = wrap.style.display === "none";
+      wrap.style.display = isHidden ? "block" : "none";
+      if (btn) {
+        btn.classList.toggle("active", isHidden);
+      }
+    }
+
+    function clearOutputConsole(n) {
+      const outputEl = document.getElementById("output" + n);
+      const statusEl = document.getElementById("status" + n);
+      if (outputEl) {
+        outputEl.innerHTML = `<span class="term-muted">Console output cleared. Click "▶ Run Code" to execute.</span>`;
+      }
+      if (statusEl) {
+        statusEl.textContent = "Ready";
+        statusEl.className = "term-status-badge";
+      }
+    }
+
+    function copyOutputConsole(n) {
+      const outputEl = document.getElementById("output" + n);
+      if (!outputEl) return;
+      const text = outputEl.innerText || "";
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById("btnCopyOut" + n);
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = "Copied!";
+          setTimeout(() => { btn.textContent = orig; }, 1500);
+        }
+      });
+    }
+
+    // Helper to find all input("...") prompts in code
+    function extractInputPrompts(code) {
+      const regex = /input\s*\(\s*(?:(['"`])([\s\S]*?)\1)?\s*\)/g;
+      const prompts = [];
+      let match;
+      while ((match = regex.exec(code)) !== null) {
+        prompts.push(match[2] !== undefined ? match[2] : "");
+      }
+      return prompts;
+    }
+
+    async function runProgramCode(n) {
+      const codeEl = document.getElementById("code" + n);
+      const code = codeEl ? codeEl.value : "";
+      const inputEl = document.getElementById("input" + n);
+      const preProvidedInput = inputEl ? inputEl.value.trim() : "";
+      const outputEl = document.getElementById("output" + n);
+      const statusEl = document.getElementById("status" + n);
+      const runBtn = document.getElementById("btnRun" + n);
+
+      if (!code.trim()) {
+        if (outputEl) outputEl.innerHTML = `<span class="term-stderr">⚠️ Please write some Python code before running.</span>`;
+        if (statusEl) {
+          statusEl.textContent = "No Code";
+          statusEl.className = "term-status-badge error";
+        }
+        return;
+      }
+
+      if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.innerHTML = `<span>⏳ Running...</span>`;
+      }
+
+      // Auto-save typed code to session
+      let currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "{}");
+      currentSess.saved = currentSess.saved || {};
+      currentSess.saved[n] = code.trim();
+      sessionStorage.setItem(sessionKey, JSON.stringify(currentSess));
+      const saveBadge = document.getElementById("save" + n);
+      if (saveBadge) saveBadge.textContent = "Saved ✓";
+
+      const prompts = extractInputPrompts(code);
+      const userInputs = [];
+
+      // If code contains input() calls and user hasn't manually filled Custom Input box, interactively prompt on the same line
+      if (prompts.length > 0 && !preProvidedInput) {
+        if (outputEl) outputEl.innerHTML = "";
+        if (statusEl) {
+          statusEl.textContent = "Waiting Input";
+          statusEl.className = "term-status-badge running";
+        }
+
+        for (let i = 0; i < prompts.length; i++) {
+          const promptText = prompts[i];
+          const displayPrompt = promptText !== "" ? promptText : "Input: ";
+
+          // Show prompt text on same line
+          const promptSpan = document.createElement("span");
+          promptSpan.className = "term-stdout";
+          promptSpan.textContent = displayPrompt;
+          outputEl.appendChild(promptSpan);
+
+          // Create inline input directly on the same line
+          const answer = await new Promise((resolve) => {
+            const inlineInput = document.createElement("input");
+            inlineInput.type = "text";
+            inlineInput.className = "inline-term-input";
+            inlineInput.autocomplete = "off";
+            inlineInput.spellcheck = false;
+            inlineInput.size = 1;
+
+            inlineInput.addEventListener("input", function() {
+              this.size = Math.max(1, this.value.length + 1);
+            });
+
+            inlineInput.addEventListener("keydown", function(e) {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const val = this.value;
+
+                // Replace input with permanent user entered text on the same line
+                const enteredSpan = document.createElement("span");
+                enteredSpan.className = "term-user-input";
+                enteredSpan.textContent = val + "\n";
+                this.replaceWith(enteredSpan);
+
+                resolve(val);
+              }
+            });
+
+            outputEl.appendChild(inlineInput);
+            outputEl.scrollTop = outputEl.scrollHeight;
+            setTimeout(() => inlineInput.focus(), 20);
+          });
+
+          userInputs.push(answer);
+        }
+      }
+
+      if (statusEl) {
+        statusEl.textContent = "Executing...";
+        statusEl.className = "term-status-badge running";
+      }
+
+      const CATALYST_DIRECT_URL = "https://appsail-50045753891.development.catalystappsail.in/run";
+      const PROXY_URL = (typeof getApiBase === 'function' ? getApiBase() : '') + "/api/run-code";
+      const LOCAL_BACKEND_URL = "http://localhost:5000/api/run-code";
+
+      const finalInput = userInputs.length ? (userInputs.join("\n") + "\n") : (preProvidedInput ? (preProvidedInput + "\n") : "\n");
+      let resultData = null;
+
+      // Helper to safely parse JSON response
+      async function safeParseJson(response) {
+        try {
+          const text = await response.text();
+          if (!text || text.trim().startsWith("<")) return null;
+          return JSON.parse(text);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      try {
+        // 1. Primary: Direct Zoho Catalyst AppSail Execution
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+          const res = await fetch(CATALYST_DIRECT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: code, input: finalInput }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          resultData = await safeParseJson(res);
+        } catch (directErr) {
+          console.warn("Direct Catalyst execution attempt failed:", directErr);
+        }
+
+        // 2. Secondary: Fallback to Local Node Backend (if running locally)
+        if (!resultData && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+          try {
+            const lRes = await fetch(LOCAL_BACKEND_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: code, input: finalInput })
+            });
+            resultData = await safeParseJson(lRes);
+          } catch (localErr) {
+            console.warn("Local backend proxy attempt failed:", localErr);
+          }
+        }
+
+        // 3. Tertiary: Fallback to Server Proxy
+        if (!resultData && PROXY_URL && PROXY_URL !== LOCAL_BACKEND_URL) {
+          try {
+            const pRes = await fetch(PROXY_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: code, input: finalInput })
+            });
+            resultData = await safeParseJson(pRes);
+          } catch (proxyErr) {
+            console.warn("Server proxy attempt failed:", proxyErr);
+          }
+        }
+
+        if (resultData && typeof resultData.success !== "undefined") {
+          if (resultData.success) {
+            let fullOutput = resultData.output || "";
+
+            // If we already displayed interactive prompts, show remainder or clean output
+            if (prompts.length > 0 && !preProvidedInput) {
+              let cleanOut = fullOutput;
+              for (const p of prompts) {
+                if (p && cleanOut.startsWith(p)) {
+                  cleanOut = cleanOut.substring(p.length);
+                }
+              }
+              if (cleanOut.trim()) {
+                const outSpan = document.createElement("span");
+                outSpan.className = "term-stdout";
+                outSpan.textContent = cleanOut;
+                outputEl.appendChild(outSpan);
+              }
+            } else {
+              outputEl.innerHTML = fullOutput.trim() 
+                ? `<span class="term-stdout">${esc(fullOutput)}</span>` 
+                : `<span class="term-stdout" style="color:#22c55e;">✓ Program executed successfully with no console output.</span>`;
+            }
+
+            if (statusEl) {
+              statusEl.textContent = "Finished (0)";
+              statusEl.className = "term-status-badge success";
+            }
+          } else {
+            const errText = resultData.output || resultData.error || "Execution returned an error.";
+            const errSpan = document.createElement("span");
+            errSpan.className = "term-stderr";
+            errSpan.textContent = "\n" + errText;
+            outputEl.appendChild(errSpan);
+
+            if (statusEl) {
+              statusEl.textContent = "Execution Error";
+              statusEl.className = "term-status-badge error";
+            }
+          }
+        } else {
+          throw new Error("Unable to connect to Zoho Catalyst code execution server. Please check your internet connection.");
+        }
+      } catch (err) {
+        console.error("Execution error:", err);
+        if (outputEl) {
+          const errSpan = document.createElement("span");
+          errSpan.className = "term-stderr";
+          errSpan.textContent = `\n⚠️ ${err.message || "Execution service unavailable."}`;
+          outputEl.appendChild(errSpan);
+        }
+        if (statusEl) {
+          statusEl.textContent = "Server Error";
+          statusEl.className = "term-status-badge error";
+        }
+      } finally {
+        if (runBtn) {
+          runBtn.disabled = false;
+          runBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>▶ Run Code</span>
+          `;
+        }
+        if (outputEl) {
+          outputEl.scrollTop = outputEl.scrollHeight;
+        }
+      }
+    }
 
     function saveProgram(n) {
       const codeEl = document.getElementById("code" + n);

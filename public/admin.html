@@ -260,7 +260,7 @@
             <line x1="12" y1="8" x2="12" y2="16"></line>
             <line x1="8" y1="12" x2="16" y2="12"></line>
           </svg>
-          <span>➕ Upload Excel &amp; Create Exam</span>
+          <span>Upload Excel &amp; Create Exam</span>
         </button>
         <button onclick="exportAdminCSV()" class="ghost"
           style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:10px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
@@ -370,8 +370,9 @@
       <button class="view-tab-btn" id="tabBtnStudents" onclick="setViewMode('students')">
         👤 Group by Student Details (<span id="countStudentsTab">0</span>)
       </button>
-      <button class="view-tab-btn" id="tabBtnCustomExams" onclick="setViewMode('customExams')">
-        🎯 Custom &amp; Uploaded Exams (<span id="countCustomExamsTab">0</span>)
+      <button class="view-tab-btn" id="tabBtnCustomExams" onclick="setViewMode('customExams')" style="display:inline-flex; align-items:center; gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        Custom &amp; Uploaded Exams (<span id="countCustomExamsTab">0</span>)
       </button>
     </div>
 
@@ -436,7 +437,8 @@
             <p class="muted" style="margin:0; font-size:12.5px;">Manage custom tests uploaded via Excel. Students can take these tests directly from their dashboard.</p>
           </div>
           <button onclick="openCustomExamModal()" class="hero-btn-primary" style="padding:8px 18px; font-size:13px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
-            <span>➕ Upload New Exam</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Upload New Exam</span>
           </button>
         </div>
         <div id="customExamsListContainer"></div>
@@ -653,6 +655,7 @@
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script src="js/export.js"></script>
+  <script src="js/highlighter.js"></script>
   <script>
     if (!requireAuth("admin")) {
       // redirected to login.html
@@ -902,7 +905,7 @@
                     </td>
                     <td>
                       ${(item.isCustomExam || item.customAssessmentId || !item.day) ? `
-                        <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-size:11px; font-weight:800;">🎯 Custom Exam</span>
+                        <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Custom Exam</span>
                         <div style="font-weight:700; color:var(--text-heading); font-size:13px; margin-top:2px;">${esc(item.examTitle || item.topic || "Custom Assessment")}</div>
                       ` : `
                         <b>Day ${item.day}</b>
@@ -1061,10 +1064,10 @@
                   ${s.assessments.map(a => `
                     <div style="display:inline-flex; align-items:center; background:var(--card-alt); border:1px solid var(--line); border-radius:8px; overflow:hidden;">
                       <button onclick="inspectAssessment('${esc(a.id)}')" class="ghost" style="padding:6px 10px; font-size:12px; border:none; border-radius:0; text-align:left; display:inline-flex; align-items:center; gap:6px;">
-                        <span><b>Day ${a.day}:</b> ${a.percentage}%</span>
+                        <span><b>${(a.isCustomExam || a.customAssessmentId || !a.day) ? `<span style="display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--primary);"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>${esc(a.examTitle || a.topic || 'Custom Exam')}</span>` : `Day ${a.day}`}:</b> ${a.percentage}%</span>
                         <span style="color:var(--muted); font-size:11px;">(${esc(a.completedAtDisplay || a.date || '')})</span>
                       </button>
-                      <button onclick="deleteAssessment('${esc(a.id)}', '${esc(s.name)}', ${a.day}, '${esc(a.studentId || s.studentId || '')}', '${esc(a.username || sUsername)}')" style="background:transparent; border:none; border-left:1px solid var(--line); padding:6px 8px; color:#ef4444; cursor:pointer;" title="Delete this assessment">
+                      <button onclick="deleteAssessment('${esc(a.id)}', '${esc(s.name)}', ${a.day || 0}, '${esc(a.studentId || s.studentId || '')}', '${esc(a.username || sUsername)}')" style="background:transparent; border:none; border-left:1px solid var(--line); padding:6px 8px; color:#ef4444; cursor:pointer;" title="Delete this assessment">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                       </button>
                     </div>
@@ -1146,7 +1149,12 @@
       const record = allSubmissions.find(a => String(a.id) === String(id) || String(allSubmissions.indexOf(a)) === String(id));
       if (!record) return;
 
-      document.getElementById("modalTitle").textContent = `${record.studentName || "Student"} — Day ${record.day} Assessment`;
+      const isCustom = !!(record.isCustomExam || record.customAssessmentId || !record.day);
+      const titleText = isCustom
+        ? `${record.studentName || "Student"} — ${record.examTitle || record.topic || "Custom Assessment"}`
+        : `${record.studentName || "Student"} — Day ${record.day} Assessment`;
+
+      document.getElementById("modalTitle").textContent = titleText;
       document.getElementById("modalSubtitle").textContent = `Roll No: ${record.rollNumber || "-"} · Dept: ${record.department || "CSE"} · Score: ${record.score}/${record.total || 5} (${record.percentage}%) · Time: ${Math.ceil((record.completionSeconds || 0) / 60)} min`;
 
       const mcqs = record.mcqDetails || [];
@@ -1167,40 +1175,86 @@
         </div>
       `).join("") : "<p class='muted'>No question-by-question MCQ logs available for this attempt.</p>";
 
-      const p1Prompt = record.program1Prompt || (CODING_BANK[record.day] ? CODING_BANK[record.day][0] : "Program 1");
-      const p2Prompt = record.program2Prompt || (CODING_BANK[record.day] ? CODING_BANK[record.day][1] : "Program 2");
-      const p3Prompt = record.program3Prompt || (CODING_BANK[record.day] ? CODING_BANK[record.day][2] : "Program 3");
+      const hasCoding = !isCustom && Boolean(
+        (record.day && typeof CODING_BANK !== 'undefined' && CODING_BANK[record.day]) ||
+        record.program1 || record.program2 || record.program3 ||
+        record.program1Prompt || record.program2Prompt || record.program3Prompt
+      );
 
-      document.getElementById("modalBody").innerHTML = `
-        <h3 style="margin-top:0; color:var(--primary); font-size:16px;">1. Conceptual MCQs Review (5 Questions)</h3>
+      let bodyHtml = `
+        <h3 style="margin-top:0; color:var(--primary); font-size:16px;">${hasCoding ? '1. Conceptual MCQs Review' : 'MCQs Review'} (${mcqs.length || record.total || 5} Questions)</h3>
         ${mcqHtml}
-
-        <h3 style="margin-top:24px; color:var(--primary); font-size:16px;">2. Candidate Coding Submissions (3 Programs)</h3>
-        
-        <div style="margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b>Challenge 1: ${esc(p1Prompt)}</b>
-            <button class="ghost" style="padding:4px 10px; font-size:11px;" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(record.program1 || '')}'))">Copy Code</button>
-          </div>
-          <div class="code-box">${esc(record.program1 || '// No code saved for Program 1')}</div>
-        </div>
-
-        <div style="margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b>Challenge 2: ${esc(p2Prompt)}</b>
-            <button class="ghost" style="padding:4px 10px; font-size:11px;" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(record.program2 || '')}'))">Copy Code</button>
-          </div>
-          <div class="code-box">${esc(record.program2 || '// No code saved for Program 2')}</div>
-        </div>
-
-        <div style="margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b>Challenge 3: ${esc(p3Prompt)}</b>
-            <button class="ghost" style="padding:4px 10px; font-size:11px;" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(record.program3 || '')}'))">Copy Code</button>
-          </div>
-          <div class="code-box">${esc(record.program3 || '// No code saved for Program 3')}</div>
-        </div>
       `;
+
+      let progs = [];
+      if (hasCoding) {
+        const p1Prompt = record.program1Prompt || (typeof CODING_BANK !== 'undefined' && CODING_BANK[record.day] ? CODING_BANK[record.day][0] : "Program 1");
+        const p2Prompt = record.program2Prompt || (typeof CODING_BANK !== 'undefined' && CODING_BANK[record.day] ? CODING_BANK[record.day][1] : "Program 2");
+        const p3Prompt = record.program3Prompt || (typeof CODING_BANK !== 'undefined' && CODING_BANK[record.day] ? CODING_BANK[record.day][2] : "Program 3");
+
+        progs = [
+          { n: 1, prompt: p1Prompt, code: record.program1 || '' },
+          { n: 2, prompt: p2Prompt, code: record.program2 || '' },
+          { n: 3, prompt: p3Prompt, code: record.program3 || '' }
+        ];
+
+        bodyHtml += `
+          <h3 style="margin-top:24px; color:var(--primary); font-size:16px;">2. Candidate Coding Submissions &amp; Live Verification</h3>
+          ${progs.map(p => `
+            <div style="margin-bottom:20px; background:var(--card-alt); border:1px solid var(--line); border-radius:12px; padding:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                <b>Challenge ${p.n}: ${esc(p.prompt)}</b>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" id="btnAdminRun${p.n}" onclick="adminRunProgram(${p.n})" class="btn-run-code" style="padding:5px 12px; font-size:12px;" title="Execute student's Python code live">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>▶ Run Code</span>
+                  </button>
+                  <button class="ghost" style="padding:5px 10px; font-size:11px;" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(p.code)}'))">Copy Code</button>
+                </div>
+              </div>
+              <div class="code-editor-container" id="adminCodeWrap${p.n}" style="min-height:140px; margin-bottom:8px;">
+                <div class="code-editor-line-numbers" id="adminLineNums${p.n}">1</div>
+                <div class="code-editor-wrapper" style="min-height:140px;">
+                  <pre class="code-highlight-layer" id="adminHighlightLayer${p.n}" aria-hidden="true"><code id="adminHighlightCode${p.n}"></code></pre>
+                  <textarea id="adminCode${p.n}" class="code-editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="# Student code...">${esc(p.code || '// No code saved for Program ' + p.n)}</textarea>
+                </div>
+              </div>
+
+              <!-- Live Execution Console for Admin -->
+              <div class="term-box" style="margin-top:6px;">
+                <div class="term-topbar">
+                  <div class="term-topbar-left">
+                    <span class="term-dots">
+                      <span class="term-dot red"></span>
+                      <span class="term-dot yellow"></span>
+                      <span class="term-dot green"></span>
+                    </span>
+                    <span class="term-title">EXECUTION CONSOLE</span>
+                    <span id="adminStatus${p.n}" class="term-status-badge">Ready</span>
+                  </div>
+                  <div class="term-topbar-actions">
+                    <button type="button" onclick="adminClearOutput(${p.n})" class="term-action-btn" title="Clear output">🗑️ Clear</button>
+                  </div>
+                </div>
+                <div id="adminOutput${p.n}" class="term-output-body" style="min-height:45px; max-height:160px;"><span class="term-muted">Click "▶ Run Code" above to execute this candidate submission live.</span></div>
+              </div>
+            </div>
+          `).join("")}
+        `;
+      }
+
+      document.getElementById("modalBody").innerHTML = bodyHtml;
+
+      if (hasCoding && progs && progs.length) {
+        progs.forEach(p => {
+          const textarea = document.getElementById("adminCode" + p.n);
+          const hlCode = document.getElementById("adminHighlightCode" + p.n);
+          const lineNums = document.getElementById("adminLineNums" + p.n);
+          if (textarea && typeof attachEditorHighlighter === 'function') {
+            attachEditorHighlighter(textarea, hlCode, lineNums);
+          }
+        });
+      }
 
       // Set delete handler in modal
       const modalDelBtn = document.getElementById("modalBtnDeleteAssessment");
@@ -1209,6 +1263,240 @@
       }
 
       document.getElementById("inspectModal").classList.add("active");
+    }
+
+    function adminClearOutput(n) {
+      const outputEl = document.getElementById("adminOutput" + n);
+      const statusEl = document.getElementById("adminStatus" + n);
+      if (outputEl) {
+        outputEl.innerHTML = `<span class="term-muted">Console output cleared. Click "▶ Run Code" to execute.</span>`;
+      }
+      if (statusEl) {
+        statusEl.textContent = "Ready";
+        statusEl.className = "term-status-badge";
+      }
+    }
+
+    // Helper to find all input("...") prompts in code
+    function extractInputPrompts(code) {
+      const regex = /input\s*\(\s*(?:(['"`])([\s\S]*?)\1)?\s*\)/g;
+      const prompts = [];
+      let match;
+      while ((match = regex.exec(code)) !== null) {
+        prompts.push(match[2] !== undefined ? match[2] : "");
+      }
+      return prompts;
+    }
+
+    async function adminRunProgram(n) {
+      const codeEl = document.getElementById("adminCode" + n);
+      const code = codeEl ? codeEl.value : "";
+      const outputEl = document.getElementById("adminOutput" + n);
+      const statusEl = document.getElementById("adminStatus" + n);
+      const runBtn = document.getElementById("btnAdminRun" + n);
+
+      if (!code.trim() || code.trim().startsWith("// No code saved")) {
+        if (outputEl) outputEl.innerHTML = `<span class="term-stderr">⚠️ No valid code available to execute.</span>`;
+        if (statusEl) {
+          statusEl.textContent = "No Code";
+          statusEl.className = "term-status-badge error";
+        }
+        return;
+      }
+
+      if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.innerHTML = `<span>⏳ Running...</span>`;
+      }
+
+      const prompts = extractInputPrompts(code);
+      const userInputs = [];
+
+      // If code contains input() calls, interactively prompt on the same line
+      if (prompts.length > 0) {
+        if (outputEl) outputEl.innerHTML = "";
+        if (statusEl) {
+          statusEl.textContent = "Waiting Input";
+          statusEl.className = "term-status-badge running";
+        }
+
+        for (let i = 0; i < prompts.length; i++) {
+          const promptText = prompts[i];
+          const displayPrompt = promptText !== "" ? promptText : "Input: ";
+
+          // Show prompt text on same line
+          const promptSpan = document.createElement("span");
+          promptSpan.className = "term-stdout";
+          promptSpan.textContent = displayPrompt;
+          outputEl.appendChild(promptSpan);
+
+          // Create inline input directly on the same line
+          const answer = await new Promise((resolve) => {
+            const inlineInput = document.createElement("input");
+            inlineInput.type = "text";
+            inlineInput.className = "inline-term-input";
+            inlineInput.autocomplete = "off";
+            inlineInput.spellcheck = false;
+            inlineInput.size = 1;
+
+            inlineInput.addEventListener("input", function() {
+              this.size = Math.max(1, this.value.length + 1);
+            });
+
+            inlineInput.addEventListener("keydown", function(e) {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const val = this.value;
+
+                // Replace input with permanent user entered text on the same line
+                const enteredSpan = document.createElement("span");
+                enteredSpan.className = "term-user-input";
+                enteredSpan.textContent = val + "\n";
+                this.replaceWith(enteredSpan);
+
+                resolve(val);
+              }
+            });
+
+            outputEl.appendChild(inlineInput);
+            outputEl.scrollTop = outputEl.scrollHeight;
+            setTimeout(() => inlineInput.focus(), 20);
+          });
+
+          userInputs.push(answer);
+        }
+      }
+
+      if (statusEl) {
+        statusEl.textContent = "Executing...";
+        statusEl.className = "term-status-badge running";
+      }
+
+      const CATALYST_DIRECT_URL = "https://appsail-50045753891.development.catalystappsail.in/run";
+      const PROXY_URL = (typeof getApiBase === 'function' ? getApiBase() : '') + "/api/run-code";
+      const LOCAL_BACKEND_URL = "http://localhost:5000/api/run-code";
+
+      const finalInput = userInputs.length ? (userInputs.join("\n") + "\n") : "\n";
+      let resultData = null;
+
+      async function safeParseJson(response) {
+        try {
+          const text = await response.text();
+          if (!text || text.trim().startsWith("<")) return null;
+          return JSON.parse(text);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      try {
+        // 1. Primary: Direct Zoho Catalyst AppSail Execution
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+          const res = await fetch(CATALYST_DIRECT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: code, input: finalInput }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          resultData = await safeParseJson(res);
+        } catch (directErr) {
+          console.warn("Direct Catalyst execution attempt failed:", directErr);
+        }
+
+        // 2. Secondary: Fallback to Local Node Backend (if running locally)
+        if (!resultData && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+          try {
+            const lRes = await fetch(LOCAL_BACKEND_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: code, input: finalInput })
+            });
+            resultData = await safeParseJson(lRes);
+          } catch (localErr) {}
+        }
+
+        // 3. Tertiary: Fallback to Server Proxy
+        if (!resultData && PROXY_URL && PROXY_URL !== LOCAL_BACKEND_URL) {
+          try {
+            const pRes = await fetch(PROXY_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: code, input: finalInput })
+            });
+            resultData = await safeParseJson(pRes);
+          } catch (proxyErr) {}
+        }
+
+        if (resultData && typeof resultData.success !== "undefined") {
+          if (resultData.success) {
+            let fullOutput = resultData.output || "";
+
+            // If we already displayed interactive prompts, show remainder or clean output
+            if (prompts.length > 0) {
+              let cleanOut = fullOutput;
+              for (const p of prompts) {
+                if (p && cleanOut.startsWith(p)) {
+                  cleanOut = cleanOut.substring(p.length);
+                }
+              }
+              if (cleanOut.trim()) {
+                const outSpan = document.createElement("span");
+                outSpan.className = "term-stdout";
+                outSpan.textContent = cleanOut;
+                outputEl.appendChild(outSpan);
+              }
+            } else {
+              outputEl.innerHTML = fullOutput.trim() 
+                ? `<span class="term-stdout">${esc(fullOutput)}</span>` 
+                : `<span class="term-stdout" style="color:#22c55e;">✓ Program executed successfully with no console output.</span>`;
+            }
+
+            if (statusEl) {
+              statusEl.textContent = "Finished (0)";
+              statusEl.className = "term-status-badge success";
+            }
+          } else {
+            const errText = resultData.output || resultData.error || "Execution returned an error.";
+            const errSpan = document.createElement("span");
+            errSpan.className = "term-stderr";
+            errSpan.textContent = "\n" + errText;
+            outputEl.appendChild(errSpan);
+
+            if (statusEl) {
+              statusEl.textContent = "Execution Error";
+              statusEl.className = "term-status-badge error";
+            }
+          }
+        } else {
+          throw new Error("Unable to connect to Zoho Catalyst code execution server.");
+        }
+      } catch (err) {
+        console.error("Execution error:", err);
+        if (outputEl) {
+          const errSpan = document.createElement("span");
+          errSpan.className = "term-stderr";
+          errSpan.textContent = `\n⚠️ ${err.message || "Execution service unavailable."}`;
+          outputEl.appendChild(errSpan);
+        }
+        if (statusEl) {
+          statusEl.textContent = "Server Error";
+          statusEl.className = "term-status-badge error";
+        }
+      } finally {
+        if (runBtn) {
+          runBtn.disabled = false;
+          runBtn.innerHTML = `
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>▶ Run Code</span>
+          `;
+        }
+        if (outputEl) {
+          outputEl.scrollTop = outputEl.scrollHeight;
+        }
+      }
     }
 
     async function deleteAssessment(id, studentName, day, studentId, username) {
@@ -1705,7 +1993,8 @@
             <p style="margin:0; font-weight:700; color:var(--text-heading); font-size:15px;">No Custom Assessments Created Yet</p>
             <p class="muted" style="margin:4px 0 16px; font-size:13px;">Upload an Excel file with questions to create your first custom candidate exam.</p>
             <button onclick="openCustomExamModal()" class="hero-btn-primary" style="padding:10px 22px; font-size:13.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
-              <span>➕ Upload Excel &amp; Create Exam</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Upload Excel &amp; Create Exam</span>
             </button>
           </div>
         `;
@@ -1724,7 +2013,7 @@
               <div style="background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; box-shadow:var(--shadow-sm);">
                 <div style="flex:1; min-width:260px;">
                   <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                    <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-weight:800; font-size:11px;">🎯 Custom Assessment</span>
+                    <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-weight:800; font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Custom Assessment</span>
                     <span class="badge" style="background:var(--tag-bg); color:var(--muted); font-size:11px;">⏱️ ${exam.durationMinutes || 20} min</span>
                     <span class="badge done" style="font-size:11px;">${(exam.questions || []).length} MCQs</span>
                   </div>

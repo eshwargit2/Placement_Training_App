@@ -973,14 +973,78 @@ textarea {
   font-weight: 600;
 }
 
-/* Coding Programs Cards */
+/* Coding Programs Cards & Execution Terminal */
 .coding-card {
   background: #ffffff;
   border: 1.5px solid #e2e8f0;
   border-radius: 16px;
   padding: 22px;
-  margin-bottom: 22px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.coding-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.coding-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-run-code {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-run-code:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+}
+
+.btn-run-code:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-save-prog {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-save-prog:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 .coding-prompt {
@@ -995,23 +1059,333 @@ textarea {
   margin: 12px 0 16px;
 }
 
-.code-editor {
-  min-height: 240px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  line-height: 1.6;
-  background: #090e1a;
-  color: #e2e8f0;
-  border: 1px solid #1e293b;
-  border-radius: 12px;
-  padding: 14px;
-  margin: 8px 0 16px;
-  tab-size: 4;
+.coding-editor-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  margin-bottom: 6px;
 }
 
-.code-editor:focus {
+.coding-lang-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.coding-hint-text {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+/* Code Editor Container with Syntax Highlighting & Line Numbers */
+.code-editor-container {
+  display: flex;
+  position: relative;
+  background: #090e1a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  margin: 4px 0 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-height: 220px;
+}
+
+.code-editor-container:focus-within {
   border-color: #38bdf8;
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}
+
+.code-editor-line-numbers {
+  width: 44px;
+  min-width: 44px;
+  background: #080c16;
+  border-right: 1px solid #1e293b;
+  padding: 14px 6px 14px 0;
+  text-align: right;
+  font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+  font-size: 13px;
+  line-height: 22px;
+  color: #475569;
+  user-select: none;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.code-editor-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  min-height: 220px;
+}
+
+.code-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 14px;
+  font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+  font-size: 13px !important;
+  line-height: 22px !important;
+  tab-size: 4 !important;
+  -moz-tab-size: 4 !important;
+  letter-spacing: 0 !important;
+  box-sizing: border-box !important;
+  pointer-events: none;
+  white-space: pre !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  color: #e2e8f0;
+}
+
+.code-highlight-layer code {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  display: block;
+}
+
+.code-editor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+  font-size: 13px !important;
+  line-height: 22px !important;
+  tab-size: 4 !important;
+  -moz-tab-size: 4 !important;
+  letter-spacing: 0 !important;
+  box-sizing: border-box !important;
+  padding: 14px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  color: transparent !important;
+  caret-color: #38bdf8 !important;
+  border: none !important;
+  outline: none !important;
+  resize: none !important;
+  white-space: pre !important;
+  overflow: auto !important;
+}
+
+.code-editor::placeholder {
+  color: #475569 !important;
+  opacity: 1 !important;
+}
+
+.code-editor::selection {
+  background: rgba(56, 189, 248, 0.3) !important;
+  color: transparent !important;
+}
+
+/* Python Syntax Highlighting Tokens (VS Code Dark Pro Theme) */
+.py-keyword   { color: #c084fc !important; font-weight: 700; } /* Purple: def, class, if, return, import, for, in */
+.py-builtin   { color: #38bdf8 !important; font-weight: 600; } /* Sky Blue: print, input, len, range, int, str, append, split */
+.py-constant  { color: #f59e0b !important; font-weight: 600; } /* Amber: True, False, None, self */
+.py-string    { color: #4ade80 !important; }                   /* Emerald Green: "strings", 'chars', """docstrings""" */
+.py-number    { color: #fbbf24 !important; }                   /* Warm Gold: 123, 4.56 */
+.py-comment   { color: #64748b !important; font-style: italic; } /* Slate Muted: # comments */
+.py-func      { color: #60a5fa !important; font-weight: 600; } /* Blue: function name definitions */
+.py-class     { color: #2dd4bf !important; font-weight: 700; } /* Teal: class name definitions */
+.py-decorator { color: #f43f5e !important; }                   /* Rose: @decorator */
+.py-operator  { color: #94a3b8 !important; }                   /* Slate light: +, -, *, ==, etc. */
+
+/* Terminal Console Styling */
+.term-box {
+  background: #090e1a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.term-topbar {
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.term-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.term-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.term-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.term-dot.red { background: #ef4444; }
+.term-dot.yellow { background: #f59e0b; }
+.term-dot.green { background: #10b981; }
+
+.term-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 0.3px;
+}
+
+.term-status-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.term-status-badge.running {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.term-status-badge.success {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.term-status-badge.error {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.term-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.term-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.term-action-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.term-action-btn.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.term-input-section {
+  background: #0c1322;
+  border-bottom: 1px dashed #1e293b;
+  padding: 10px 14px;
+}
+
+.term-input-field {
+  width: 100%;
+  box-sizing: border-box;
+  background: #070b14;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 8px 10px;
+  resize: vertical;
+  min-height: 48px;
+}
+
+.term-input-field:focus {
+  border-color: #38bdf8;
+  outline: none;
+}
+
+.term-output-body {
+  padding: 12px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  max-height: 220px;
+  min-height: 65px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #e2e8f0;
+}
+
+.term-stdout {
+  color: #f1f5f9;
+}
+
+.term-stderr {
+  color: #f87171;
+  font-weight: 600;
+}
+
+.term-system {
+  color: #38bdf8;
+  font-style: italic;
+}
+
+.term-muted {
+  color: #64748b;
+  font-style: italic;
+}
+
+.inline-term-input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #38bdf8 !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  font-weight: 700 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-block !important;
+  vertical-align: baseline !important;
+  caret-color: #38bdf8 !important;
+  width: auto;
+}
+
+.term-user-input {
+  color: #38bdf8;
+  font-weight: 700;
 }
 
 /* ==========================================================================
@@ -2213,10 +2587,23 @@ textarea {
     width: 100%;
   }
 
-  .code-editor {
+  .code-editor-container {
     min-height: 200px;
-    padding: 12px;
-    font-size: 12.5px;
+  }
+
+  .code-editor-line-numbers {
+    width: 36px;
+    min-width: 36px;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 12px 4px 12px 0;
+  }
+
+  .code-highlight-layer,
+  .code-editor {
+    font-size: 12px !important;
+    line-height: 20px !important;
+    padding: 12px !important;
   }
 
   /* Tables */

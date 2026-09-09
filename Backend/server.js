@@ -1283,6 +1283,43 @@ app.delete('/api/custom-assessments/:id', async (req, res) => {
   }
 });
 
+// ==========================================================================
+// CODE EXECUTION ENDPOINT (ZOHO CATALYST APPSAIL INTEGRATION)
+// ==========================================================================
+const CATALYST_RUN_URL = 'https://appsail-50045753891.development.catalystappsail.in/run';
+
+app.post('/api/run-code', async (req, res) => {
+  try {
+    const { code, input } = req.body || {};
+    if (!code || !code.trim()) {
+      return res.status(400).json({ success: false, output: 'No code provided.' });
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(CATALYST_RUN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: code,
+        input: input || ''
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    const data = await response.json();
+    return res.json(data);
+  } catch (error) {
+    console.error('Error executing code via Catalyst:', error);
+    return res.status(500).json({
+      success: false,
+      output: `Code execution service error: ${error.message}`
+    });
+  }
+});
+
 // Start Server (when run directly)
 if (require.main === module) {
   app.listen(PORT, () => {
