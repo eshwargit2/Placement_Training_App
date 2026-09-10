@@ -1079,10 +1079,14 @@
         const res = await fetch(`${getApiBase()}/api/custom-assessments`);
         const cData = await res.json();
         if (cData && Array.isArray(cData.customAssessments)) {
-          state.customAssessments = cData.customAssessments;
-          localStorage.setItem("placementPortal_customAssessments", JSON.stringify(cData.customAssessments));
-          save();
-          renderDashboard();
+          const prev = JSON.stringify(state.customAssessments || []);
+          const next = JSON.stringify(cData.customAssessments);
+          if (prev !== next) {
+            state.customAssessments = cData.customAssessments;
+            localStorage.setItem("placementPortal_customAssessments", JSON.stringify(cData.customAssessments));
+            save();
+            renderDashboard();
+          }
         }
       } catch (err) {
         console.warn("Could not sync custom assessments from server:", err);
@@ -1099,6 +1103,17 @@
       });
 
       syncCustomAssessments();
+      setInterval(syncCustomAssessments, 7000);
+
+      if (typeof subscribeDataSync === 'function') {
+        subscribeDataSync((event) => {
+          if (!event) return;
+          const type = event.type || '';
+          if (type.startsWith('custom') || type.startsWith('question') || type.startsWith('submission')) {
+            renderDashboard();
+          }
+        });
+      }
     }
   </script>
 </body>

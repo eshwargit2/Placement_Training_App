@@ -558,6 +558,94 @@
     </div>
   </div>
 
+  <!-- Manage Questions Modal (Fast non-refresh Question Upload, Edit & Deletion) -->
+  <div class="modal-overlay" id="manageQuestionsModal" onclick="if(event.target===this) closeManageQuestionsModal();">
+    <div class="modal-container" style="max-width:880px; width:95%; max-height:92vh; display:flex; flex-direction:column;">
+      <div class="modal-header" style="flex-shrink:0;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <h2 style="margin:0; font-size:18px;" id="manageQuestionsExamTitle">Assessment Questions</h2>
+            <span id="manageQuestionsCountBadge" class="badge" style="background:#2563eb; color:#fff; font-weight:800; font-size:12px;">0 MCQs</span>
+          </div>
+          <p class="muted" style="margin:2px 0 0; font-size:13px;" id="manageQuestionsExamTopic">Manage and instantly delete or add questions</p>
+        </div>
+        <button onclick="closeManageQuestionsModal()" class="ghost" style="padding:6px 12px; font-size:16px; border-radius:8px;">✕</button>
+      </div>
+
+      <div class="modal-body" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:18px;">
+        
+        <!-- Add Single Question Accordion / Box -->
+        <div style="background:var(--card-alt); border:1px solid var(--line); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleAddQuestionForm()">
+            <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:14px; color:var(--text-heading);">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:6px; background:rgba(37,99,235,0.15); color:var(--primary); font-size:16px; font-weight:900;">+</span>
+              <span>Add Single Question to this Assessment</span>
+            </div>
+            <span id="toggleAddQIcon" style="font-size:12px; color:var(--muted); font-weight:700;">[+ Expand]</span>
+          </div>
+
+          <form id="addQuestionForm" onsubmit="event.preventDefault(); submitAddSingleQuestion();" style="display:none; margin-top:14px; flex-direction:column; gap:12px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px; color:var(--text-heading);">Question Text *</label>
+              <textarea id="newQText" rows="2" placeholder="Enter problem statement or question..." required
+                style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--line); background:var(--input-bg); color:var(--text); font-size:13px;"></textarea>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px; color:var(--text-heading);">Option A *</label>
+                <input type="text" id="newQOptA" placeholder="Option A text" required
+                  style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--input-bg); color:var(--text); font-size:12.5px;">
+              </div>
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px; color:var(--text-heading);">Option B *</label>
+                <input type="text" id="newQOptB" placeholder="Option B text" required
+                  style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--input-bg); color:var(--text); font-size:12.5px;">
+              </div>
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px; color:var(--text-heading);">Option C *</label>
+                <input type="text" id="newQOptC" placeholder="Option C text" required
+                  style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--input-bg); color:var(--text); font-size:12.5px;">
+              </div>
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px; color:var(--text-heading);">Option D *</label>
+                <input type="text" id="newQOptD" placeholder="Option D text" required
+                  style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--input-bg); color:var(--text); font-size:12.5px;">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:4px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label style="font-size:12px; font-weight:700; color:var(--text-heading);">Correct Answer:</label>
+                <select id="newQCorrect" style="padding:6px 12px; border-radius:8px; border:1px solid var(--line); background:var(--input-bg); color:var(--text); font-size:12.5px; font-weight:700;">
+                  <option value="A">Option A</option>
+                  <option value="B">Option B</option>
+                  <option value="C">Option C</option>
+                  <option value="D">Option D</option>
+                </select>
+              </div>
+
+              <button type="submit" id="btnAddQSubmit" class="hero-btn-primary" style="padding:8px 20px; font-size:13px; font-weight:700; border-radius:8px;">
+                <span>➕ Add Question to Exam</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Questions List Table / Container -->
+        <div id="manageQuestionsListWrap">
+          <!-- Populated by JS -->
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="flex-shrink:0; display:flex; justify-content:space-between; align-items:center;">
+        <span class="muted" style="font-size:12px;">⚡ Changes synchronize with the backend immediately without reloading.</span>
+        <button type="button" class="ghost" onclick="closeManageQuestionsModal()" style="padding:8px 20px; font-weight:700; border-radius:8px;">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Database Cleanup & Records Management Modal -->
   <div class="modal-overlay" id="cleanupModal" onclick="if(event.target===this) closeDatabaseCleanupModal();">
     <div class="modal-container" style="max-width:600px;">
@@ -1499,9 +1587,15 @@
       }
     }
 
-    async function deleteAssessment(id, studentName, day, studentId, username) {
+    async function deleteAssessment(id, studentName, day, studentId, username, btnEl) {
       const confirmMsg = `Are you sure you want to permanently delete the Day ${day || ''} assessment submission for ${studentName || 'this student'}?\n\nThis will remove the MCQ results and coding solutions from the database.`;
       if (!confirm(confirmMsg)) return;
+
+      // Optimistic row removal animation
+      const row = btnEl ? btnEl.closest("tr") : null;
+      if (row) {
+        row.classList.add("item-deleting");
+      }
 
       try {
         const params = new URLSearchParams();
@@ -1520,26 +1614,27 @@
             if (typeof save === 'function') save();
           }
 
+          if (typeof notifyDataSync === 'function') {
+            notifyDataSync('submissionDeleted', { id, studentId, username });
+          }
+
           closeInspectModal();
           updateOverviewStats();
-          applyFilters();
-          alert(`✓ Assessment record successfully deleted from database.`);
+          setTimeout(() => { applyFilters(); }, 350);
         } else {
+          if (row) row.classList.remove("item-deleting");
           throw new Error(data.error || "Failed to delete assessment");
         }
       } catch (err) {
         console.error("Delete error:", err);
-        // Fallback local deletion if backend is offline
-        if (confirm(`Could not connect to backend (${err.message}).\n\nDo you want to delete this record locally?`)) {
-          allSubmissions = allSubmissions.filter(a => String(a.id) !== String(id));
-          if (typeof state !== 'undefined' && state.attempts) {
-            state.attempts = state.attempts.filter(a => String(a.id) !== String(id));
-            if (typeof save === 'function') save();
-          }
-          closeInspectModal();
-          updateOverviewStats();
-          applyFilters();
+        allSubmissions = allSubmissions.filter(a => String(a.id) !== String(id));
+        if (typeof state !== 'undefined' && state.attempts) {
+          state.attempts = state.attempts.filter(a => String(a.id) !== String(id));
+          if (typeof save === 'function') save();
         }
+        closeInspectModal();
+        updateOverviewStats();
+        setTimeout(() => { applyFilters(); }, 350);
       }
     }
 
@@ -1567,17 +1662,25 @@
         });
         const data = await res.json();
         if (data.success) {
+          allSubmissions = allSubmissions.filter(a => {
+            const cDate = a.completedAt ? new Date(a.completedAt).toISOString().slice(0, 10) : "";
+            const disp = String(a.completedAtDisplay || a.date || "");
+            return !(cDate === selectedDate || (a.completedAt && a.completedAt.startsWith(selectedDate)) || disp.includes(selectedDate));
+          });
+
           if (typeof state !== 'undefined' && state.attempts) {
-            state.attempts = state.attempts.filter(a => {
-              const cDate = a.completedAt ? new Date(a.completedAt).toISOString().slice(0, 10) : "";
-              const disp = String(a.completedAtDisplay || a.date || "");
-              return !(cDate === selectedDate || (a.completedAt && a.completedAt.startsWith(selectedDate)) || disp.includes(selectedDate));
-            });
+            state.attempts = allSubmissions.slice();
             if (typeof save === 'function') save();
           }
 
+          if (typeof notifyDataSync === 'function') {
+            notifyDataSync('submissionsPurgedByDate', { date: selectedDate });
+          }
+
+          closeDatabaseCleanupModal();
+          updateOverviewStats();
+          applyFilters();
           alert(`✓ ${data.message}`);
-          await fetchAdminData();
         } else {
           throw new Error(data.error || "Failed to delete records for date " + selectedDate);
         }
@@ -1607,14 +1710,21 @@
         });
         const data = await res.json();
         if (data.success) {
+          allSubmissions = [];
           if (typeof state !== 'undefined') {
             state.attempts = [];
             state.submissions = [];
             if (typeof save === 'function') save();
           }
 
+          if (typeof notifyDataSync === 'function') {
+            notifyDataSync('allSubmissionsPurged', {});
+          }
+
+          closeDatabaseCleanupModal();
+          updateOverviewStats();
+          applyFilters();
           alert(`✓ ${data.message}`);
-          await fetchAdminData();
         } else {
           throw new Error(data.error || "Failed to delete all records.");
         }
@@ -1909,23 +2019,11 @@
           body: JSON.stringify(examPayload)
         });
         const data = await res.json();
-        if (data.success) {
-          if (typeof state !== 'undefined') {
-            state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
-            state.customAssessments = state.customAssessments.filter(e => String(e.id) !== String(examPayload.id));
-            state.customAssessments.unshift(examPayload);
-            localStorage.setItem("placementPortal_customAssessments", JSON.stringify(state.customAssessments));
-            if (typeof save === 'function') save();
-          }
-          alert(`✓ Exam "${title}" with ${uploadedExamQuestions.length} questions published successfully!\n\nStudents can now take this assessment from their dashboard.`);
-          closeCustomExamModal();
-          await fetchAdminData();
-          setViewMode('customExams');
-        } else {
-          throw new Error(data.error || "Failed to publish exam");
-        }
-      } catch (err) {
-        console.warn("Server save error, storing in local portal state:", err.message);
+        
+        // Optimistically update local list
+        allCustomExams = allCustomExams.filter(e => String(e.id) !== String(examPayload.id));
+        allCustomExams.unshift(examPayload);
+
         if (typeof state !== 'undefined') {
           state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
           state.customAssessments = state.customAssessments.filter(e => String(e.id) !== String(examPayload.id));
@@ -1933,9 +2031,37 @@
           localStorage.setItem("placementPortal_customAssessments", JSON.stringify(state.customAssessments));
           if (typeof save === 'function') save();
         }
-        alert(`✓ Exam "${title}" with ${uploadedExamQuestions.length} questions published locally.`);
+
+        if (typeof notifyDataSync === 'function') {
+          notifyDataSync('customAssessmentCreated', { exam: examPayload });
+        }
+
         closeCustomExamModal();
         updateOverviewStats();
+        renderCustomExamsBank();
+        setViewMode('customExams');
+
+        alert(`✓ Exam "${title}" with ${uploadedExamQuestions.length} questions published successfully!\n\nStudents can now take this assessment immediately.`);
+      } catch (err) {
+        console.warn("Server save error, storing in local portal state:", err.message);
+        allCustomExams = allCustomExams.filter(e => String(e.id) !== String(examPayload.id));
+        allCustomExams.unshift(examPayload);
+
+        if (typeof state !== 'undefined') {
+          state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
+          state.customAssessments = state.customAssessments.filter(e => String(e.id) !== String(examPayload.id));
+          state.customAssessments.unshift(examPayload);
+          localStorage.setItem("placementPortal_customAssessments", JSON.stringify(state.customAssessments));
+          if (typeof save === 'function') save();
+        }
+
+        if (typeof notifyDataSync === 'function') {
+          notifyDataSync('customAssessmentCreated', { exam: examPayload });
+        }
+
+        closeCustomExamModal();
+        updateOverviewStats();
+        renderCustomExamsBank();
         setViewMode('customExams');
       } finally {
         if (btn) {
@@ -1945,18 +2071,21 @@
       }
     }
 
-    async function deleteCustomExam(examId, examTitle) {
-      if (!confirm(`Are you sure you want to delete the custom assessment:\n\n"${examTitle}"?\n\nThis will remove it from student dashboards and Firebase database.`)) return;
+    async function deleteCustomExam(examId, examTitle, btnEl) {
+      if (!confirm(`Are you sure you want to delete the custom assessment:\n\n"${examTitle}"?\n\nThis will remove it from candidate dashboards and the database.`)) return;
+
+      const card = btnEl ? btnEl.closest(".custom-exam-card") : null;
+      if (card) {
+        card.classList.add("item-deleting");
+      }
 
       const apiBase = (typeof getApiBase === 'function' ? getApiBase() : API_BASE);
 
       try {
-        await fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(examId)}`, {
+        fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(examId)}`, {
           method: 'DELETE'
-        });
-      } catch (err) {
-        console.warn("Delete API error notice:", err.message);
-      }
+        }).catch(e => console.warn("Background delete API notice:", e.message));
+      } catch (err) {}
 
       // Always clear from local state and storage
       if (typeof state !== 'undefined' && Array.isArray(state.customAssessments)) {
@@ -1965,9 +2094,240 @@
         if (typeof save === 'function') save();
       }
       allCustomExams = allCustomExams.filter(e => String(e.id) !== String(examId) && String(e.title || '').trim().toLowerCase() !== String(examTitle || '').trim().toLowerCase());
+
+      if (typeof notifyDataSync === 'function') {
+        notifyDataSync('customAssessmentDeleted', { examId, examTitle });
+      }
+
       updateOverviewStats();
-      renderCustomExamsBank();
-      alert(`✓ Assessment "${examTitle}" deleted successfully from Firebase and portal.`);
+      setTimeout(() => {
+        renderCustomExamsBank();
+      }, 350);
+    }
+
+    // ==========================================================================
+    // INDIVIDUAL QUESTION MANAGEMENT (LIVE DELETE & ADD WITHOUT PAGE RELOAD)
+    // ==========================================================================
+    let currentManagingExamId = null;
+
+    function openManageQuestionsModal(examId) {
+      currentManagingExamId = examId;
+      const exam = allCustomExams.find(e => String(e.id) === String(examId)) ||
+        ((state && Array.isArray(state.customAssessments)) ? state.customAssessments.find(e => String(e.id) === String(examId)) : null);
+
+      if (!exam) {
+        alert("Assessment not found.");
+        return;
+      }
+
+      document.getElementById("manageQuestionsExamTitle").textContent = exam.title || "Assessment Questions";
+      document.getElementById("manageQuestionsExamTopic").textContent = `${exam.topic || "Placement Test"} · ${exam.durationMinutes || 20} min duration`;
+      
+      const qCount = (exam.questions || []).length;
+      document.getElementById("manageQuestionsCountBadge").textContent = `${qCount} MCQ${qCount !== 1 ? 's' : ''}`;
+
+      // Reset add form
+      const form = document.getElementById("addQuestionForm");
+      if (form) {
+        form.reset();
+        form.style.display = "none";
+      }
+      const icon = document.getElementById("toggleAddQIcon");
+      if (icon) icon.textContent = "[+ Expand]";
+
+      renderManageQuestionsList();
+
+      const modal = document.getElementById("manageQuestionsModal");
+      if (modal) modal.classList.add("active");
+    }
+
+    function closeManageQuestionsModal() {
+      const modal = document.getElementById("manageQuestionsModal");
+      if (modal) modal.classList.remove("active");
+      currentManagingExamId = null;
+    }
+
+    function toggleAddQuestionForm() {
+      const form = document.getElementById("addQuestionForm");
+      const icon = document.getElementById("toggleAddQIcon");
+      if (!form) return;
+
+      const isHidden = form.style.display === "none" || !form.style.display;
+      form.style.display = isHidden ? "flex" : "none";
+      if (icon) icon.textContent = isHidden ? "[− Collapse]" : "[+ Expand]";
+      if (isHidden) {
+        document.getElementById("newQText")?.focus();
+      }
+    }
+
+    function renderManageQuestionsList() {
+      const container = document.getElementById("manageQuestionsListWrap");
+      if (!container || !currentManagingExamId) return;
+
+      const exam = allCustomExams.find(e => String(e.id) === String(currentManagingExamId)) ||
+        ((state && Array.isArray(state.customAssessments)) ? state.customAssessments.find(e => String(e.id) === String(currentManagingExamId)) : null);
+
+      if (!exam || !Array.isArray(exam.questions) || !exam.questions.length) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:32px 16px; background:var(--card); border:1px dashed var(--line); border-radius:12px;">
+            <p style="margin:0 0 6px; font-weight:700; color:var(--text-heading); font-size:14px;">No Questions in this Assessment</p>
+            <p class="muted" style="margin:0; font-size:12.5px;">Click "Add Single Question" above to add problem statements.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div style="border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--card);">
+          <table style="width:100%; border-collapse:collapse; font-size:12.5px;">
+            <thead>
+              <tr style="background:var(--card-alt); border-bottom:1px solid var(--line); text-align:left;">
+                <th style="padding:10px 12px; width:45px;">#</th>
+                <th style="padding:10px 12px;">Question Text &amp; Options</th>
+                <th style="padding:10px 12px; width:90px; text-align:center;">Correct Ans</th>
+                <th style="padding:10px 12px; width:90px; text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${exam.questions.map((q, idx) => `
+                <tr id="qRow_${currentManagingExamId}_${idx}" style="border-bottom:1px solid var(--line); transition:all 0.3s ease;">
+                  <td style="padding:10px 12px; font-weight:800; color:var(--muted); vertical-align:top;">${idx + 1}</td>
+                  <td style="padding:10px 12px; vertical-align:top;">
+                    <div style="font-weight:700; color:var(--text-heading); margin-bottom:6px; font-size:13px; line-height:1.4;">${esc(q.question)}</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:11.5px; color:var(--text); background:var(--card-alt); padding:8px 10px; border-radius:8px; border:1px solid var(--line);">
+                      <div><b>A:</b> ${esc((q.options && q.options[0]) || '-')}</div>
+                      <div><b>B:</b> ${esc((q.options && q.options[1]) || '-')}</div>
+                      <div><b>C:</b> ${esc((q.options && q.options[2]) || '-')}</div>
+                      <div><b>D:</b> ${esc((q.options && q.options[3]) || '-')}</div>
+                    </div>
+                  </td>
+                  <td style="padding:10px 12px; text-align:center; vertical-align:top;">
+                    <span class="badge" style="background:#22c55e; color:#fff; font-weight:900; font-size:12px; padding:3px 10px; border-radius:6px;">${q.answer || 'A'}</span>
+                  </td>
+                  <td style="padding:10px 12px; text-align:right; vertical-align:top;">
+                    <button type="button" onclick="deleteQuestionFromExam('${esc(currentManagingExamId)}', ${idx}, this)"
+                      class="btn-delete-action" style="padding:6px 10px; font-size:11.5px; border-radius:6px;" title="Delete this question">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      <span>Delete</span>
+                    </button>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    async function deleteQuestionFromExam(examId, qIndex, btnEl) {
+      const exam = allCustomExams.find(e => String(e.id) === String(examId)) ||
+        ((state && Array.isArray(state.customAssessments)) ? state.customAssessments.find(e => String(e.id) === String(examId)) : null);
+
+      if (!exam || !Array.isArray(exam.questions) || qIndex >= exam.questions.length) return;
+
+      const qStatement = exam.questions[qIndex]?.question || `Question #${qIndex + 1}`;
+      const preview = qStatement.length > 50 ? qStatement.substring(0, 50) + "..." : qStatement;
+
+      if (!confirm(`Delete question #${qIndex + 1}:\n"${preview}"?`)) return;
+
+      // Optimistic row animation
+      const row = btnEl ? btnEl.closest("tr") : document.getElementById(`qRow_${examId}_${qIndex}`);
+      if (row) {
+        row.classList.add("item-deleting");
+      }
+
+      // Call online helper
+      if (typeof deleteQuestionFromAssessmentOnline === 'function') {
+        deleteQuestionFromAssessmentOnline(examId, qIndex).catch(err => console.warn("Question delete notice:", err.message));
+      }
+
+      // Update in-memory exam
+      exam.questions.splice(qIndex, 1);
+      exam.questions.forEach((q, i) => { q.number = i + 1; });
+      exam.totalQuestions = exam.questions.length;
+
+      // Update local storage
+      if (typeof updateLocalCustomAssessment === 'function') {
+        updateLocalCustomAssessment(exam);
+      }
+
+      // Update badge counts in real-time
+      const badge = document.getElementById("manageQuestionsCountBadge");
+      if (badge) badge.textContent = `${exam.questions.length} MCQ${exam.questions.length !== 1 ? 's' : ''}`;
+
+      setTimeout(() => {
+        renderManageQuestionsList();
+        renderCustomExamsBank();
+        updateOverviewStats();
+      }, 350);
+    }
+
+    async function submitAddSingleQuestion() {
+      if (!currentManagingExamId) return;
+
+      const qText = (document.getElementById("newQText")?.value || "").trim();
+      const optA = (document.getElementById("newQOptA")?.value || "").trim();
+      const optB = (document.getElementById("newQOptB")?.value || "").trim();
+      const optC = (document.getElementById("newQOptC")?.value || "").trim();
+      const optD = (document.getElementById("newQOptD")?.value || "").trim();
+      const ans = (document.getElementById("newQCorrect")?.value || "A").trim();
+
+      if (!qText || !optA || !optB || !optC || !optD) {
+        alert("Please fill in question text and all 4 options.");
+        return;
+      }
+
+      const btn = document.getElementById("btnAddQSubmit");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳ Adding...</span>`;
+      }
+
+      const questionData = {
+        question: qText,
+        options: [optA, optB, optC, optD],
+        answer: ans
+      };
+
+      try {
+        if (typeof addQuestionToAssessmentOnline === 'function') {
+          await addQuestionToAssessmentOnline(currentManagingExamId, questionData);
+        }
+
+        const exam = allCustomExams.find(e => String(e.id) === String(currentManagingExamId)) ||
+          ((state && Array.isArray(state.customAssessments)) ? state.customAssessments.find(e => String(e.id) === String(currentManagingExamId)) : null);
+
+        if (exam) {
+          if (!exam.questions.some(q => q.question === qText)) {
+            exam.questions.push({
+              number: exam.questions.length + 1,
+              question: qText,
+              options: [optA, optB, optC, optD],
+              answer: ans
+            });
+            exam.totalQuestions = exam.questions.length;
+          }
+        }
+
+        // Reset form
+        document.getElementById("addQuestionForm")?.reset();
+        toggleAddQuestionForm();
+
+        // Update badges & re-render questions list
+        const badge = document.getElementById("manageQuestionsCountBadge");
+        if (badge && exam) badge.textContent = `${exam.questions.length} MCQ${exam.questions.length !== 1 ? 's' : ''}`;
+
+        renderManageQuestionsList();
+        renderCustomExamsBank();
+        updateOverviewStats();
+      } catch (err) {
+        alert("Error adding question: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>➕ Add Question to Exam</span>`;
+        }
+      }
     }
 
     function renderCustomExamsBank(searchQ) {
@@ -1991,7 +2351,7 @@
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             </div>
             <p style="margin:0; font-weight:700; color:var(--text-heading); font-size:15px;">No Custom Assessments Created Yet</p>
-            <p class="muted" style="margin:4px 0 16px; font-size:13px;">Upload an Excel file with questions to create your first custom candidate exam.</p>
+            <p class="muted" style="margin:4px 0 16px; font-size:13px;">Upload an Excel file with questions or create a candidate mock exam.</p>
             <button onclick="openCustomExamModal()" class="hero-btn-primary" style="padding:10px 22px; font-size:13.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               <span>Upload Excel &amp; Create Exam</span>
@@ -2008,14 +2368,15 @@
             const avgScore = attemptsForThisExam.length
               ? Math.round(attemptsForThisExam.reduce((acc, a) => acc + Number(a.percentage || 0), 0) / attemptsForThisExam.length)
               : null;
+            const qCount = (exam.questions || []).length;
 
             return `
-              <div style="background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; box-shadow:var(--shadow-sm);">
+              <div class="custom-exam-card" id="examCard_${esc(exam.id)}" style="background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; box-shadow:var(--shadow-sm); transition:all 0.35s ease;">
                 <div style="flex:1; min-width:260px;">
                   <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                     <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-weight:800; font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Custom Assessment</span>
                     <span class="badge" style="background:var(--tag-bg); color:var(--muted); font-size:11px;">⏱️ ${exam.durationMinutes || 20} min</span>
-                    <span class="badge done" style="font-size:11px;">${(exam.questions || []).length} MCQs</span>
+                    <span class="badge done" id="examCountBadge_${esc(exam.id)}" style="font-size:11px; font-weight:800;">${qCount} MCQs</span>
                   </div>
                   <h4 style="margin:0 0 4px; font-size:16px; font-weight:800; color:var(--text-heading);">${esc(exam.title)}</h4>
                   <p class="muted" style="margin:0; font-size:13px;">${esc(exam.topic || "General Assessment")} · Created ${esc(exam.createdAtDisplay || "Recently")}</p>
@@ -2026,12 +2387,16 @@
                   </div>
                 </div>
 
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <a href="assessment.html?customId=${encodeURIComponent(exam.id)}" target="_blank" class="ghost" style="padding:8px 16px; font-size:12.5px; border-radius:8px; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <button type="button" onclick="openManageQuestionsModal('${esc(exam.id)}')" class="hero-btn-primary" style="padding:8px 16px; font-size:12.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; background:#2563eb;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    <span>Manage Questions (${qCount})</span>
+                  </button>
+                  <a href="assessment.html?customId=${encodeURIComponent(exam.id)}" target="_blank" class="ghost" style="padding:8px 14px; font-size:12.5px; border-radius:8px; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    Preview Test
+                    Preview
                   </a>
-                  <button onclick="deleteCustomExam('${esc(exam.id)}', '${esc(exam.title)}')" class="btn-delete-action" style="padding:8px 14px; font-size:12.5px; border-radius:8px;" title="Delete custom exam">
+                  <button type="button" onclick="deleteCustomExam('${esc(exam.id)}', '${esc(exam.title)}', this)" class="btn-delete-action" style="padding:8px 14px; font-size:12.5px; border-radius:8px;" title="Delete custom exam">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                     Delete Exam
                   </button>
@@ -2042,6 +2407,110 @@
         </div>
       `;
     }
+
+    // ==========================================================================
+    // REAL-TIME AUTO-SYNC & SPEED STATE UPDATES (INSTANT REFLECTION)
+    // ==========================================================================
+    if (typeof subscribeDataSync === 'function') {
+      subscribeDataSync((event) => {
+        if (!event) return;
+        const type = event.type || '';
+        
+        if (type === 'submissionAdded' && event.payload && event.payload.submission) {
+          const sub = event.payload.submission;
+          if (!allSubmissions.some(a => String(a.id) === String(sub.id))) {
+            allSubmissions.unshift(sub);
+          }
+          if (typeof state !== 'undefined') {
+            state.attempts = state.attempts || [];
+            if (!state.attempts.some(a => String(a.id) === String(sub.id))) {
+              state.attempts.unshift(sub);
+            }
+          }
+          updateOverviewStats();
+          if (currentView === 'submissions' || currentView === 'students') {
+            applyFilters();
+          }
+        } else if (type.startsWith('submission')) {
+          if (typeof state !== 'undefined' && Array.isArray(state.attempts)) {
+            allSubmissions = state.attempts;
+            updateOverviewStats();
+            if (currentView === 'submissions' || currentView === 'students') {
+              applyFilters();
+            }
+          }
+        } else if (type.startsWith('custom') || type.startsWith('question')) {
+          if (typeof state !== 'undefined' && Array.isArray(state.customAssessments)) {
+            allCustomExams = state.customAssessments;
+            updateOverviewStats();
+            if (currentView === 'customExams') {
+              renderCustomExamsBank();
+            }
+            if (currentManagingExamId) {
+              renderManageQuestionsList();
+            }
+          }
+        }
+      });
+    }
+
+    // High-speed non-intrusive background sync (checks every 2.5 seconds quietly)
+    async function silentBackgroundSync() {
+      // 1. Check for live student assessment submissions
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/assessments`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.assessments)) {
+            const serverCount = data.assessments.length;
+            const localCount = allSubmissions.length;
+            const changed = serverCount !== localCount || (serverCount > 0 && data.assessments[0]?.id !== allSubmissions[0]?.id);
+            if (changed) {
+              allSubmissions = data.assessments;
+              if (typeof state !== 'undefined') {
+                state.attempts = data.assessments.slice();
+                if (typeof save === 'function') save();
+              }
+              updateOverviewStats();
+              if (currentView === 'submissions' || currentView === 'students') {
+                applyFilters();
+              }
+            }
+          }
+        }
+      } catch (err) {}
+
+      // 2. Check for custom assessments / question bank updates
+      try {
+        const cRes = await fetch(`${API_BASE}/api/custom-assessments`);
+        if (cRes.ok) {
+          const cData = await cRes.json();
+          if (cData && Array.isArray(cData.customAssessments)) {
+            const serverCount = cData.customAssessments.length;
+            const localCount = allCustomExams.length;
+            const changed = serverCount !== localCount || JSON.stringify(cData.customAssessments) !== JSON.stringify(allCustomExams);
+            if (changed) {
+              allCustomExams = cData.customAssessments;
+              if (typeof state !== 'undefined') {
+                state.customAssessments = cData.customAssessments;
+                localStorage.setItem("placementPortal_customAssessments", JSON.stringify(cData.customAssessments));
+                if (typeof save === 'function') save();
+              }
+              updateOverviewStats();
+              if (currentView === 'customExams') {
+                renderCustomExamsBank();
+              }
+              if (currentManagingExamId) {
+                renderManageQuestionsList();
+              }
+            }
+          }
+        }
+      } catch (err) {}
+    }
+
+    // Run high-speed polling every 2.5 seconds
+    setInterval(silentBackgroundSync, 2500);
 
     // Initial load
     fetchAdminData();

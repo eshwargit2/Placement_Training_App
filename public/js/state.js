@@ -475,3 +475,195 @@ async function fetchStudentDashboardOnline(studentIdOrUsername) {
   }
   return null;
 }
+
+// ==========================================================================
+// REAL-TIME INSTANT CROSS-TAB & BACKEND DATA SYNC BUS
+// ==========================================================================
+let _syncChannel = null;
+try {
+  if (typeof BroadcastChannel !== 'undefined') {
+    _syncChannel = new BroadcastChannel('placement_realtime_sync');
+  }
+} catch (e) {}
+
+const _syncListeners = new Set();
+
+function subscribeDataSync(callback) {
+  if (typeof callback === 'function') {
+    _syncListeners.add(callback);
+  }
+  return () => _syncListeners.delete(callback);
+}
+
+function notifyDataSync(type, payload = {}) {
+  const eventData = {
+    type,
+    payload,
+    timestamp: Date.now(),
+    sourceTabId: window.__tabId || (window.__tabId = Math.random().toString(36).slice(2))
+  };
+
+  // 1. Notify listeners in current tab
+  _syncListeners.forEach(cb => {
+    try { cb(eventData); } catch (e) { console.error('Sync listener error:', e); }
+  });
+
+  // 2. Broadcast across tabs
+  if (_syncChannel) {
+    try { _syncChannel.postMessage(eventData); } catch (e) {}
+  }
+
+  // 3. Storage event fallback
+  try {
+    localStorage.setItem('placement_sync_signal', JSON.stringify({ type, timestamp: Date.now() }));
+  } catch (e) {}
+}
+
+if (_syncChannel) {
+  _syncChannel.onmessage = (event) => {
+    const data = event.data;
+    if (data && data.sourceTabId !== window.__tabId) {
+      _syncListeners.forEach(cb => {
+        try { cb(data); } catch (e) { console.error('Sync listener error:', e); }
+      });
+    }
+  };
+}
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'placement_sync_signal' && e.newValue) {
+    try {
+      const parsed = JSON.parse(e.newValue);
+      _syncListeners.forEach(cb => {
+        try { cb(parsed); } catch (err) {}
+      });
+    } catch (err) {}
+  } else if (e.key === 'placementPortal_customAssessments' && e.newValue) {
+    try {
+      const parsedExams = JSON.parse(e.newValue);
+      if (Array.isArray(parsedExams)) {
+        state.customAssessments = parsedExams;
+        _syncListeners.forEach(cb => {
+          try { cb({ type: 'customAssessmentsUpdated', payload: parsedExams }); } catch (err) {}
+        });
+      }
+    } catch (err) {}
+  }
+});
+
+window.subscribeDataSync = subscribeDataSync;
+window.notifyDataSync = notifyDataSync;
+
+// ==========================================================================
+// LIVE QUESTION & CUSTOM ASSESSMENT MANAGEMENT HELPERS
+// ==========================================================================
+async function fetchLiveCustomAssessmentsOnline() {
+  const apiBase = getApiBase();
+  try {
+    const res = await fetch(`${apiBase}/api/custom-assessments`);
+    if (!res.ok) return state.customAssessments || [];
+    const data = await safeFetchJson(res);
+    if (data && Array.isArray(data.customAssessments)) {
+      state.customAssessments = data.customAssessments;
+      localStorage.setItem("placementPortal_customAssessments", JSON.stringify(data.customAssessments));
+      save();
+      return data.customAssessments;
+    }
+  } catch (err) {
+    console.warn("Could not fetch live custom assessments:", err.message);
+  }
+  return state.customAssessments || [];
+}
+
+async function addQuestionToAssessmentOnline(examId, questionData) {
+  const apiBase = getApiBase();
+  try {
+    const res = await fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(examId)}/questions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(questionData)
+    });
+    const data = await safeFetchJson(res);
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to add question on server.');
+    }
+    
+    // Update local state
+    if (data.customAssessment) {
+      updateLocalCustomAssessment(data.customAssessment);
+    }
+    notifyDataSync('questionAdded', { examId, question: questionData, customAssessment: data.customAssessment });
+    return data;
+  } catch (err) {
+    console.warn("Server add question error, falling back locally:", err.message);
+    // Local fallback
+    const exams = state.customAssessments || [];
+    const target = exams.find(e => String(e.id) === String(examId));
+    if (target) {
+      if (!Array.isArray(target.questions)) target.questions = [];
+      target.questions.push({
+        number: target.questions.length + 1,
+        question: questionData.question,
+        options: questionData.options,
+        answer: questionData.answer || 'A'
+      });
+      target.totalQuestions = target.questions.length;
+      updateLocalCustomAssessment(target);
+      notifyDataSync('questionAdded', { examId, question: questionData, customAssessment: target });
+      return { success: true, customAssessment: target, localFallback: true };
+    }
+    throw err;
+  }
+}
+
+async function deleteQuestionFromAssessmentOnline(examId, qIndex) {
+  const apiBase = getApiBase();
+  try {
+    const res = await fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(examId)}/questions/${qIndex}`, {
+      method: 'DELETE'
+    });
+    const data = await safeFetchJson(res);
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to delete question from server.');
+    }
+
+    if (data.customAssessment) {
+      updateLocalCustomAssessment(data.customAssessment);
+    }
+    notifyDataSync('questionDeleted', { examId, qIndex, customAssessment: data.customAssessment });
+    return data;
+  } catch (err) {
+    console.warn("Server delete question error, falling back locally:", err.message);
+    // Local fallback
+    const exams = state.customAssessments || [];
+    const target = exams.find(e => String(e.id) === String(examId));
+    if (target && Array.isArray(target.questions) && qIndex < target.questions.length) {
+      target.questions.splice(qIndex, 1);
+      target.questions.forEach((q, idx) => { q.number = idx + 1; });
+      target.totalQuestions = target.questions.length;
+      updateLocalCustomAssessment(target);
+      notifyDataSync('questionDeleted', { examId, qIndex, customAssessment: target });
+      return { success: true, customAssessment: target, localFallback: true };
+    }
+    throw err;
+  }
+}
+
+function updateLocalCustomAssessment(updatedExam) {
+  if (!updatedExam || !updatedExam.id) return;
+  state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
+  const idx = state.customAssessments.findIndex(e => String(e.id) === String(updatedExam.id));
+  if (idx >= 0) {
+    state.customAssessments[idx] = updatedExam;
+  } else {
+    state.customAssessments.unshift(updatedExam);
+  }
+  localStorage.setItem("placementPortal_customAssessments", JSON.stringify(state.customAssessments));
+  save();
+}
+
+window.fetchLiveCustomAssessmentsOnline = fetchLiveCustomAssessmentsOnline;
+window.addQuestionToAssessmentOnline = addQuestionToAssessmentOnline;
+window.deleteQuestionFromAssessmentOnline = deleteQuestionFromAssessmentOnline;
+window.updateLocalCustomAssessment = updateLocalCustomAssessment;
+

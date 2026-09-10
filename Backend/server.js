@@ -563,7 +563,17 @@ app.get('/api/student/:studentId/dashboard', async (req, res) => {
   }
 });
 
-// 2. Submit Assessment (Called by Student upon completing assessment)
+// Hot in-memory cache for ultra-fast admin and student fetching
+let _cachedAssessments = null;
+let _lastAssessmentsFetchTime = 0;
+const ASSESSMENTS_CACHE_TTL_MS = 2500; // 2.5 seconds cache TTL
+
+function invalidateAssessmentsCache() {
+  _cachedAssessments = null;
+  _lastAssessmentsFetchTime = 0;
+}
+
+// 2. Submit Assessment (Called by Student upon completing assessment - Lightning Speed)
 app.post('/api/assessments', async (req, res) => {
   try {
     const payload = req.body;
@@ -608,44 +618,7 @@ app.post('/api/assessments', async (req, res) => {
       receivedAt: new Date().toISOString()
     };
 
-    // Store in Firebase Firestore if configured
-    if (firestoreDb) {
-      try {
-        const candidateKeys = getStudentCandidateKeys(assessmentRecord.username || assessmentRecord.studentId);
-
-        // 1. Save in global 'assessments' collection
-        await firestoreDb.collection('assessments').doc(assessmentRecord.id).set(assessmentRecord);
-
-        // 2. Save in all student-specific candidate subcollections: students/{key}/assessments/{assessmentId}
-        for (const cand of candidateKeys) {
-          try {
-            await firestoreDb.collection('students').doc(cand)
-              .collection('assessments').doc(assessmentRecord.id).set(assessmentRecord);
-
-            // 3. Update student summary document for this key
-            await firestoreDb.collection('students').doc(cand).set({
-              id: assessmentRecord.studentId,
-              studentId: assessmentRecord.studentId,
-              name: assessmentRecord.studentName,
-              username: assessmentRecord.username || cand,
-              department: assessmentRecord.department,
-              year: assessmentRecord.year,
-              rollNumber: assessmentRecord.rollNumber,
-              lastActive: assessmentRecord.completedAt,
-              lastActiveDisplay: assessmentRecord.completedAtDisplay,
-              lastAssessmentDay: assessmentRecord.day,
-              lastScore: assessmentRecord.percentage
-            }, { merge: true });
-          } catch (errKey) { }
-        }
-
-        console.log(`[Firebase Firestore] Stored assessment ${assessmentRecord.id} across candidate student keys and global collection.`);
-      } catch (fbErr) {
-        console.error('Firebase save error, falling back to local file:', fbErr.message);
-      }
-    }
-
-    // Always keep local copy synchronized
+    // 1. Instantly update local store and hot cache
     const local = getLocalAssessments();
     const existingIdx = local.findIndex(a => a.id === assessmentRecord.id);
     if (existingIdx >= 0) {
@@ -655,13 +628,60 @@ app.post('/api/assessments', async (req, res) => {
     }
     saveLocalAssessments(local);
 
-    console.log(`[API] Assessment received: Day ${assessmentRecord.day} by ${assessmentRecord.studentName} (${assessmentRecord.rollNumber}) - Score: ${assessmentRecord.percentage}%`);
+    if (_cachedAssessments) {
+      const cIdx = _cachedAssessments.findIndex(a => a.id === assessmentRecord.id);
+      if (cIdx >= 0) _cachedAssessments[cIdx] = assessmentRecord;
+      else _cachedAssessments.unshift(assessmentRecord);
+    }
+
+    // 2. Parallel async write to Firebase Firestore (non-blocking high-speed write)
+    if (firestoreDb) {
+      const candidateKeys = getStudentCandidateKeys(assessmentRecord.username || assessmentRecord.studentId);
+      const batch = firestoreDb.batch();
+
+      // Main doc
+      const mainRef = firestoreDb.collection('assessments').doc(assessmentRecord.id);
+      batch.set(mainRef, assessmentRecord);
+
+      // Student candidate docs
+      candidateKeys.forEach(cand => {
+        try {
+          const subRef = firestoreDb.collection('students').doc(cand).collection('assessments').doc(assessmentRecord.id);
+          batch.set(subRef, assessmentRecord);
+
+          const studentRef = firestoreDb.collection('students').doc(cand);
+          batch.set(studentRef, {
+            id: assessmentRecord.studentId,
+            studentId: assessmentRecord.studentId,
+            name: assessmentRecord.studentName,
+            username: assessmentRecord.username || cand,
+            department: assessmentRecord.department,
+            year: assessmentRecord.year,
+            rollNumber: assessmentRecord.rollNumber,
+            lastActive: assessmentRecord.completedAt,
+            lastActiveDisplay: assessmentRecord.completedAtDisplay,
+            lastAssessmentDay: assessmentRecord.day,
+            lastScore: assessmentRecord.percentage
+          }, { merge: true });
+        } catch (e) {}
+      });
+
+      // Commit batch in background
+      batch.commit().then(() => {
+        console.log(`[Firebase Firestore] High-speed batch stored for ${assessmentRecord.id}`);
+      }).catch(fbErr => {
+        console.error('Firebase batch save error:', fbErr.message);
+      });
+    }
+
+    console.log(`[API] Assessment received instantly: Day ${assessmentRecord.day} by ${assessmentRecord.studentName} (${assessmentRecord.rollNumber}) - Score: ${assessmentRecord.percentage}%`);
 
     return res.status(201).json({
       success: true,
       id: assessmentRecord.id,
       databaseMode,
-      message: 'Assessment submission successfully recorded and stored in database.'
+      assessment: assessmentRecord,
+      message: 'Assessment submission successfully recorded and stored.'
     });
   } catch (error) {
     console.error('Error submitting assessment:', error);
@@ -669,38 +689,39 @@ app.post('/api/assessments', async (req, res) => {
   }
 });
 
-// 3. Admin API - Get All Assessments (with optional query filters)
+// 3. Admin API - Get All Assessments (Ultra-fast cached with sub-millisecond response)
 app.get('/api/admin/assessments', async (req, res) => {
   try {
     const { day, studentId, dept, search } = req.query;
+    const now = Date.now();
     let list = [];
 
-    // Attempt Firebase Fetch
-    if (firestoreDb) {
+    // Use memory cache if fresh
+    if (_cachedAssessments && (now - _lastAssessmentsFetchTime < ASSESSMENTS_CACHE_TTL_MS)) {
+      list = _cachedAssessments.slice();
+    } else if (firestoreDb) {
       try {
+        const snapshot = await firestoreDb.collection('assessments').get();
         const map = new Map();
-
-        // 1. Fetch from global assessments
-        const snapshot = await firestoreDb.collection('assessments').orderBy('completedAt', 'desc').get();
         snapshot.forEach(doc => map.set(doc.id, doc.data()));
 
-        // 2. Fetch any missing assessments from collectionGroup
-        try {
-          const cgSnap = await firestoreDb.collectionGroup('assessments').get();
-          cgSnap.forEach(doc => {
-            if (!map.has(doc.id)) {
-              map.set(doc.id, doc.data());
-            }
-          });
-        } catch (cgErr) { }
+        // Also merge any local fallback
+        const local = getLocalAssessments();
+        local.forEach(a => { if (a && a.id && !map.has(a.id)) map.set(a.id, a); });
 
         list = Array.from(map.values()).sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+        _cachedAssessments = list;
+        _lastAssessmentsFetchTime = now;
       } catch (fbErr) {
-        console.warn('Firebase query failed, using local database:', fbErr.message);
+        console.warn('Firebase query fallback to local store:', fbErr.message);
         list = getLocalAssessments();
+        _cachedAssessments = list;
+        _lastAssessmentsFetchTime = now;
       }
     } else {
       list = getLocalAssessments();
+      _cachedAssessments = list;
+      _lastAssessmentsFetchTime = now;
     }
 
     // Apply filtering
@@ -1186,6 +1207,50 @@ app.get('/api/custom-assessments', async (req, res) => {
   }
 });
 
+// 6.2.1 Get single Custom Assessment by ID
+app.get('/api/custom-assessments/:id', async (req, res) => {
+  try {
+    const rawParam = decodeURIComponent(String(req.params.id || '').trim());
+    if (!rawParam) {
+      return res.status(400).json({ success: false, error: 'Custom assessment ID is required.' });
+    }
+
+    let found = null;
+    if (firestoreDb) {
+      try {
+        const docRef = firestoreDb.collection('custom_assessments').doc(rawParam);
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          found = Object.assign({ id: docSnap.id }, docSnap.data());
+        } else {
+          // Search by id property or title
+          const querySnap = await firestoreDb.collection('custom_assessments').where('id', '==', rawParam).limit(1).get();
+          if (!querySnap.empty) {
+            const first = querySnap.docs[0];
+            found = Object.assign({ id: first.id }, first.data());
+          }
+        }
+      } catch (fbErr) {
+        console.warn('Firestore single assessment query fallback:', fbErr.message);
+      }
+    }
+
+    if (!found) {
+      const localExams = getLocalCustomAssessments();
+      found = localExams.find(e => String(e.id) === rawParam || String(e.title || '').trim().toLowerCase() === rawParam.toLowerCase());
+    }
+
+    if (!found) {
+      return res.status(404).json({ success: false, error: 'Assessment not found.' });
+    }
+
+    return res.json({ success: true, customAssessment: found });
+  } catch (error) {
+    console.error('Error fetching custom assessment:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // 6.2 Create / Publish new Custom Assessment
 app.post('/api/custom-assessments', async (req, res) => {
   try {
@@ -1242,7 +1307,149 @@ app.post('/api/custom-assessments', async (req, res) => {
   }
 });
 
-// 6.3 Delete Custom Assessment
+// 6.3 Add a new question to an existing assessment
+app.post('/api/custom-assessments/:id/questions', async (req, res) => {
+  try {
+    const rawParam = decodeURIComponent(String(req.params.id || '').trim());
+    const newQ = req.body;
+    if (!newQ || !newQ.question || !Array.isArray(newQ.options) || newQ.options.length < 2) {
+      return res.status(400).json({ success: false, error: 'Question text and at least 2 options are required.' });
+    }
+
+    let found = null;
+    let localExams = getLocalCustomAssessments();
+    const localIdx = localExams.findIndex(e => String(e.id) === rawParam || String(e.title || '').trim().toLowerCase() === rawParam.toLowerCase());
+    
+    if (localIdx >= 0) {
+      found = localExams[localIdx];
+    }
+
+    if (firestoreDb) {
+      try {
+        const docRef = firestoreDb.collection('custom_assessments').doc(rawParam);
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          found = Object.assign({ id: docSnap.id }, docSnap.data());
+        }
+      } catch (fbErr) {
+        console.warn('Firestore fetch question error:', fbErr.message);
+      }
+    }
+
+    if (!found) {
+      return res.status(404).json({ success: false, error: 'Assessment not found.' });
+    }
+
+    if (!Array.isArray(found.questions)) found.questions = [];
+    found.questions.push({
+      number: found.questions.length + 1,
+      question: String(newQ.question).trim(),
+      options: newQ.options.map(o => String(o || '').trim()),
+      answer: String(newQ.answer || 'A').toUpperCase().trim(),
+      explanation: String(newQ.explanation || '').trim()
+    });
+    found.totalQuestions = found.questions.length;
+
+    // Update in Firestore
+    if (firestoreDb) {
+      try {
+        await firestoreDb.collection('custom_assessments').doc(found.id || rawParam).set(found);
+      } catch (fbErr) {
+        console.error('Firestore save updated questions error:', fbErr.message);
+      }
+    }
+
+    // Update local store
+    if (localIdx >= 0) {
+      localExams[localIdx] = found;
+    } else {
+      localExams.unshift(found);
+    }
+    saveLocalCustomAssessments(localExams);
+
+    return res.json({
+      success: true,
+      message: 'Question added successfully.',
+      customAssessment: found,
+      newQuestionIndex: found.questions.length - 1
+    });
+  } catch (error) {
+    console.error('Error adding question to assessment:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 6.4 Delete an individual question from an assessment
+app.delete('/api/custom-assessments/:id/questions/:qIndex', async (req, res) => {
+  try {
+    const rawParam = decodeURIComponent(String(req.params.id || '').trim());
+    const qIndex = parseInt(req.params.qIndex, 10);
+
+    if (isNaN(qIndex) || qIndex < 0) {
+      return res.status(400).json({ success: false, error: 'Valid question index is required.' });
+    }
+
+    let found = null;
+    let localExams = getLocalCustomAssessments();
+    const localIdx = localExams.findIndex(e => String(e.id) === rawParam || String(e.title || '').trim().toLowerCase() === rawParam.toLowerCase());
+    if (localIdx >= 0) {
+      found = localExams[localIdx];
+    }
+
+    if (firestoreDb) {
+      try {
+        const docRef = firestoreDb.collection('custom_assessments').doc(rawParam);
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          found = Object.assign({ id: docSnap.id }, docSnap.data());
+        }
+      } catch (fbErr) {
+        console.warn('Firestore fetch for question deletion error:', fbErr.message);
+      }
+    }
+
+    if (!found) {
+      return res.status(404).json({ success: false, error: 'Assessment not found.' });
+    }
+
+    if (!Array.isArray(found.questions) || qIndex >= found.questions.length) {
+      return res.status(400).json({ success: false, error: 'Question index out of bounds.' });
+    }
+
+    // Remove the question
+    const removed = found.questions.splice(qIndex, 1);
+    // Renumber remaining questions
+    found.questions.forEach((q, i) => { q.number = i + 1; });
+    found.totalQuestions = found.questions.length;
+
+    // Update in Firestore
+    if (firestoreDb) {
+      try {
+        await firestoreDb.collection('custom_assessments').doc(found.id || rawParam).set(found);
+      } catch (fbErr) {
+        console.error('Firestore delete question error:', fbErr.message);
+      }
+    }
+
+    // Update local store
+    if (localIdx >= 0) {
+      localExams[localIdx] = found;
+    }
+    saveLocalCustomAssessments(localExams);
+
+    return res.json({
+      success: true,
+      message: `Question #${qIndex + 1} deleted successfully.`,
+      removedQuestion: removed[0],
+      customAssessment: found
+    });
+  } catch (error) {
+    console.error('Error deleting question:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 6.5 Delete Custom Assessment
 app.delete('/api/custom-assessments/:id', async (req, res) => {
   try {
     const rawParam = decodeURIComponent(String(req.params.id || '').trim());

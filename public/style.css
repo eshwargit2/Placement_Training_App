@@ -5291,4 +5291,66 @@ body.dark-theme .custom-exams-filter-btn {
   }
 }
 
+/* ==========================================================================
+   REAL-TIME REACTIVE ELEMENT TRANSITIONS (FAST NON-REFRESH DOM UPDATES)
+   ========================================================================== */
+.item-deleting {
+  opacity: 0 !important;
+  transform: scale(0.96) translateX(-16px) !important;
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
+.item-added {
+  animation: itemAddedGlow 0.6s ease-out forwards;
+}
+
+@keyframes itemAddedGlow {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+    background-color: rgba(37, 99, 235, 0.18);
+  }
+  50% {
+    background-color: rgba(37, 99, 235, 0.12);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    background-color: transparent;
+  }
+}
+
+.live-badge-pulse {
+  animation: liveBadgePulseAnim 2s infinite ease-in-out;
+}
+
+@keyframes liveBadgePulseAnim {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.modal-sheet {
+  background: var(--card);
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  max-width: 860px;
+  width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}

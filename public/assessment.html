@@ -117,6 +117,36 @@
 
       customExam = customList.find(e => String(e.id) === String(customId));
 
+      if (!customExam || !customExam.questions || !customExam.questions.length) {
+        // Try live fetch
+        (async function fetchLiveSingleAssessment() {
+          try {
+            const apiBase = (typeof getApiBase === 'function' ? getApiBase() : 'http://localhost:5000');
+            const res = await fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(customId)}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data && data.customAssessment && Array.isArray(data.customAssessment.questions)) {
+                customExam = data.customAssessment;
+                durationMins = customExam.durationMinutes || 20;
+                topicName = customExam.topic || customExam.title;
+                qs = (customExam.questions || []).map(q => [
+                  q.question,
+                  (q.options && q.options[0]) || "Option A",
+                  (q.options && q.options[1]) || "Option B",
+                  (q.options && q.options[2]) || "Option C",
+                  (q.options && q.options[3]) || "Option D",
+                  q.answer || "A"
+                ]);
+                document.getElementById("assessmentTitle").textContent = customExam.title;
+                document.getElementById("assessmentDesc").textContent = `${topicName} · Custom Examination`;
+                document.getElementById("mcqHeaderTitle").textContent = `Assessment Questions — ${qs.length} Multiple Choice Questions`;
+                renderMCQQuestionsList();
+              }
+            }
+          } catch (e) {}
+        })();
+      }
+
       if (!customExam) {
         customExam = {
           id: customId,
@@ -171,24 +201,30 @@
       sessionKey = "assessmentSession_" + (state.user ? state.user.id : "guest") + "_" + day;
     }
 
-    // Render MCQs
-    document.getElementById("mcqContainer").innerHTML = qs.map((q, i) => `
-      <div class="question-card">
-        <div class="q-title">
-          <span class="q-num">Q${i + 1}</span>
-          <span>${esc(q[0])}</span>
+    // Render MCQs Helper
+    function renderMCQQuestionsList() {
+      const container = document.getElementById("mcqContainer");
+      if (!container) return;
+      container.innerHTML = qs.map((q, i) => `
+        <div class="question-card">
+          <div class="q-title">
+            <span class="q-num">Q${i + 1}</span>
+            <span>${esc(q[0])}</span>
+          </div>
+          <div class="options-container">
+            ${q.slice(1, 5).map((o, j) => `
+              <label class="option-tile">
+                <input type="radio" name="q${i}" value="${"ABCD"[j]}">
+                <span class="option-indicator">${"ABCD"[j]}</span>
+                <span class="option-text">${esc(o)}</span>
+              </label>
+            `).join("")}
+          </div>
         </div>
-        <div class="options-container">
-          ${q.slice(1, 5).map((o, j) => `
-            <label class="option-tile">
-              <input type="radio" name="q${i}" value="${"ABCD"[j]}">
-              <span class="option-indicator">${"ABCD"[j]}</span>
-              <span class="option-text">${esc(o)}</span>
-            </label>
-          `).join("")}
-        </div>
-      </div>
-    `).join("");
+      `).join("");
+    }
+
+    renderMCQQuestionsList();
 
     // Render Coding Programs if any
     if (cs.length) {
@@ -771,6 +807,12 @@
       };
 
       state.attempts.push(assessmentRecord);
+      save();
+
+      // Broadcast real-time event to Admin Panel and other active tabs immediately
+      if (typeof notifyDataSync === 'function') {
+        notifyDataSync('submissionAdded', { submission: assessmentRecord });
+      }
 
       // Background auto-sync with Backend API & Firebase
       if (typeof getApiBase === 'function') {

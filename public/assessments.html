@@ -474,23 +474,41 @@
       if (modal) modal.classList.remove("active");
     }
 
-    // Load custom exams from backend API if available
-    (async function fetchLiveCustomAssessments() {
+    // Load custom exams from backend API and subscribe to live data updates
+    async function syncCustomAssessmentsSilently() {
       if (typeof getApiBase === 'function') {
         try {
           const res = await fetch(`${getApiBase()}/api/custom-assessments`);
           if (res.ok) {
             const cData = await res.json();
             if (cData && Array.isArray(cData.customAssessments)) {
-              state.customAssessments = cData.customAssessments;
-              localStorage.setItem("placementPortal_customAssessments", JSON.stringify(cData.customAssessments));
-              const myAttempts = getMyAttempts(state.user || {});
-              renderCustomExamsSection(myAttempts);
+              const prev = JSON.stringify(state.customAssessments || []);
+              const next = JSON.stringify(cData.customAssessments);
+              if (prev !== next) {
+                state.customAssessments = cData.customAssessments;
+                localStorage.setItem("placementPortal_customAssessments", JSON.stringify(cData.customAssessments));
+                const myAttempts = getMyAttempts(state.user || {});
+                renderCustomExamsSection(myAttempts);
+              }
             }
           }
         } catch (err) {}
       }
-    })();
+    }
+
+    syncCustomAssessmentsSilently();
+    setInterval(syncCustomAssessmentsSilently, 7000);
+
+    if (typeof subscribeDataSync === 'function') {
+      subscribeDataSync((event) => {
+        if (!event) return;
+        const type = event.type || '';
+        if (type.startsWith('custom') || type.startsWith('question')) {
+          const myAttempts = getMyAttempts(state.user || {});
+          renderCustomExamsSection(myAttempts);
+        }
+      });
+    }
 
     // User init
     const user = state.user || {};
