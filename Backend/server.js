@@ -1497,6 +1497,49 @@ app.delete('/api/custom-assessments/:id', async (req, res) => {
 });
 
 // ==========================================================================
+// ==========================================================================
+// CODE SECURITY VALIDATION HELPER
+// ==========================================================================
+function validateCodeSecurity(code) {
+  if (!code || typeof code !== 'string') {
+    return { safe: true };
+  }
+
+  const restrictedModules = [
+    'os', 'pathlib', 'glob', 'sys', 'subprocess', 'shutil',
+    'socket', 'ctypes', 'pty', 'commands', 'platform',
+    'importlib', 'tempfile', 'posix', 'nt', 'fcntl', 'msvcrt',
+    'urllib', 'requests', 'http', 'ftplib', 'telnetlib', 'smtplib',
+    'threading', 'multiprocessing', '_thread', 'resource',
+    'stat', 'fileinput', 'mmap', 'pickle', '_pickle', 'cPickle'
+  ];
+
+  for (const mod of restrictedModules) {
+    const importRegex = new RegExp(`(?:^|[\\r\\n;])\\s*import\\s+(?:[a-zA-Z0-9_\\s,]*\\b)?${mod}(?:\\.[a-zA-Z0-9_]+)?(?:\\s+as\\s+[a-zA-Z0-9_]+)?(?:\\s*,|[\\r\\n;#]|$)`, 'i');
+    const fromRegex = new RegExp(`(?:^|[\\r\\n;])\\s*from\\s+${mod}(?:\\.[a-zA-Z0-9_]+)?\\s+import\\b`, 'i');
+    const dynamicRegex = new RegExp(`(?:__import__|import_module)\\s*\\(\\s*['"]${mod}(?:\\.[a-zA-Z0-9_]+)?['"]`, 'i');
+
+    if (importRegex.test(code) || fromRegex.test(code) || dynamicRegex.test(code)) {
+      return {
+        safe: false,
+        module: mod,
+        error: `Security Alert: Module '${mod}' is restricted for security reasons. OS, filesystem, process execution, and system operations are not permitted in the training editor.`
+      };
+    }
+  }
+
+  if (/__import__\s*\(|importlib\s*\./i.test(code)) {
+    return {
+      safe: false,
+      module: 'dynamic_import',
+      error: 'Security Alert: Dynamic module importing via __import__ or importlib is restricted.'
+    };
+  }
+
+  return { safe: true };
+}
+
+// ==========================================================================
 // CODE EXECUTION ENDPOINT (ZOHO CATALYST APPSAIL INTEGRATION)
 // ==========================================================================
 const CATALYST_RUN_URL = 'https://appsail-50045753891.development.catalystappsail.in/run';
@@ -1506,6 +1549,15 @@ app.post('/api/run-code', async (req, res) => {
     const { code, input } = req.body || {};
     if (!code || !code.trim()) {
       return res.status(400).json({ success: false, output: 'No code provided.' });
+    }
+
+    // Security Check: Block OS, pathlib, glob, sys, subprocess, etc.
+    const secCheck = validateCodeSecurity(code);
+    if (!secCheck.safe) {
+      return res.json({
+        success: false,
+        output: `🚫 ${secCheck.error}\n\nPlease remove system/OS imports and write standalone algorithms.`
+      });
     }
 
     const controller = new AbortController();

@@ -116,13 +116,93 @@ function attachEditorHighlighter(textarea, highlightCodeEl, lineNumsEl) {
     textarea.dataset.hlAttached = "true";
 
     textarea.addEventListener("keydown", function(e) {
+      // 1. Enter key: Auto indentation with Python colon (:) awareness
+      if (e.key === "Enter" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        const val = this.value;
+
+        // Current line text up to cursor
+        const textBefore = val.substring(0, start);
+        const textAfter = val.substring(end);
+        const lastNewline = textBefore.lastIndexOf("\n");
+        const currentLine = textBefore.substring(lastNewline + 1);
+
+        // Leading indentation of current line
+        const indentMatch = currentLine.match(/^(\s*)/);
+        let indent = indentMatch ? indentMatch[1] : "";
+
+        // Check if line ends with ':' (ignoring comments and trailing spaces)
+        const cleanLine = currentLine.split("#")[0].trimEnd();
+        if (cleanLine.endsWith(":")) {
+          indent += "    "; // 4-space Python block indentation
+        }
+
+        const insertText = "\n" + indent;
+        this.value = textBefore + insertText + textAfter;
+        this.selectionStart = this.selectionEnd = start + insertText.length;
+        this.dispatchEvent(new Event("input"));
+        update();
+        return;
+      }
+
+      // 2. Tab / Shift+Tab: Indent / Dedent 4 spaces
       if (e.key === "Tab") {
         e.preventDefault();
         const start = this.selectionStart;
         const end = this.selectionEnd;
-        this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
-        this.selectionStart = this.selectionEnd = start + 4;
-        update();
+        const val = this.value;
+
+        if (e.shiftKey) {
+          // Shift+Tab: Dedent 4 spaces
+          const textBefore = val.substring(0, start);
+          const lastNewline = textBefore.lastIndexOf("\n");
+          const lineStart = lastNewline + 1;
+          const currentLine = val.substring(lineStart);
+          
+          if (currentLine.startsWith("    ")) {
+            this.value = val.substring(0, lineStart) + val.substring(lineStart + 4);
+            this.selectionStart = Math.max(lineStart, start - 4);
+            this.selectionEnd = Math.max(lineStart, end - 4);
+            this.dispatchEvent(new Event("input"));
+            update();
+          } else if (currentLine.startsWith(" ")) {
+            const spaces = currentLine.match(/^ +/)[0].length;
+            const removeCount = Math.min(spaces, 4);
+            this.value = val.substring(0, lineStart) + val.substring(lineStart + removeCount);
+            this.selectionStart = Math.max(lineStart, start - removeCount);
+            this.selectionEnd = Math.max(lineStart, end - removeCount);
+            this.dispatchEvent(new Event("input"));
+            update();
+          }
+        } else {
+          // Tab: Insert 4 spaces
+          this.value = val.substring(0, start) + "    " + val.substring(end);
+          this.selectionStart = this.selectionEnd = start + 4;
+          this.dispatchEvent(new Event("input"));
+          update();
+        }
+        return;
+      }
+
+      // 3. Backspace key: Unindent 4 spaces if cursor is on leading 4 spaces
+      if (e.key === "Backspace") {
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        if (start === end && start >= 4) {
+          const textBefore = this.value.substring(0, start);
+          const lastNewline = textBefore.lastIndexOf("\n");
+          const lineBeforeCursor = textBefore.substring(lastNewline + 1);
+          if (/^\s+$/.test(lineBeforeCursor) && lineBeforeCursor.endsWith("    ")) {
+            e.preventDefault();
+            this.value = this.value.substring(0, start - 4) + this.value.substring(start);
+            this.selectionStart = this.selectionEnd = start - 4;
+            this.dispatchEvent(new Event("input"));
+            update();
+            return;
+          }
+        }
       }
     });
 
@@ -136,6 +216,63 @@ function attachEditorHighlighter(textarea, highlightCodeEl, lineNumsEl) {
   update();
 }
 
-window.highlightPythonCode = highlightPythonCode;
-window.syncEditorHighlight = syncEditorHighlight;
-window.attachEditorHighlighter = attachEditorHighlighter;
+/**
+ * Security Validator for Code Execution
+ * Restricts importing OS-dependent, filesystem, subprocess, network, and security-compromising modules.
+ * Examples blocked:
+ *   - import os / import os.path / from os import ...
+ *   - from pathlib import Path / import pathlib
+ *   - import glob / from glob import ...
+ *   - import subprocess / from subprocess import ...
+ *   - import sys / from sys import ...
+ *   - import shutil / from shutil import ...
+ *   - __import__('os') / importlib.import_module(...)
+ */
+function validateCodeSecurity(code) {
+  if (!code || typeof code !== 'string') {
+    return { safe: true };
+  }
+
+  const restrictedModules = [
+    'os', 'pathlib', 'glob', 'sys', 'subprocess', 'shutil',
+    'socket', 'ctypes', 'pty', 'commands', 'platform',
+    'importlib', 'tempfile', 'posix', 'nt', 'fcntl', 'msvcrt',
+    'urllib', 'requests', 'http', 'ftplib', 'telnetlib', 'smtplib',
+    'threading', 'multiprocessing', '_thread', 'resource',
+    'stat', 'fileinput', 'mmap', 'pickle', '_pickle', 'cPickle'
+  ];
+
+  for (const mod of restrictedModules) {
+    const importRegex = new RegExp(`(?:^|[\\r\\n;])\\s*import\\s+(?:[a-zA-Z0-9_\\s,]*\\b)?${mod}(?:\\.[a-zA-Z0-9_]+)?(?:\\s+as\\s+[a-zA-Z0-9_]+)?(?:\\s*,|[\\r\\n;#]|$)`, 'i');
+    const fromRegex = new RegExp(`(?:^|[\\r\\n;])\\s*from\\s+${mod}(?:\\.[a-zA-Z0-9_]+)?\\s+import\\b`, 'i');
+    const dynamicRegex = new RegExp(`(?:__import__|import_module)\\s*\\(\\s*['"]${mod}(?:\\.[a-zA-Z0-9_]+)?['"]`, 'i');
+
+    if (importRegex.test(code) || fromRegex.test(code) || dynamicRegex.test(code)) {
+      return {
+        safe: false,
+        module: mod,
+        error: `Security Alert: Module '${mod}' is restricted for security reasons. OS, filesystem, process execution, and system operations are not permitted in the training editor.`
+      };
+    }
+  }
+
+  if (/__import__\s*\(|importlib\s*\./i.test(code)) {
+    return {
+      safe: false,
+      module: 'dynamic_import',
+      error: 'Security Alert: Dynamic module importing via __import__ or importlib is restricted.'
+    };
+  }
+
+  return { safe: true };
+}
+
+if (typeof window !== 'undefined') {
+  window.highlightPythonCode = highlightPythonCode;
+  window.syncEditorHighlight = syncEditorHighlight;
+  window.attachEditorHighlighter = attachEditorHighlighter;
+  window.validateCodeSecurity = validateCodeSecurity;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { highlightPythonCode, syncEditorHighlight, attachEditorHighlighter, validateCodeSecurity };
+}

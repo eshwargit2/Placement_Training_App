@@ -349,14 +349,7 @@
     function setupCodeEditorKeyHandlers() {
       document.querySelectorAll(".code-editor").forEach(el => {
         el.addEventListener("keydown", function(e) {
-          if (e.key === "Tab") {
-            e.preventDefault();
-            const start = this.selectionStart;
-            const end = this.selectionEnd;
-            this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
-            this.selectionStart = this.selectionEnd = start + 4;
-            this.dispatchEvent(new Event("input"));
-          } else if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
             e.preventDefault();
             const progNum = this.id.replace("code", "");
             if (progNum) runProgramCode(parseInt(progNum, 10));
@@ -429,6 +422,21 @@
           statusEl.className = "term-status-badge error";
         }
         return;
+      }
+
+      // Security Check: Block OS, pathlib, glob, sys, subprocess, etc.
+      if (typeof validateCodeSecurity === 'function') {
+        const secCheck = validateCodeSecurity(code);
+        if (!secCheck.safe) {
+          if (outputEl) {
+            outputEl.innerHTML = `<span class="term-stderr" style="color: #ef4444; font-weight: 600;">🚫 ${secCheck.error}</span>\n<span style="color: #94a3b8; font-size: 12px; display: inline-block; margin-top: 6px;">Please remove system/OS imports and write standalone algorithms.</span>`;
+          }
+          if (statusEl) {
+            statusEl.textContent = "Restricted";
+            statusEl.className = "term-status-badge error";
+          }
+          return;
+        }
       }
 
       if (runBtn) {

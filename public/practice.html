@@ -875,6 +875,18 @@
         return;
       }
 
+      // Security Check: Block OS, pathlib, glob, sys, subprocess, etc.
+      if (typeof validateCodeSecurity === 'function') {
+        const secCheck = validateCodeSecurity(code);
+        if (!secCheck.safe) {
+          consoleOut.innerHTML = `<span class="term-stderr" style="color: #ef4444; font-weight: 600;">🚫 ${secCheck.error}</span>\n<span style="color: #94a3b8; font-size: 12px; display: inline-block; margin-top: 6px;">Please remove system/OS imports and write standalone algorithms.</span>`;
+          statusBadge.textContent = "● Restricted";
+          statusBadge.style.color = "#ef4444";
+          if (metaEl) metaEl.textContent = "Execution blocked by security policy";
+          return;
+        }
+      }
+
       if (runBtn) {
         runBtn.disabled = true;
         runBtn.innerHTML = `<span>⏳ Running...</span>`;
