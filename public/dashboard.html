@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Student Dashboard · VMKVEC Placement Training</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.jpg" type="image/x-icon">
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
   <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
@@ -17,215 +20,515 @@
   </script>
 </head>
 
-<body>
-  <div id="mainHeader"></div>
+<body class="v-dash-body">
+  <!-- Hidden SVG Gradients for Ring Charts -->
+  <svg width="0" height="0" style="position:absolute;">
+    <defs>
+      <linearGradient id="cyanBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38bdf8" />
+        <stop offset="100%" stop-color="#2563eb" />
+      </linearGradient>
+    </defs>
+  </svg>
 
-  <main class="wrap">
-    <!-- Student Hero Welcome Card -->
-    <div class="dash-hero-card" id="studentHeroSection">
-      <!-- Filled dynamically by JS -->
-    </div>
-
-    <!-- Student Key Performance Metrics -->
-    <div class="grid" id="studentStatsGrid" style="margin-bottom: 24px;">
-      <!-- Filled dynamically by JS -->
-    </div>
-
-    <!-- Company Interview Bank Feature Card -->
-    <div class="dash-company-banner">
+  <div class="v-dash-layout">
+    <!-- ==========================================
+         1. LEFT SIDEBAR NAVIGATION
+         ========================================== -->
+    <aside class="v-dash-sidebar" id="vDashSidebar">
       <div>
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-            <path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16" />
-          </svg>
-          <h2 style="margin:0; font-size:20px; font-weight:800; color:#fff;">Company Interview Question Bank</h2>
-        </div>
-        <p style="margin:0; color:#cbd5e1; font-size:13.5px; max-width:680px;">
-          Tier-1 placement technical, DSA, SQL, project architecture, and HR questions tailored for campus recruitment
-          drives.
-        </p>
-        <div class="dash-company-tags">
-          <span class="dash-company-tag">
-            <span
-              style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#60a5fa; margin-right:6px;"></span>Wipro
-            Elite &amp; Turbo
-          </span>
-          <span class="dash-company-tag">
-            <span
-              style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#38bdf8; margin-right:6px;"></span>Infosys
-            DSE &amp; SE
-          </span>
-          <span class="dash-company-tag">
-            <span
-              style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#f87171; margin-right:6px;"></span>TCS
-            NQT &amp; Digital
-          </span>
-        </div>
-      </div>
-      <a href="company-bank.html" class="hero-btn-primary"
-        style="text-decoration:none; padding:12px 22px; font-size:14px; white-space:nowrap; border-radius:10px; display:inline-flex; align-items:center; gap:8px;">
-        <span>Explore Question Bank</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14M12 5l7 7-7 7" />
-        </svg>
-      </a>
-    </div>
-    <!-- Strong and Focus Areas -->
-    <div
-      style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-      <div>
-        <h2 style="margin:0 0 2px; font-size:18px; font-weight:800; color:var(--text-heading);">Skill Diagnostics &amp;
-          Topic Analysis</h2>
-        <p class="muted" style="margin:0; font-size:13px;">Real-time accuracy updated from your correct and incorrect
-          question responses across daily assessments.</p>
-      </div>
-      <button onclick="exportStudentPDF(user.id)" class="hero-btn-primary"
-        style="padding:9px 18px; font-size:13px; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-        Download My Performance PDF
-      </button>
-    </div>
+        <!-- Logo Block -->
+        <a href="dashboard.html" class="v-dash-logo-block">
+          <div class="v-dash-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div class="v-dash-logo-text">
+            <div class="v-dash-logo-title">VMKVEC</div>
+            <div class="v-dash-logo-sub">Placement Training</div>
+            <div class="v-dash-logo-dept">CSE</div>
+          </div>
+        </a>
 
-    <div class="grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 24px; gap:18px;">
-      <div class="dash-skill-box" style="border-top:3px solid #10b981;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h2 style="color:#059669; margin:0; display:flex; align-items:center; gap:8px; font-size:16px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-            Mastered &amp; Strong Topics
-          </h2>
-          <span class="badge done" id="countStrongPill">0 Topics</span>
-        </div>
-        <div id="strongAreasList"></div>
-      </div>
-      <div class="dash-skill-box" style="border-top:3px solid #f59e0b;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h2 style="color:#d97706; margin:0; display:flex; align-items:center; gap:8px; font-size:16px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="6" />
-              <circle cx="12" cy="12" r="2" />
-            </svg>
-            Priority Focus &amp; Weak Areas
-          </h2>
-          <span class="badge badge-warning" style="font-weight:700;" id="countWeakPill">0 Topics</span>
-        </div>
-        <div id="weakAreasList"></div>
-      </div>
-    </div>
+        <!-- Main Navigation Links -->
+        <nav class="v-dash-nav-list">
+          <a href="dashboard.html" class="v-dash-nav-link active" title="Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+          </a>
+          <a href="assessments.html" class="v-dash-nav-link" title="Assessments">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Assessments</span>
+          </a>
+          <a href="practice.html" class="v-dash-nav-link" title="Practice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Practice</span>
+          </a>
+          <a href="performance.html" class="v-dash-nav-link" title="Performance">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Performance</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Resources">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Resources</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Interview Prep">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Interview Prep</span>
+          </a>
 
-    <!-- Assessment History Log -->
-    <div class="card" style="margin-bottom: 24px;">
-      <div class="dash-section-header">
-        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-          <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-              <line x1="18" y1="20" x2="18" y2="10" />
-              <line x1="12" y1="20" x2="12" y2="4" />
-              <line x1="6" y1="20" x2="6" y2="14" />
+          <div class="v-dash-sidebar-divider"></div>
+
+          <!-- Lower Navigation Links -->
+          <a href="profile.html" class="v-dash-nav-link" title="Profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </a>
+          <a href="profile.html" class="v-dash-nav-link" title="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Bottom Sidebar Artwork -->
+      <div class="v-dash-sidebar-art">
+        <div class="v-dash-art-text">
+          Build<br>Your Career<br>Step by Step
+        </div>
+        <svg class="v-dash-art-mountains" viewBox="0 0 200 60" fill="none">
+          <!-- Mountain Vector -->
+          <polygon points="10,60 65,15 120,60" fill="#0f224a" opacity="0.6" />
+          <polygon points="50,60 110,8 170,60" fill="#1e3a8a" opacity="0.8" />
+          <polygon points="100,60 145,22 190,60" fill="#0d1b3e" opacity="0.9" />
+          <!-- Neon Peaks -->
+          <polyline points="100,16 110,8 120,16" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
+          <!-- Flag at peak -->
+          <line x1="110" y1="8" x2="110" y2="1" stroke="#38bdf8" stroke-width="1.5" />
+          <polygon points="110,1 119,4 110,7" fill="#38bdf8" />
+        </svg>
+      </div>
+    </aside>
+
+    <!-- ==========================================
+         2. MAIN WRAPPER & TOP BAR
+         ========================================== -->
+    <div class="v-dash-main-wrap">
+      <header class="v-dash-topbar">
+        <div style="display:flex; align-items:center; gap:12px; flex:1; max-width:540px;">
+          <!-- Sidebar Expand/Collapse Toggle Button (Desktop & Mobile) -->
+          <button type="button" class="v-dash-sidebar-toggle-btn" id="vDashSidebarToggleBtn" onclick="toggleSidebarCollapse()" title="Collapse Sidebar (Compact)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <path d="M15 10l-3 2 3 2"></path>
             </svg>
-            Assessment History &amp; Performance Log
-          </h2>
-          <button id="btnUploadAllAssessments" onclick="uploadAllAssessmentsToDatabase()" class="hero-btn-primary"
-            style="padding:7px 16px; font-size:12.5px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <span>Upload to Database</span>
+          </button>
+          <button type="button" class="v-dash-mobile-menu-btn" onclick="toggleVDashSidebar()" title="Toggle Navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
         </div>
-        <div id="syncStatusToast" style="font-size:13px; font-weight:600;"></div>
-      </div>
-      <div id="assessmentHistoryTable"></div>
-    </div>
 
-    <!-- 33-Day Curriculum Roadmap -->
-    <div class="card">
-      <div class="dash-section-header">
-        <div>
-          <h2 style="margin-bottom:4px; display:flex; align-items:center; gap:8px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
-              <line x1="8" y1="2" x2="8" y2="18" />
-              <line x1="16" y1="6" x2="16" y2="22" />
+        <!-- Right User Actions -->
+        <div class="v-dash-top-actions">
+          <!-- Theme Toggle Switch -->
+          <div class="v-dash-theme-toggle" id="vDashThemeToggleBtn" onclick="toggleDashboardTheme()" title="Toggle Theme">
+            <div class="v-dash-theme-thumb">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="#0b1329" stroke="#0b1329" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+            </div>
+          </div>
+
+          <!-- User Profile Pill -->
+          <div class="v-dash-profile-pill" onclick="window.location.href='profile.html'" title="View Profile">
+            <div class="v-dash-avatar-badge" id="vDashAvatarInitial">SS</div>
+            <div class="v-dash-user-titles">
+              <span class="v-dash-welcome-text">Welcome back,</span>
+              <span class="v-dash-user-fullname">
+                <span id="vDashUserNameLabel">Soundhareshwaran S R</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ==========================================
+           3. MAIN 2-COLUMN GRID (CENTER + RIGHT)
+           ========================================== -->
+      <main class="v-dash-content-area">
+        <!-- Center Column -->
+        <div class="v-dash-center-column">
+          <!-- Hero Feature Banner -->
+          <div class="v-dash-hero-card">
+            <div class="v-dash-hero-left">
+              <div class="v-dash-tag-pill">CSE Placement Training</div>
+              <h1 class="v-dash-hero-heading">
+                <span class="learn">Learn</span>
+                <span class="dot">•</span>
+                <span class="practice">Practice</span>
+                <span class="dot">•</span>
+                <span class="placed">Get Placed</span>
+              </h1>
+              <p class="v-dash-hero-sub">
+                Build your skills, track your progress and ace your placement journey with structured learning and real-world practice.
+              </p>
+              <div class="v-dash-hero-features">
+                <span class="v-dash-feature-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  Real Exam Pattern
+                </span>
+                <span class="v-dash-feature-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Expert Curated Content
+                </span>
+                <span class="v-dash-feature-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  Track Progress
+                </span>
+              </div>
+            </div>
+
+            <div class="v-dash-hero-right">
+              <!-- 3D Style Laptop & Notebook Vector -->
+              <svg class="v-dash-laptop-art" viewBox="0 0 240 160" fill="none">
+                <!-- Glowing Aura -->
+                <ellipse cx="120" cy="90" rx="90" ry="45" fill="radial-gradient(circle, rgba(56,189,248,0.28) 0%, transparent 70%)" />
+                <!-- Coffee Mug -->
+                <ellipse cx="45" cy="55" rx="14" ry="7" fill="#1e293b" />
+                <path d="M31 55v14c0 6 6 10 14 10s14-4 14-10V55" fill="#334155" />
+                <path d="M59 58c4 0 7 2 7 6s-3 6-7 6" stroke="#64748b" stroke-width="2" fill="none" />
+                <!-- Notebook with code -->
+                <polygon points="135,115 195,95 215,130 155,150" fill="#0f172a" stroke="#3b82f6" stroke-width="1.5" />
+                <text x="170" y="125" fill="#38bdf8" font-size="12" font-weight="700" transform="rotate(-18 170 125)">&lt;/&gt;</text>
+                <!-- Laptop Screen -->
+                <polygon points="65,30 175,18 180,85 70,97" fill="#0b1329" stroke="#38bdf8" stroke-width="2" />
+                <!-- Code Lines on Screen -->
+                <line x1="80" y1="40" x2="130" y2="35" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="82" y1="48" x2="160" y2="40" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
+                <line x1="84" y1="56" x2="140" y2="50" stroke="#34d399" stroke-width="2" stroke-linecap="round" />
+                <line x1="86" y1="64" x2="120" y2="60" stroke="#facc15" stroke-width="2" stroke-linecap="round" />
+                <line x1="88" y1="72" x2="150" y2="66" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+                <!-- Laptop Base / Keyboard -->
+                <polygon points="50,98 185,84 215,110 80,124" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
+                <polygon points="75,103 175,93 185,104 85,114" fill="#0f172a" />
+              </svg>
+              <div class="v-dash-dream-quote">
+                Your Dream Job<br>is Closer<br>Than You Think
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 KPI Performance Metric Cards -->
+          <div class="v-dash-kpi-row" id="vDashKpiGrid">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Assessment & Practice Section -->
+          <div class="v-dash-section-card">
+            <div class="v-dash-section-header">
+              <div class="v-dash-sec-title-wrap">
+                <div class="v-dash-sec-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                </div>
+                <div>
+                  <h2 class="v-dash-sec-title">Assessment &amp; Practice</h2>
+                  <p class="v-dash-sec-sub">Take assessments, solve practice questions and strengthen your core concepts.</p>
+                </div>
+              </div>
+              <a href="assessments.html" class="v-dash-view-all-btn">
+                <span>View All</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </a>
+            </div>
+
+            <!-- 4 Action Cards Grid -->
+            <div class="v-dash-practice-grid">
+              <!-- Card 1: Mock Tests -->
+              <div class="v-dash-action-card" onclick="openCustomExamsModal()">
+                <div class="v-dash-action-top">
+                  <div class="v-dash-action-icon green">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  </div>
+                  <span class="v-dash-action-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+                </div>
+                <div>
+                  <div class="v-dash-action-title">Mock Tests</div>
+                  <p class="v-dash-action-desc">Simulate real exam experience with timed tests.</p>
+                </div>
+              </div>
+
+              <!-- Card 2: Topic Wise Practice -->
+              <a href="assessments.html" class="v-dash-action-card">
+                <div class="v-dash-action-top">
+                  <div class="v-dash-action-icon blue">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  </div>
+                  <span class="v-dash-action-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+                </div>
+                <div>
+                  <div class="v-dash-action-title">Topic Wise Practice</div>
+                  <p class="v-dash-action-desc">Focus on specific topics and improve step by step.</p>
+                </div>
+              </a>
+
+              <!-- Card 3: Previous Year Questions -->
+              <a href="company-bank.html" class="v-dash-action-card">
+                <div class="v-dash-action-top">
+                  <div class="v-dash-action-icon purple">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  </div>
+                  <span class="v-dash-action-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+                </div>
+                <div>
+                  <div class="v-dash-action-title">Previous Year Questions</div>
+                  <p class="v-dash-action-desc">Practice with real placement question papers.</p>
+                </div>
+              </a>
+
+              <!-- Card 4: Custom Practice -->
+              <a href="practice.html" class="v-dash-action-card">
+                <div class="v-dash-action-top">
+                  <div class="v-dash-action-icon amber">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </div>
+                  <span class="v-dash-action-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+                </div>
+                <div>
+                  <div class="v-dash-action-title">Custom Practice</div>
+                  <p class="v-dash-action-desc">Create your own tests and challenge yourself.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Bottom Split Row: Company Bank & Skill Diagnostics -->
+          <div class="v-dash-bottom-grid">
+            <!-- Company Bank Banner -->
+            <div class="v-dash-banner-card">
+              <div class="v-dash-banner-header">
+                <div class="v-dash-banner-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <div>
+                  <h3 class="v-dash-banner-title">Company Interview Question Bank</h3>
+                  <p class="v-dash-banner-desc">Tier-1 placement technical, DSA, SQL, project architecture, and HR questions tailored for campus recruitment drives.</p>
+                </div>
+              </div>
+              <div class="v-dash-banner-footer">
+                <div class="v-dash-tags-list">
+                  <span class="v-dash-mini-tag"><span class="dot blue"></span>Wipro Elite &amp; Turbo</span>
+                  <span class="v-dash-mini-tag"><span class="dot purple"></span>Infosys DSE &amp; SE</span>
+                  <span class="v-dash-mini-tag"><span class="dot red"></span>TCS NQT &amp; Digital</span>
+                </div>
+                <a href="company-bank.html" class="v-dash-btn-primary">
+                  <span>Explore Question Bank</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Skill Diagnostics Card -->
+            <div class="v-dash-banner-card" id="performanceSection">
+              <div class="v-dash-banner-header">
+                <div class="v-dash-banner-icon" style="background:rgba(168,85,247,0.15); color:#c084fc;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <div>
+                  <h3 class="v-dash-banner-title">Skill Diagnostics &amp; Analysis</h3>
+                  <p class="v-dash-banner-desc">Real-time accuracy, topic-wise performance and improvement suggestions.</p>
+                </div>
+              </div>
+              <div class="v-dash-banner-footer" style="justify-content:space-between; gap:10px;">
+                <a href="performance.html" class="v-dash-btn-primary" style="background:#7c3aed;">
+                  <span>View Diagnostics</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+                <button onclick="exportStudentPDF(state.user ? state.user.id : '')" class="v-dash-btn-secondary">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assessment History Log -->
+          <div class="card" style="background:#09132c; border:1px solid rgba(56,189,248,0.14); border-radius:16px;">
+            <div class="dash-section-header">
+              <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                <h2 style="margin:0; display:flex; align-items:center; gap:8px; font-size:16.5px; color:#fff;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
+                  Assessment History &amp; Performance Log
+                </h2>
+                <button id="btnUploadAllAssessments" onclick="uploadAllAssessmentsToDatabase()" class="v-dash-btn-primary"
+                  style="padding:6px 14px; font-size:12px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  <span>Upload to Database</span>
+                </button>
+              </div>
+              <div id="syncStatusToast" style="font-size:13px; font-weight:600;"></div>
+            </div>
+            <div id="assessmentHistoryTable"></div>
+          </div>
+
+          <!-- 33-Day Curriculum Roadmap -->
+          <div class="card" id="roadmapSection" style="background:#09132c; border:1px solid rgba(56,189,248,0.14); border-radius:16px;">
+            <div class="dash-section-header">
+              <div>
+                <h2 style="margin-bottom:4px; display:flex; align-items:center; gap:8px; font-size:17px; color:#fff;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                    <line x1="8" y1="2" x2="8" y2="18" />
+                    <line x1="16" y1="6" x2="16" y2="22" />
+                  </svg>
+                  33-Day Training &amp; Assessment Roadmap
+                </h2>
+                <p class="muted" style="margin:0;">Interactive daily practice modules with timed assessments and coding challenges.</p>
+              </div>
+              <div class="dash-filter-controls">
+                <button class="dash-filter-btn active" id="filterAll" onclick="setRoadmapFilter('all')">All (<span id="countAll">33</span>)</button>
+                <button class="dash-filter-btn" id="filterCompleted" onclick="setRoadmapFilter('completed')">Completed (<span id="countCompleted">0</span>)</button>
+                <button class="dash-filter-btn" id="filterPending" onclick="setRoadmapFilter('pending')">Pending (<span id="countPending">33</span>)</button>
+                <!-- Custom Exams button -->
+                <button type="button" id="btnOpenCustomExamsModal" onclick="openCustomExamsModal()" class="dash-filter-btn"
+                  style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(79,70,229,0.2) 100%); border-color:rgba(37,99,235,0.4); color:#38bdf8; font-weight:800; cursor:pointer;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                  <span>Custom Exams</span>
+                  <span id="customExamsRoadmapBadge" class="badge" style="background:#2563eb; color:#fff; font-weight:800; padding:1px 6px; font-size:11px; border-radius:10px;">0</span>
+                </button>
+              </div>
+            </div>
+            <div id="roadmapList" style="margin-top: 16px;"></div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             4. RIGHT SIDEBAR / PANEL WIDGETS
+             ========================================== -->
+        <aside class="v-dash-right-panel">
+          <!-- Widget 1: Keep Going / Progress Gauge -->
+          <div class="v-dash-widget">
+            <div class="v-dash-widget-head">
+              <span style="font-size:18px;">🚀</span>
+              <h3 class="v-dash-widget-title">Keep Going!</h3>
+            </div>
+            <p class="v-dash-widget-sub">Small steps every day lead to big results.</p>
+
+            <!-- Circular Progress Ring Gauge -->
+            <div class="v-dash-gauge-box">
+              <svg class="v-dash-gauge-svg" viewBox="0 0 100 100">
+                <circle class="v-dash-gauge-bg" cx="50" cy="50" r="40" />
+                <circle class="v-dash-gauge-val" id="vDashGaugeCircle" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+                <text class="v-dash-gauge-text" id="vDashGaugePercent" x="50" y="50">0%</text>
+              </svg>
+              <div class="v-dash-gauge-subtext">Overall Progress</div>
+            </div>
+
+            <!-- 4 Checklist Items -->
+            <div class="v-dash-checklist">
+              <div class="v-dash-check-item">
+                <span class="v-dash-check-icon green">✓</span>
+                <span>Complete Assessments</span>
+              </div>
+              <div class="v-dash-check-item">
+                <span class="v-dash-check-icon blue">✓</span>
+                <span>Practice Regularly</span>
+              </div>
+              <div class="v-dash-check-item">
+                <span class="v-dash-check-icon purple">✓</span>
+                <span>Improve Weak Areas</span>
+              </div>
+              <div class="v-dash-check-item">
+                <span class="v-dash-check-icon amber">🎯</span>
+                <span>Stay Consistent</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 2: Your Stats -->
+          <div class="v-dash-widget">
+            <div class="v-dash-widget-head">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <h3 class="v-dash-widget-title">Your Stats</h3>
+            </div>
+
+            <div class="v-dash-stats-list">
+              <div class="v-dash-stat-row">
+                <div class="v-dash-stat-label-wrap">
+                  <span style="color:#10b981;">📄</span>
+                  <span>Assessments</span>
+                </div>
+                <span class="v-dash-stat-num" id="rightStatsCompleted">0 / 33</span>
+              </div>
+              <div class="v-dash-stat-row">
+                <div class="v-dash-stat-label-wrap">
+                  <span style="color:#38bdf8;">📝</span>
+                  <span>Practice Tests</span>
+                </div>
+                <span class="v-dash-stat-num" id="rightStatsPractice">0</span>
+              </div>
+              <div class="v-dash-stat-row">
+                <div class="v-dash-stat-label-wrap">
+                  <span style="color:#c084fc;">📊</span>
+                  <span>Average Score</span>
+                </div>
+                <span class="v-dash-stat-num" id="rightStatsAvg">0%</span>
+              </div>
+              <div class="v-dash-stat-row">
+                <div class="v-dash-stat-label-wrap">
+                  <span style="color:#fbbf24;">⚡</span>
+                  <span>Total Attempts</span>
+                </div>
+                <span class="v-dash-stat-num" id="rightStatsAttempts">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 3: Inspirational Quote -->
+          <div class="v-dash-quote-card">
+            <div class="v-dash-quote-mark">“</div>
+            <p class="v-dash-quote-body">
+              Discipline today builds the freedom you want tomorrow.
+            </p>
+          </div>
+        </aside>
+      </main>
+    </div>
+  </div>
+
+  <!-- Custom Assessments Modal -->
+  <div class="modal-overlay" id="customExamsModal" onclick="if(event.target===this) closeCustomExamsModal();">
+    <div class="modal-container" style="max-width:640px; background:#09132c; border:1px solid rgba(56,189,248,0.25);">
+      <div class="modal-header" style="background:#070e20; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(37,99,235,0.15); color:#38bdf8; display:flex; align-items:center; justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
             </svg>
-            33-Day Training &amp; Assessment Roadmap
-          </h2>
-          <p class="muted" style="margin:0;">Interactive daily practice modules with timed assessments and coding
-            challenges.</p>
-        </div>
-        <div class="dash-filter-controls">
-          <div class="dash-search-box">
-            <span class="dash-search-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </span>
-            <input type="text" id="roadmapSearch" class="dash-search-input"
-              placeholder="Search topics (e.g. Loops, SQL)..." oninput="filterRoadmap()">
           </div>
-          <button class="dash-filter-btn active" id="filterAll" onclick="setRoadmapFilter('all')">All (<span
-              id="countAll">33</span>)</button>
-          <button class="dash-filter-btn" id="filterCompleted" onclick="setRoadmapFilter('completed')">Completed (<span
-              id="countCompleted">0</span>)</button>
-          <button class="dash-filter-btn" id="filterPending" onclick="setRoadmapFilter('pending')">Pending (<span
-              id="countPending">33</span>)</button>
-          <!-- Custom Exams button placed right near the Pending button -->
-          <button type="button" id="btnOpenCustomExamsModal" onclick="openCustomExamsModal()" class="dash-filter-btn"
-            style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(79,70,229,0.15) 100%); border-color:rgba(37,99,235,0.35); color:var(--primary); font-weight:800; cursor:pointer;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-            <span>Custom Exams</span>
-            <span id="customExamsRoadmapBadge" class="badge" style="background:var(--primary); color:#fff; font-weight:800; padding:1px 6px; font-size:11px; border-radius:10px;">0</span>
-          </button>
+          <div>
+            <h3 style="margin:0; font-size:16.5px; font-weight:800; color:#ffffff;">Special &amp; Custom Placement Assessments</h3>
+            <small class="muted">Exclusive mock exams and tests published by faculty</small>
+          </div>
         </div>
+        <button onclick="closeCustomExamsModal()" class="ghost" style="padding:6px 10px; border-radius:8px;">✕</button>
       </div>
-      <div id="roadmapList" style="margin-top: 16px;"></div>
-    </div>
-
-    <!-- Custom Assessments Small Box / Modal -->
-    <div class="modal-overlay" id="customExamsModal" onclick="if(event.target===this) closeCustomExamsModal();">
-      <div class="modal-container" style="max-width:640px;">
-        <div class="modal-header">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:36px; height:36px; border-radius:10px; background:rgba(37,99,235,0.15); color:var(--primary); display:flex; align-items:center; justify-content:center;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-              </svg>
-            </div>
-            <div>
-              <h3 style="margin:0; font-size:16.5px; font-weight:800; color:var(--text-heading);">Special &amp; Custom Placement Assessments</h3>
-              <small class="muted">Exclusive mock exams and tests published by faculty</small>
-            </div>
-          </div>
-          <button onclick="closeCustomExamsModal()" class="ghost" style="padding:6px 10px; border-radius:8px;">✕</button>
-        </div>
-        <div class="modal-body" style="padding:16px 20px;">
-          <div id="customExamsDashboardList"></div>
-        </div>
+      <div class="modal-body" style="padding:16px 20px;">
+        <div id="customExamsDashboardList"></div>
       </div>
     </div>
-  </main>
+  </div>
 
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
@@ -235,10 +538,60 @@
       // redirected by requireAuth
     }
 
-    renderHeader("dashboard");
-
     let currentFilter = 'all';
     let searchQuery = '';
+
+    // Keyboard shortcut Ctrl + K for search
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const input = document.getElementById("vDashMainSearch");
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }
+    });
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function toggleVDashSidebar() {
+      const sidebar = document.getElementById("vDashSidebar");
+      if (sidebar) sidebar.classList.toggle("open");
+    }
+
+    function onVDashSearch(val) {
+      searchQuery = (val || "").toLowerCase().trim();
+      renderDashboardRoadmap();
+    }
+
+    function toggleDashboardTheme() {
+      if (typeof toggleTheme === 'function') {
+        toggleTheme();
+        updateThemeUI();
+      }
+    }
+
+    function updateThemeUI() {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      const thumb = document.querySelector(".v-dash-theme-thumb");
+      if (thumb) {
+        if (currentTheme === "light") {
+          thumb.style.transform = "translateX(20px)";
+          thumb.style.background = "#38bdf8";
+          thumb.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        } else {
+          thumb.style.transform = "translateX(0)";
+          thumb.style.background = "#facc15";
+          thumb.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="#0b1329" stroke="#0b1329" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>';
+        }
+      }
+    }
 
     function showToast(msg, isSuccess = true) {
       const toast = document.getElementById("syncStatusToast");
@@ -272,209 +625,113 @@
       const avg = myAttempts.length ? Math.round(myAttempts.reduce((n, a) => n + Number(a.percentage || 0), 0) / myAttempts.length) : 0;
       const progressPct = Math.round((completed.size / curriculum.length) * 100);
 
-      // Initial avatar letters
-      const initials = (user.name || user.username || user.id || "ST")
-        .split(" ")
-        .map(w => w[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase();
+      // Top Profile Info
+      const name = user.name || user.username || "Soundhareshwaran S R";
+      document.getElementById("vDashUserNameLabel").textContent = name;
+      const initials = name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "SS";
+      document.getElementById("vDashAvatarInitial").textContent = initials;
 
-      // 1. Render Student Hero Section
-      document.getElementById("studentHeroSection").innerHTML = `
-        <div class="dash-hero-content">
-          <div class="dash-user-section">
-            <div class="dash-avatar">${esc(initials)}</div>
-            <div class="dash-user-info">
-              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <h1 style="margin:0;">Welcome back, ${esc(user.name || user.username || "Student")}</h1>
+      updateThemeUI();
+
+      // 1. Render 4 KPI Performance Metric Cards
+      document.getElementById("vDashKpiGrid").innerHTML = `
+        <!-- KPI 1: Assessments Completed -->
+        <div class="v-dash-kpi-card" onclick="scrollToSection('roadmapSection')">
+          <div class="v-dash-kpi-header">
+            <div class="v-dash-kpi-icon green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="v-dash-kpi-info">
+              <div class="v-dash-kpi-label">ASSESSMENTS COMPLETED</div>
+              <div class="v-dash-kpi-val-row">
+                <span class="v-dash-kpi-val">${completed.size} <span class="v-dash-kpi-total">/ ${curriculum.length}</span></span>
+                <span class="v-dash-kpi-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
               </div>
-              <p style="margin:4px 0 10px;">Placement preparation active · Track your daily assessments and progress.</p>
-              <div class="dash-meta-pills">
-                <span class="dash-meta-pill">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
-                  Login: <b>${esc(user.username || user.id)}</b>
-                </span>
-                <span class="dash-meta-pill">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16M2 7l10-5 10 5M4 7v15M20 7v15M8 11v6M12 11v6M16 11v6"/></svg>
-                  Dept: <b>${esc(user.department || "CSE")}</b>
-                </span>
-                <span class="dash-meta-pill">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  Year: <b>${esc(user.year || "3rd Year")}</b>
-                </span>
-                <span class="dash-meta-pill">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
-                  Roll: <b>${esc(user.rollNumber || "-")}</b>
-                </span>
-              </div>
+              <div class="v-dash-kpi-sub">${curriculum.length - completed.size} days remaining</div>
             </div>
           </div>
-          <div class="dash-hero-actions">
-            <a href="profile.html" class="ghost" style="background: rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:10px 18px; text-decoration:none; border-radius:10px; display:inline-flex; align-items:center; gap:8px; font-weight:600;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              Edit Profile
-            </a>
+          <div class="v-dash-kpi-bar">
+            <div class="v-dash-kpi-fill green" style="width: ${progressPct}%;"></div>
+          </div>
+        </div>
+
+        <!-- KPI 2: Total Attempts -->
+        <div class="v-dash-kpi-card" onclick="scrollToSection('performanceSection')">
+          <div class="v-dash-kpi-header">
+            <div class="v-dash-kpi-icon blue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="v-dash-kpi-info">
+              <div class="v-dash-kpi-label">TOTAL ATTEMPTS</div>
+              <div class="v-dash-kpi-val-row">
+                <span class="v-dash-kpi-val">${myAttempts.length}</span>
+                <span class="v-dash-kpi-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+              </div>
+              <div class="v-dash-kpi-sub">Practice tests taken</div>
+            </div>
+          </div>
+          <div class="v-dash-kpi-bar">
+            <div class="v-dash-kpi-fill blue" style="width: ${Math.min(100, myAttempts.length * 5)}%;"></div>
+          </div>
+        </div>
+
+        <!-- KPI 3: Average Score -->
+        <div class="v-dash-kpi-card" onclick="scrollToSection('performanceSection')">
+          <div class="v-dash-kpi-header">
+            <div class="v-dash-kpi-icon purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div class="v-dash-kpi-info">
+              <div class="v-dash-kpi-label">AVERAGE SCORE</div>
+              <div class="v-dash-kpi-val-row">
+                <span class="v-dash-kpi-val">${avg}%</span>
+                <span class="v-dash-kpi-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+              </div>
+              <div class="v-dash-kpi-sub">${myAttempts.length ? (avg >= 75 ? 'High Performance' : 'Keep practicing daily') : 'No attempts recorded'}</div>
+            </div>
+          </div>
+          <div class="v-dash-kpi-bar">
+            <div class="v-dash-kpi-fill purple" style="width: ${avg}%;"></div>
+          </div>
+        </div>
+
+        <!-- KPI 4: Curriculum Progress -->
+        <div class="v-dash-kpi-card" onclick="scrollToSection('roadmapSection')">
+          <div class="v-dash-kpi-header">
+            <div class="v-dash-kpi-icon amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+            <div class="v-dash-kpi-info">
+              <div class="v-dash-kpi-label">CURRICULUM PROGRESS</div>
+              <div class="v-dash-kpi-val-row">
+                <span class="v-dash-kpi-val">${progressPct}%</span>
+                <span class="v-dash-kpi-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+              </div>
+              <div class="v-dash-kpi-sub">${completed.size} of ${curriculum.length} modules completed</div>
+            </div>
+          </div>
+          <div class="v-dash-kpi-bar">
+            <div class="v-dash-kpi-fill amber" style="width: ${progressPct}%;"></div>
           </div>
         </div>
       `;
 
-      // 2. Render Modern Performance Stats
-      document.getElementById("studentStatsGrid").innerHTML = `
-        <div class="dash-stat-card-modern">
-          <div class="dash-stat-top">
-            <div class="dash-stat-title">Assessments Completed</div>
-            <div class="dash-stat-icon-wrap dash-stat-icon-green">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-          </div>
-          <div class="dash-stat-value">${completed.size} <span style="font-size:16px; color:var(--muted); font-weight:500;">/ ${curriculum.length}</span></div>
-          <div class="muted">${curriculum.length - completed.size} days remaining</div>
-        </div>
+      // 2. Update Right Sidebar Widgets
+      const gaugeCircle = document.getElementById("vDashGaugeCircle");
+      const gaugePercent = document.getElementById("vDashGaugePercent");
+      if (gaugeCircle && gaugePercent) {
+        const circum = 2 * Math.PI * 40; // 251.2
+        const offset = circum - (progressPct / 100) * circum;
+        gaugeCircle.style.strokeDashoffset = offset;
+        gaugePercent.textContent = `${progressPct}%`;
+      }
 
-        <div class="dash-stat-card-modern">
-          <div class="dash-stat-top">
-            <div class="dash-stat-title">Total Attempts</div>
-            <div class="dash-stat-icon-wrap dash-stat-icon-blue">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
-          </div>
-          <div class="dash-stat-value">${myAttempts.length}</div>
-          <div class="muted">Practice tests taken</div>
-        </div>
+      document.getElementById("rightStatsCompleted").textContent = `${completed.size} / ${curriculum.length}`;
+      document.getElementById("rightStatsPractice").textContent = `${myAttempts.length}`;
+      document.getElementById("rightStatsAvg").textContent = `${avg}%`;
+      document.getElementById("rightStatsAttempts").textContent = `${myAttempts.length}`;
 
-        <div class="dash-stat-card-modern">
-          <div class="dash-stat-top">
-            <div class="dash-stat-title">Average Score</div>
-            <div class="dash-stat-icon-wrap dash-stat-icon-purple">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            </div>
-          </div>
-          <div class="dash-stat-value" style="color: ${myAttempts.length ? (avg >= 75 ? 'var(--success, #10b981)' : (avg >= 50 ? '#f59e0b' : 'var(--danger, #ef4444)')) : 'var(--text-heading)'};">${avg}%</div>
-          <div class="muted">${myAttempts.length ? (avg >= 75 ? 'High Performance' : 'Keep practicing daily') : 'No attempts recorded'}</div>
-        </div>
-
-        <div class="dash-stat-card-modern">
-          <div class="dash-stat-top">
-            <div class="dash-stat-title">Curriculum Progress</div>
-            <div class="dash-stat-icon-wrap dash-stat-icon-amber">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-            </div>
-          </div>
-          <div class="dash-stat-value">${progressPct}%</div>
-          <div class="dash-progress-track">
-            <div class="dash-progress-fill" style="width: ${progressPct}%;"></div>
-          </div>
-        </div>
-      `;
-
-      // 3. Render Mastered / Focus Areas based on Right & Wrong Questions
-      const topicStats = {};
-
-      myAttempts.forEach(a => {
-        const topicName = a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : `Day ${a.day}`);
-        const key = `Day ${a.day}: ${topicName}`;
-
-        if (!topicStats[key]) {
-          topicStats[key] = {
-            day: a.day,
-            topic: topicName,
-            attemptsCount: 0,
-            latestPercentage: Number(a.percentage || 0),
-            totalScore: 0,
-            totalPossible: 0,
-            correctQuestions: [],
-            incorrectQuestions: []
-          };
-        }
-
-        const stat = topicStats[key];
-        stat.attemptsCount++;
-        stat.latestPercentage = Number(a.percentage || 0);
-        stat.totalScore += Number(a.score || 0);
-        stat.totalPossible += Number(a.total || 5);
-
-        const details = (a.mcqDetails && a.mcqDetails.length) ? a.mcqDetails : (typeof getAttemptDetails === 'function' ? getAttemptDetails(a) : []);
-
-        details.forEach(d => {
-          const ok = (d.result === 'Correct' || d.answer === d.correct);
-          if (ok) {
-            if (!stat.correctQuestions.some(q => q.question === d.question)) {
-              stat.correctQuestions.push({
-                number: d.number,
-                question: d.question,
-                correct: d.correct
-              });
-            }
-          } else {
-            if (!stat.incorrectQuestions.some(q => q.question === d.question)) {
-              stat.incorrectQuestions.push({
-                number: d.number,
-                question: d.question,
-                yourAnswer: d.answer,
-                correct: d.correct
-              });
-            }
-          }
-        });
-      });
-
-      const strongTopics = Object.values(topicStats).filter(t => t.latestPercentage >= 75);
-      const weakTopics = Object.values(topicStats).filter(t => t.latestPercentage < 75);
-
-      document.getElementById("countStrongPill").textContent = `${strongTopics.length} Topics`;
-      document.getElementById("countWeakPill").textContent = `${weakTopics.length} Topics`;
-
-      document.getElementById("strongAreasList").innerHTML = strongTopics.length ? `
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          ${strongTopics.map(t => `
-            <div class="dash-strong-topic-card">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span class="dash-strong-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
-                <span class="dash-score-pill high" style="font-size:11px; padding:3px 8px;">${t.latestPercentage}% Accuracy</span>
-              </div>
-              ${t.correctQuestions.length ? `
-                <div style="font-size:12px; color:var(--muted); line-height:1.4;">
-                  ✓ Mastered ${t.correctQuestions.length} key concepts in this module.
-                </div>
-              ` : ''}
-            </div>
-          `).join("")}
-        </div>
-      ` : `<p class='muted' style='margin:0;'>No mastered topics yet (≥75% score). Complete daily tests to build your mastery log!</p>`;
-
-      document.getElementById("weakAreasList").innerHTML = weakTopics.length ? `
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          ${weakTopics.map(t => `
-            <div class="dash-weak-topic-card">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
-                <span class="dash-weak-topic-title">Day ${t.day} — ${esc(t.topic)}</span>
-                <div style="display:flex; gap:6px; align-items:center;">
-                  <span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; font-weight:700; font-size:11px;">⚠️ ${t.incorrectQuestions.length || 1} Missed</span>
-                  <a href="assessment.html?day=${t.day}" class="ghost" style="padding:2px 8px; font-size:11px; border-radius:6px; text-decoration:none; font-weight:700;">Revise</a>
-                </div>
-              </div>
-              ${t.incorrectQuestions.length ? `
-                <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--line); font-size:12px;">
-                  ${t.incorrectQuestions.slice(0, 2).map(q => `
-                    <div style="margin-bottom:4px;">
-                      <div class="dash-weak-topic-question">• ${esc(q.question)}</div>
-                      <div class="dash-weak-topic-answers">
-                        Selected: <span style="color:#ef4444; font-weight:700;">${esc(q.yourAnswer || 'Incorrect')}</span> &nbsp;|&nbsp; Correct: <span style="color:#22c55e; font-weight:700;">${esc(q.correct)}</span>
-                      </div>
-                    </div>
-                  `).join("")}
-                  ${t.incorrectQuestions.length > 2 ? `<div class="dash-weak-topic-foot">+${t.incorrectQuestions.length - 2} more missed question(s) to review</div>` : ''}
-                </div>
-              ` : `
-                <div class="dash-weak-topic-foot">Score was below 75%. Retake assessment to improve score and mastery.</div>
-              `}
-            </div>
-          `).join("")}
-        </div>
-      ` : `<p class='muted' style='margin:0;'>No weak areas identified. Great job keeping your scores up!</p>`;
-
-      // 4. Render Assessment History Table
+      // 3. Render Assessment History Table
       const histEl = document.getElementById("assessmentHistoryTable");
       const unsyncedCount = myAttempts.filter(a => !a.synced).length;
       const uploadBtn = document.getElementById("btnUploadAllAssessments");
@@ -482,7 +739,7 @@
         if (unsyncedCount > 0) {
           uploadBtn.style.display = "inline-flex";
           uploadBtn.innerHTML = `
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span>Upload to Database (${unsyncedCount})</span>
           `;
         } else {
@@ -535,17 +792,27 @@
         `;
       } else {
         histEl.innerHTML = `
-          <div style="text-align:center; padding:32px 16px;">
-            <p style="margin:0; font-weight:700; color:var(--text-heading); font-size:16px;">No assessments attempted yet</p>
-            <p class="muted" style="margin:4px 0 16px;">Pick any module from the roadmap or custom tests to take your first timed test.</p>
+          <div style="text-align:center; padding:28px 16px;">
+            <p style="margin:0; font-weight:700; color:var(--text-heading); font-size:15px;">No assessments attempted yet</p>
+            <p class="muted" style="margin:4px 0 0; font-size:13px;">Pick any module from the roadmap or custom tests to take your first timed test.</p>
           </div>
         `;
       }
 
-      // 5. Special & Custom Published Assessments Section
+      // 4. Special & Custom Published Assessments Section
       renderCustomExamsSection(myAttempts);
 
-      // 6. Interactive Roadmap Rendering
+      // 5. Interactive Roadmap Rendering
+      renderDashboardRoadmap();
+    }
+
+    function renderDashboardRoadmap() {
+      const user = state.user || {};
+      const myAttempts = getMyAttempts(user);
+      const completed = new Set(myAttempts.map(a => a.day));
+      const byDay = {};
+      myAttempts.forEach(a => (byDay[a.day] ??= []).push(a));
+
       document.getElementById("countCompleted").textContent = completed.size;
       document.getElementById("countPending").textContent = curriculum.length - completed.size;
 
@@ -571,7 +838,7 @@
 
       if (!filteredDays.length) {
         listEl.innerHTML = `
-          <div style="text-align:center; padding:30px 16px;">
+          <div style="text-align:center; padding:28px 16px;">
             <p class="muted" style="margin:0;">No roadmap modules match the search / filter criteria.</p>
           </div>
         `;
@@ -581,8 +848,8 @@
           const pct = latest ? Number(latest.percentage || 0) : 0;
           const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
           return `
-            <div class="dash-roadmap-card ${item.isDone ? 'completed' : 'pending'}">
-              <div class="dash-card-header-bar">
+            <div class="dash-roadmap-card ${item.isDone ? 'completed' : 'pending'}" style="background:#070d1e;">
+              <div class="dash-card-header-bar" style="background:rgba(255,255,255,0.03);">
                 <div class="dash-day-badge"><b>Day ${item.dayNum}</b> — ${esc(item.title)}</div>
                 <div style="display:flex; align-items:center; gap:8px;">
                   ${item.isDone ? `<span class="badge done">Completed</span>` : `<span class="badge badge-pending">Pending</span>`}
@@ -594,8 +861,9 @@
                   <div class="dash-topic-sub">${esc(item.sub)}</div>
                   ${latest ? `<div style="margin-top:6px;"><span class="dash-score-pill ${scoreClass}">Latest Score: ${latest.percentage}%</span></div>` : ''}
                 </div>
-                <a href="assessment.html?day=${item.dayNum}" class="hero-btn-primary" style="text-decoration:none; padding:10px 20px; font-size:13.5px; white-space:nowrap; border-radius:10px; display:inline-flex; align-items:center; gap:6px;">
+                <a href="assessment.html?day=${item.dayNum}" class="v-dash-btn-primary" style="text-decoration:none; padding:8px 18px; font-size:13px;">
                   <span>${item.isDone ? 'Retake' : 'Open'} Assessment</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
               </div>
             </div>
@@ -625,11 +893,11 @@
 
       if (!exams.length) {
         listEl.innerHTML = `
-          <div style="text-align:center; padding:32px 16px; background:var(--card-alt); border:1px dashed var(--line); border-radius:12px;">
-            <div style="width:44px; height:44px; margin:0 auto 10px; border-radius:12px; background:rgba(37,99,235,0.12); color:var(--primary); display:flex; align-items:center; justify-content:center;">
+          <div style="text-align:center; padding:32px 16px; background:#070d1e; border:1px dashed rgba(56,189,248,0.2); border-radius:12px;">
+            <div style="width:44px; height:44px; margin:0 auto 10px; border-radius:12px; background:rgba(37,99,235,0.15); color:#38bdf8; display:flex; align-items:center; justify-content:center;">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             </div>
-            <p style="margin:0 0 4px; font-weight:700; color:var(--text-heading); font-size:14.5px;">No Custom Assessments Available</p>
+            <p style="margin:0 0 4px; font-weight:700; color:#fff; font-size:14.5px;">No Custom Assessments Available</p>
             <p class="muted" style="margin:0; font-size:12.5px;">When faculty publishes mock tests or special placement exams, they will appear in this box.</p>
           </div>
         `;
@@ -646,22 +914,22 @@
             const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
 
             return `
-              <div class="dash-roadmap-card ${isDone ? 'completed' : 'pending'}" style="margin-bottom:0; border-radius:12px; padding:14px 16px;">
+              <div class="dash-roadmap-card ${isDone ? 'completed' : 'pending'}" style="margin-bottom:0; border-radius:12px; padding:14px 16px; background:#070d1e;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
                   <div style="flex:1; min-width:220px;">
                     <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-                      <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary); font-weight:800; font-size:10.5px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Special Exam</span>
-                      <span class="badge" style="background:var(--tag-bg); color:var(--muted); font-size:10.5px;">⏱️ ${exam.durationMinutes || 20} min</span>
+                      <span class="badge" style="background:rgba(37,99,235,0.18); color:#38bdf8; font-weight:800; font-size:10.5px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Special Exam</span>
+                      <span class="badge" style="background:rgba(255,255,255,0.06); color:#94a3b8; font-size:10.5px;">⏱️ ${exam.durationMinutes || 20} min</span>
                       ${isDone ? `<span class="badge done" style="font-size:10.5px;">✓ Completed</span>` : `<span class="badge badge-pending" style="font-size:10.5px;">Not Attempted</span>`}
                     </div>
-                    <h4 style="margin:0 0 2px; font-size:15px; font-weight:800; color:var(--text-heading);">${esc(exam.title)}</h4>
+                    <h4 style="margin:0 0 2px; font-size:15px; font-weight:800; color:#fff;">${esc(exam.title)}</h4>
                     <p class="muted" style="margin:0 0 8px; font-size:12px;">${esc(exam.topic || "Placement Mock Assessment")} · <b>${(exam.questions || []).length} MCQs</b></p>
                     ${latest ? `
                       <span class="dash-score-pill ${scoreClass}" style="font-size:11px; padding:2px 8px;">Latest Score: ${latest.score}/${latest.total || exam.questions.length} (${pct}%)</span>
                     ` : ''}
                   </div>
                   <div>
-                    <a href="assessment.html?customId=${encodeURIComponent(exam.id)}" class="hero-btn-primary" style="text-decoration:none; padding:8px 16px; font-size:12.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                    <a href="assessment.html?customId=${encodeURIComponent(exam.id)}" class="v-dash-btn-primary" style="text-decoration:none; padding:8px 16px; font-size:12.5px;">
                       <span>${isDone ? 'Retake Exam' : 'Start Assessment'}</span>
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                     </a>
@@ -774,18 +1042,13 @@
       if (filter === 'all') document.getElementById("filterAll").classList.add("active");
       if (filter === 'completed') document.getElementById("filterCompleted").classList.add("active");
       if (filter === 'pending') document.getElementById("filterPending").classList.add("active");
-      renderDashboard();
-    }
-
-    function filterRoadmap() {
-      searchQuery = (document.getElementById("roadmapSearch").value || "").toLowerCase().trim();
-      renderDashboard();
+      renderDashboardRoadmap();
     }
 
     // 1. Initial Render
     renderDashboard();
 
-    // 2. Fetch Live Profile & Assessment Data from Backend Database (Firebase Firestore)
+    // 2. Fetch Live Profile & Assessment Data from Backend Database
     function mergeCustomExams(serverExams, localExams) {
       const map = new Map();
       (Array.isArray(localExams) ? localExams : []).forEach(e => {

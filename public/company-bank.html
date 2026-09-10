@@ -1,57 +1,186 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Company Interview Question Bank · VMKVEC Placement</title>
+  <title>Company Interview Question Bank · VMKVEC</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.jpg" type="image/x-icon">
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
-  <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
   <script>
-    (function() {
+    (function () {
       const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
 </head>
-<body>
-  <div id="mainHeader"></div>
 
-  <main class="wrap">
-    <a id="backBtn" href="index.html" class="ghost" style="margin-bottom:18px; text-decoration:none; display:inline-flex; align-items:center; padding:8px 16px; border-radius:10px;">← Back</a>
+<body class="v-dash-body">
+  <div class="v-dash-layout">
+    <!-- 1. LEFT SIDEBAR NAVIGATION -->
+    <aside class="v-dash-sidebar" id="vDashSidebar">
+      <div>
+        <a href="dashboard.html" class="v-dash-logo-block">
+          <div class="v-dash-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div class="v-dash-logo-text">
+            <div class="v-dash-logo-title">VMKVEC</div>
+            <div class="v-dash-logo-sub">Placement Training</div>
+            <div class="v-dash-logo-dept">CSE</div>
+          </div>
+        </a>
 
-    <div class="card">
-      <h1 style="margin:0 0 6px;">Company Interview Question Bank</h1>
-      <p class="muted" style="margin:0;">Original placement-preparation questions based on publicly reported interview themes. Tier-1 placement technical, DSA, SQL, project and HR questions.</p>
+        <nav class="v-dash-nav-list">
+          <a href="dashboard.html" class="v-dash-nav-link" title="Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+          </a>
+          <a href="assessments.html" class="v-dash-nav-link" title="Assessments">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Assessments</span>
+          </a>
+          <a href="practice.html" class="v-dash-nav-link" title="Practice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Practice</span>
+          </a>
+          <a href="performance.html" class="v-dash-nav-link" title="Performance">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Performance</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link active" title="Resources">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Resources</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Interview Prep">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Interview Prep</span>
+          </a>
+
+          <div class="v-dash-sidebar-divider"></div>
+
+          <a href="profile.html" class="v-dash-nav-link" title="Profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </a>
+          <a href="profile.html" class="v-dash-nav-link" title="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="v-dash-sidebar-art">
+        <div class="v-dash-art-text">Build<br>Your Career<br>Step by Step</div>
+        <svg class="v-dash-art-mountains" viewBox="0 0 200 60" fill="none">
+          <polygon points="10,60 65,15 120,60" fill="#0f224a" opacity="0.6" />
+          <polygon points="50,60 110,8 170,60" fill="#1e3a8a" opacity="0.8" />
+          <polygon points="100,60 145,22 190,60" fill="#0d1b3e" opacity="0.9" />
+          <polyline points="100,16 110,8 120,16" stroke="#38bdf8" stroke-width="2" />
+          <line x1="110" y1="8" x2="110" y2="1" stroke="#38bdf8" stroke-width="1.5" />
+          <polygon points="110,1 119,4 110,7" fill="#38bdf8" />
+        </svg>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN WRAPPER -->
+    <div class="v-dash-main-wrap">
+      <header class="v-dash-topbar">
+        <div style="display:flex; align-items:center; gap:12px; flex:1; max-width:540px;">
+          <!-- Sidebar Expand/Collapse Toggle Button -->
+          <button type="button" class="v-dash-sidebar-toggle-btn" id="vDashSidebarToggleBtn" onclick="toggleSidebarCollapse()" title="Collapse Sidebar (Compact)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <path d="M15 10l-3 2 3 2"></path>
+            </svg>
+          </button>
+          <button type="button" class="v-dash-mobile-menu-btn" onclick="toggleVDashSidebar()" title="Toggle Navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="v-dash-search-container">
+            <span class="v-dash-search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" class="v-dash-search-input" placeholder="Search company questions...">
+            <span class="v-dash-search-badge">Ctrl + K</span>
+          </div>
+        </div>
+
+        <div class="v-dash-top-actions">
+          <div class="v-dash-theme-toggle" onclick="toggleDashboardTheme()" title="Toggle Theme">
+            <div class="v-dash-theme-thumb"></div>
+          </div>
+          <div class="v-dash-profile-pill" onclick="window.location.href='profile.html'">
+            <div class="v-dash-avatar-badge" id="vDashAvatarInitial">SS</div>
+            <div class="v-dash-user-titles">
+              <span class="v-dash-welcome-text">Welcome back,</span>
+              <span class="v-dash-user-fullname">
+                <span id="vDashUserNameLabel">Soundhareshwaran S R</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main style="padding:24px 28px 48px; max-width:1300px;">
+        <div style="background:linear-gradient(135deg, #09132c 0%, #0d1e44 100%); border:1px solid rgba(56,189,248,0.18); border-radius:18px; padding:24px 28px; margin-bottom:24px;">
+          <div class="v-dash-tag-pill">Resources &amp; Interview Question Bank</div>
+          <h1 style="font-size:26px; font-weight:800; color:#fff; margin:0 0 6px;">Company Interview Question Bank</h1>
+          <p style="color:#94a3b8; margin:0; font-size:13.5px;">Tier-1 placement technical, DSA, SQL, project architecture, and HR questions tailored for campus recruitment drives.</p>
+        </div>
+
+        <div id="companyCards"></div>
+      </main>
     </div>
-
-    <div id="companyCards">
-      <!-- Filled by JS -->
-    </div>
-  </main>
+  </div>
 
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script>
-    renderHeader("company");
-
-    const backBtn = document.getElementById("backBtn");
-    if (state.role === "admin" || state.role === "trainer") {
-      backBtn.href = "admin.html";
-      backBtn.textContent = "← Back to Admin Panel";
-    } else if (state.role === "student") {
-      backBtn.href = "dashboard.html";
-      backBtn.textContent = "← Back to Student Dashboard";
-    } else {
-      backBtn.href = "index.html";
-      backBtn.textContent = "← Back to Home";
+    function toggleVDashSidebar() {
+      const sidebar = document.getElementById("vDashSidebar");
+      if (sidebar) sidebar.classList.toggle("open");
     }
+
+    function toggleDashboardTheme() {
+      if (typeof toggleTheme === 'function') {
+        toggleTheme();
+        updateThemeUI();
+      }
+    }
+
+    function updateThemeUI() {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      const thumb = document.querySelector(".v-dash-theme-thumb");
+      if (thumb) {
+        if (currentTheme === "light") {
+          thumb.style.transform = "translateX(20px)";
+          thumb.style.background = "#38bdf8";
+        } else {
+          thumb.style.transform = "translateX(0)";
+        }
+      }
+    }
+
+    const user = state.user || {};
+    const name = user.name || user.username || "Soundhareshwaran S R";
+    document.getElementById("vDashUserNameLabel").textContent = name;
+    const initials = name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "SS";
+    document.getElementById("vDashAvatarInitial").textContent = initials;
+
+    updateThemeUI();
 
     const companies = Object.keys(COMPANY_INTERVIEW_BANK);
     document.getElementById("companyCards").innerHTML = companies.map(c => `
-      <div class="card">
-        <h2 style="margin-top:0; color:var(--primary);">${c} Placement Preparation</h2>
+      <div class="card" style="background:#09132c; border:1px solid rgba(56,189,248,0.15); border-radius:16px; margin-bottom:20px;">
+        <h2 style="margin-top:0; color:#38bdf8; font-size:18px;">${c} Placement Preparation</h2>
         <div class="table-wrap">
           <table>
             <thead>

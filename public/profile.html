@@ -1,208 +1,288 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Student Profile · VMKVEC Placement Training</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.jpg" type="image/x-icon">
   <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
-  <link rel="icon" href="logo.jpg" type="image/x-icon" sizes="16x16 32x32">
   <script>
-    (function() {
+    (function () {
       const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
 </head>
-<body>
-  <div id="mainHeader"></div>
 
-  <main class="wrap">
-    <div class="card login" style="max-width: 480px; margin: 20px auto;">
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-        <div style="width:44px; height:44px; border-radius:12px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        </div>
-        <div>
-          <h1 style="margin:0; font-size:24px;">Student Profile</h1>
-          <p class="muted" style="margin:2px 0 0;">Please enter your academic details.</p>
-        </div>
+<body class="v-dash-body">
+  <div class="v-dash-layout">
+    <!-- 1. LEFT SIDEBAR NAVIGATION -->
+    <aside class="v-dash-sidebar" id="vDashSidebar">
+      <div>
+        <a href="dashboard.html" class="v-dash-logo-block">
+          <div class="v-dash-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div class="v-dash-logo-text">
+            <div class="v-dash-logo-title">VMKVEC</div>
+            <div class="v-dash-logo-sub">Placement Training</div>
+            <div class="v-dash-logo-dept">CSE</div>
+          </div>
+        </a>
+
+        <nav class="v-dash-nav-list">
+          <a href="dashboard.html" class="v-dash-nav-link" title="Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+          </a>
+          <a href="assessments.html" class="v-dash-nav-link" title="Assessments">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Assessments</span>
+          </a>
+          <a href="practice.html" class="v-dash-nav-link" title="Practice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Practice</span>
+          </a>
+          <a href="performance.html" class="v-dash-nav-link" title="Performance">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Performance</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Resources">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Resources</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Interview Prep">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Interview Prep</span>
+          </a>
+
+          <div class="v-dash-sidebar-divider"></div>
+
+          <a href="profile.html" class="v-dash-nav-link active" title="Profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </a>
+          <a href="profile.html" class="v-dash-nav-link" title="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+        </nav>
       </div>
 
-      <div class="notice" id="studentMetaBadge" style="margin-bottom:20px; font-size:13px;">
-        <!-- Filled by JS -->
+      <div class="v-dash-sidebar-art">
+        <div class="v-dash-art-text">Build<br>Your Career<br>Step by Step</div>
+        <svg class="v-dash-art-mountains" viewBox="0 0 200 60" fill="none">
+          <polygon points="10,60 65,15 120,60" fill="#0f224a" opacity="0.6" />
+          <polygon points="50,60 110,8 170,60" fill="#1e3a8a" opacity="0.8" />
+          <polygon points="100,60 145,22 190,60" fill="#0d1b3e" opacity="0.9" />
+          <polyline points="100,16 110,8 120,16" stroke="#38bdf8" stroke-width="2" />
+          <line x1="110" y1="8" x2="110" y2="1" stroke="#38bdf8" stroke-width="1.5" />
+          <polygon points="110,1 119,4 110,7" fill="#38bdf8" />
+        </svg>
       </div>
+    </aside>
 
-      <form id="profileForm" onsubmit="event.preventDefault(); saveStudentProfile();">
-        <div class="form-group">
-          <label for="pname">Student Name <span class="req">*</span></label>
-          <input id="pname" type="text" placeholder="Enter full name" maxlength="50" oninput="clearErr('pname')">
-          <span class="field-hint">Alphabets, spaces, and dots only</span>
-          <span class="field-err" id="err-pname"></span>
+    <!-- 2. MAIN WRAPPER -->
+    <div class="v-dash-main-wrap">
+      <header class="v-dash-topbar">
+        <div style="display:flex; align-items:center; gap:12px; flex:1; max-width:540px;">
+          <!-- Sidebar Expand/Collapse Toggle Button -->
+          <button type="button" class="v-dash-sidebar-toggle-btn" id="vDashSidebarToggleBtn" onclick="toggleSidebarCollapse()" title="Collapse Sidebar (Compact)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <path d="M15 10l-3 2 3 2"></path>
+            </svg>
+          </button>
+          <button type="button" class="v-dash-mobile-menu-btn" onclick="toggleVDashSidebar()" title="Toggle Navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="v-dash-search-container">
+            <span class="v-dash-search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" class="v-dash-search-input" placeholder="Search profile settings...">
+            <span class="v-dash-search-badge">Ctrl + K</span>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="pdept">Department <span class="req">*</span></label>
-          <select id="pdept" onchange="clearErr('pdept')">
-            <option value="Computer Science and Engineering (CSE)">Computer Science and Engineering (CSE)</option>
-            <option value="Information Technology (IT)">Information Technology (IT)</option>
-            <option value="Artificial Intelligence and Data Science (AI & DS)">Artificial Intelligence and Data Science (AI & DS)</option>
-          </select>
-          <span class="field-err" id="err-pdept"></span>
-        </div>
-
-        <div class="form-group">
-          <label for="pyear">Year of Study <span class="req">*</span></label>
-          <select id="pyear" onchange="clearErr('pyear')">
-            <option value="4th Year">4th Year</option>
-            <option value="3rd Year" selected>3rd Year</option>
-            <option value="2nd Year">2nd Year</option>
-            <option value="1st Year">1st Year</option>
-          </select>
-          <span class="field-err" id="err-pyear"></span>
-        </div>
-
-        <div class="form-group">
-          <label for="proll">Roll Number <span class="req">*</span></label>
-          <input id="proll" type="text" placeholder="e.g. 01, 25, or 21CS045" maxlength="25" oninput="clearErr('proll')">
-          <span class="field-hint">Enter your student roll number (digits or alphanumeric)</span>
-          <span class="field-err" id="err-proll"></span>
-        </div>
-
-        <div id="formActions" style="margin-top:24px; display:flex; gap:12px;">
-          <button id="saveProfileBtn" type="submit" style="flex:1; padding:14px; font-size:15px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
-            <span id="saveBtnText">💾 Save & Continue</span>
+        <div class="v-dash-top-actions">
+          <div class="v-dash-theme-toggle" onclick="toggleDashboardTheme()" title="Toggle Theme">
+            <div class="v-dash-theme-thumb"></div>
+          </div>
+          <button type="button" class="v-dash-icon-btn" onclick="logout()" title="Logout" style="color:#f87171;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           </button>
         </div>
-      </form>
+      </header>
+
+      <!-- Main Profile Workspace -->
+      <main style="padding:28px 32px 60px; max-width:960px;">
+        <!-- Profile Banner Card -->
+        <div style="background:linear-gradient(135deg, #09132c 0%, #0d1e44 60%, #0a1636 100%); border:1px solid rgba(56,189,248,0.2); border-radius:18px; padding:28px; margin-bottom:24px; display:flex; align-items:center; gap:24px; flex-wrap:wrap; box-shadow:0 10px 30px rgba(0,0,0,0.35);">
+          <div style="width:74px; height:74px; border-radius:18px; background:linear-gradient(135deg, #2563eb 0%, #38bdf8 100%); color:#ffffff; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(37,99,235,0.45); flex-shrink:0;" id="pAvatarInitial">
+            SS
+          </div>
+          <div style="flex:1; min-width:260px;">
+            <div style="font-size:12px; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Verified Student Account</div>
+            <h1 style="margin:0 0 6px; font-size:26px; font-weight:800; color:#ffffff;" id="pDisplayName">Soundhareshwaran S R</h1>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="dash-meta-pill">Login: <b id="pMetaUsername">student009</b></span>
+              <span class="dash-meta-pill">ID: <b id="pMetaId">9</b></span>
+              <span class="dash-meta-pill">Status: <b style="color:#10b981;">Active</b></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Form Card -->
+        <div class="card" style="background:#09132c; border:1px solid rgba(56,189,248,0.15); border-radius:18px; padding:28px;">
+          <h2 style="margin:0 0 18px; font-size:18px; font-weight:800; color:#ffffff; display:flex; align-items:center; gap:8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Academic &amp; Profile Details
+          </h2>
+
+          <form id="profileForm" onsubmit="event.preventDefault(); saveStudentProfile();">
+            <div class="form-group">
+              <label for="pname">Student Name <span class="req">*</span></label>
+              <input id="pname" type="text" placeholder="Enter full name" maxlength="50" oninput="clearErr('pname')">
+              <span class="field-hint">Alphabets, spaces, and dots only</span>
+              <span class="field-err" id="err-pname"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="pdept">Department <span class="req">*</span></label>
+              <select id="pdept" onchange="clearErr('pdept')">
+                <option value="Computer Science and Engineering (CSE)">Computer Science and Engineering (CSE)</option>
+                <option value="Information Technology (IT)">Information Technology (IT)</option>
+                <option value="Artificial Intelligence and Data Science (AI & DS)">Artificial Intelligence and Data Science (AI & DS)</option>
+                <option value="Electronics and Communication Engineering (ECE)">Electronics and Communication Engineering (ECE)</option>
+              </select>
+              <span class="field-err" id="err-pdept"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="pyear">Year of Study <span class="req">*</span></label>
+              <select id="pyear" onchange="clearErr('pyear')">
+                <option value="4th Year" selected>4th Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="1st Year">1st Year</option>
+              </select>
+              <span class="field-err" id="err-pyear"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="proll">Roll Number <span class="req">*</span></label>
+              <input id="proll" type="text" placeholder="e.g. 86 or 21CS086" maxlength="25" oninput="clearErr('proll')">
+              <span class="field-hint">Enter your official student roll number</span>
+              <span class="field-err" id="err-proll"></span>
+            </div>
+
+            <div style="margin-top:24px; display:flex; gap:12px;">
+              <button id="saveProfileBtn" type="submit" class="v-dash-btn-primary" style="padding:12px 28px; font-size:14px; border-radius:10px;">
+                <span id="saveBtnText">💾 Save Profile</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
     </div>
-  </main>
+  </div>
 
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script>
-    if (!requireAuth("student")) {
-      // redirected by requireAuth
+    if (!requireAuth("student")) {}
+
+    function toggleVDashSidebar() {
+      const sidebar = document.getElementById("vDashSidebar");
+      if (sidebar) sidebar.classList.toggle("open");
     }
 
-    renderHeader("profile");
+    function toggleDashboardTheme() {
+      if (typeof toggleTheme === 'function') {
+        toggleTheme();
+        updateThemeUI();
+      }
+    }
 
-    const user = state.user || {};
-    document.getElementById("studentMetaBadge").innerHTML = `
-      Student ID: <b>${esc(user.id)}</b> &nbsp;|&nbsp; Login: <b>${esc(user.username)}</b>
-    `;
-
-    if (user.name) document.getElementById("pname").value = user.name;
-    if (user.department) {
-      const deptEl = document.getElementById("pdept");
-      if (deptEl) {
-        const match = Array.from(deptEl.options).find(o => 
-          o.value === user.department ||
-          o.value.toLowerCase().includes(user.department.toLowerCase()) ||
-          user.department.toLowerCase().includes(o.value.toLowerCase()) ||
-          (user.department.toUpperCase() === "IT" && o.value.includes("(IT)")) ||
-          (user.department.toUpperCase().includes("AI") && o.value.includes("(AI & DS)")) ||
-          (user.department.toUpperCase() === "CSE" && o.value.includes("(CSE)"))
-        );
-        if (match) {
-          deptEl.value = match.value;
+    function updateThemeUI() {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      const thumb = document.querySelector(".v-dash-theme-thumb");
+      if (thumb) {
+        if (currentTheme === "light") {
+          thumb.style.transform = "translateX(20px)";
+          thumb.style.background = "#38bdf8";
         } else {
-          deptEl.value = user.department;
+          thumb.style.transform = "translateX(0)";
         }
       }
     }
-    if (user.year) document.getElementById("pyear").value = user.year;
-    if (user.rollNumber) document.getElementById("proll").value = user.rollNumber;
 
-    if (user.profileCompleted) {
-      const cancelBtn = document.createElement("a");
-      cancelBtn.href = "dashboard.html";
-      cancelBtn.className = "ghost";
-      cancelBtn.style.cssText = "padding:14px 20px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; border-radius:10px;";
-      cancelBtn.textContent = "Cancel";
-      document.getElementById("formActions").appendChild(cancelBtn);
-    }
-
-    function clearErr(id) {
-      const el = document.getElementById(id);
-      const err = document.getElementById("err-" + id);
-      if (el) el.classList.remove("input-invalid");
+    function clearErr(fieldId) {
+      const err = document.getElementById(`err-${fieldId}`);
       if (err) err.textContent = "";
     }
 
-    function setErr(id, msg) {
-      const el = document.getElementById(id);
-      const err = document.getElementById("err-" + id);
-      if (el) {
-        el.classList.add("input-invalid");
-        el.focus();
-      }
-      if (err) err.textContent = msg;
+    const user = state.user || {};
+    const name = user.name || user.username || "Soundhareshwaran S R";
+    document.getElementById("pDisplayName").textContent = name;
+    document.getElementById("pMetaUsername").textContent = user.username || "student";
+    document.getElementById("pMetaId").textContent = user.id || "-";
+    const initials = name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "SS";
+    document.getElementById("pAvatarInitial").textContent = initials;
+
+    if (user.name) document.getElementById("pname").value = user.name;
+    if (user.department) {
+      const el = document.getElementById("pdept");
+      if (el) el.value = user.department;
     }
+    if (user.year) {
+      const el = document.getElementById("pyear");
+      if (el) el.value = user.year;
+    }
+    if (user.rollNumber) document.getElementById("proll").value = user.rollNumber;
+
+    updateThemeUI();
 
     async function saveStudentProfile() {
-      const nameEl = document.getElementById("pname");
-      const deptEl = document.getElementById("pdept");
-      const yearEl = document.getElementById("pyear");
-      const rollEl = document.getElementById("proll");
+      const nameVal = document.getElementById("pname").value.trim();
+      const deptVal = document.getElementById("pdept").value;
+      const yearVal = document.getElementById("pyear").value;
+      const rollVal = document.getElementById("proll").value.trim();
 
-      const name = nameEl ? nameEl.value.trim() : "";
-      const department = deptEl ? deptEl.value.trim() : "Computer Science and Engineering (CSE)";
-      const year = yearEl ? yearEl.value.trim() : "3rd Year";
-      const roll = rollEl ? rollEl.value.trim() : "";
-
-      let hasError = false;
-
-      // Validate Name (alphabets, spaces, dots, min 2, max 50)
-      const nameRegex = /^[a-zA-Z\s.']{2,50}$/;
-      if (!name) {
-        setErr("pname", "Student name is required.");
-        hasError = true;
-      } else if (!nameRegex.test(name)) {
-        setErr("pname", "Name must contain only alphabetic letters, dots, and spaces (no numbers or symbols).");
-        hasError = true;
-      } else {
-        clearErr("pname");
+      if (!nameVal) {
+        document.getElementById("err-pname").textContent = "Please enter student name.";
+        return;
+      }
+      if (!rollVal) {
+        document.getElementById("err-proll").textContent = "Please enter roll number.";
+        return;
       }
 
-      // Validate Roll Number (allow digits e.g. 1, 01, 25 or alphanumeric e.g. 21CS045)
-      const rollRegex = /^[a-zA-Z0-9_-]{1,25}$/;
-      if (!roll) {
-        setErr("proll", "Roll number is required.");
-        hasError = true;
-      } else if (!rollRegex.test(roll)) {
-        setErr("proll", "Please enter a valid roll number (digits or alphanumeric).");
-        hasError = true;
-      } else {
-        clearErr("proll");
-      }
+      user.name = nameVal;
+      user.department = deptVal;
+      user.year = yearVal;
+      user.rollNumber = rollVal;
+      user.profileCompleted = true;
+      save();
 
-      if (hasError) return;
-
-      const btn = document.getElementById("saveProfileBtn");
-      const btnText = document.getElementById("saveBtnText");
-      if (btn) btn.disabled = true;
-      if (btnText) btnText.textContent = "Saving to Database...";
-
+      // Sync online if server reachable
       try {
-        await saveStudentProfileOnline({
-          name,
-          department,
-          year,
-          rollNumber: roll,
-          profileCompleted: true
+        await fetch(`${getApiBase()}/api/students/${encodeURIComponent(user.id || user.username)}/profile`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: nameVal, department: deptVal, year: yearVal, rollNumber: rollVal })
         });
+      } catch (e) {}
 
-        if (btnText) btnText.textContent = "Saved! Redirecting...";
-        window.location.href = "dashboard.html";
-      } catch (err) {
-        alert("Notice: " + (err.message || "Saved locally."));
-        window.location.href = "dashboard.html";
-      } finally {
-        if (btn) btn.disabled = false;
-        if (btnText) btnText.textContent = "💾 Save & Continue";
-      }
+      alert("Profile updated successfully!");
+      window.location.href = "dashboard.html";
     }
   </script>
 </body>

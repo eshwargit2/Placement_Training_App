@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Practice Code Editor · VMKVEC Placement Training</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <script>
+    (function () {
+      const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+
+<body class="v-dash-body">
+  <div class="v-dash-layout">
+    <!-- 1. LEFT SIDEBAR NAVIGATION -->
+    <aside class="v-dash-sidebar" id="vDashSidebar">
+      <div>
+        <a href="dashboard.html" class="v-dash-logo-block">
+          <div class="v-dash-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div class="v-dash-logo-text">
+            <div class="v-dash-logo-title">VMKVEC</div>
+            <div class="v-dash-logo-sub">Placement Training</div>
+            <div class="v-dash-logo-dept">CSE</div>
+          </div>
+        </a>
+        <nav class="v-dash-nav-list">
+          <a href="dashboard.html" class="v-dash-nav-link" title="Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+          </a>
+          <a href="assessments.html" class="v-dash-nav-link" title="Assessments">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Assessments</span>
+          </a>
+          <a href="practice.html" class="v-dash-nav-link active" title="Practice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Practice</span>
+          </a>
+          <a href="performance.html" class="v-dash-nav-link" title="Performance">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Performance</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Resources">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Resources</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Interview Prep">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Interview Prep</span>
+          </a>
+
+          <div class="v-dash-sidebar-divider"></div>
+
+          <a href="profile.html" class="v-dash-nav-link" title="Profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </a>
+          <a href="profile.html" class="v-dash-nav-link" title="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="v-dash-sidebar-art">
+        <div class="v-dash-art-text">Build<br>Your Career<br>Step by Step</div>
+        <svg class="v-dash-art-mountains" viewBox="0 0 200 60" fill="none">
+          <polygon points="10,60 65,15 120,60" fill="#0f224a" opacity="0.6" />
+          <polygon points="50,60 110,8 170,60" fill="#1e3a8a" opacity="0.8" />
+          <polygon points="100,60 145,22 190,60" fill="#0d1b3e" opacity="0.9" />
+          <polyline points="100,16 110,8 120,16" stroke="#38bdf8" stroke-width="2" />
+          <line x1="110" y1="8" x2="110" y2="1" stroke="#38bdf8" stroke-width="1.5" />
+          <polygon points="110,1 119,4 110,7" fill="#38bdf8" />
+        </svg>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN WRAPPER & TOP BAR -->
+    <div class="v-dash-main-wrap">
+      <header class="v-dash-topbar">
+        <div style="display:flex; align-items:center; gap:12px; flex:1; max-width:540px;">
+          <!-- Sidebar Expand/Collapse Toggle Button -->
+          <button type="button" class="v-dash-sidebar-toggle-btn" id="vDashSidebarToggleBtn" onclick="toggleSidebarCollapse()" title="Collapse Sidebar (Compact)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <path d="M15 10l-3 2 3 2"></path>
+            </svg>
+          </button>
+          <button type="button" class="v-dash-mobile-menu-btn" onclick="toggleVDashSidebar()" title="Toggle Navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="v-dash-search-container">
+            <span class="v-dash-search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" id="vDashMainSearch" class="v-dash-search-input" placeholder="Search coding problems or keywords..." oninput="onSearchProblems(this.value)">
+            <span class="v-dash-search-badge">Ctrl + K</span>
+          </div>
+        </div>
+
+        <div class="v-dash-top-actions">
+          <div class="v-dash-theme-toggle" onclick="toggleDashboardTheme()" title="Toggle Theme">
+            <div class="v-dash-theme-thumb"></div>
+          </div>
+          <div class="v-dash-profile-pill" onclick="window.location.href='profile.html'">
+            <div class="v-dash-avatar-badge" id="vDashAvatarInitial">SS</div>
+            <div class="v-dash-user-titles">
+              <span class="v-dash-welcome-text">Welcome back,</span>
+              <span class="v-dash-user-fullname">
+                <span id="vDashUserNameLabel">Soundhareshwaran S R</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- 3. PRACTICE IDE WORKSPACE -->
+      <main style="padding: 20px 24px 40px; flex: 1;">
+        <div class="v-ide-container" id="ideContainer">
+          <!-- Left Column: Problem Details (in standard mode) OR Editor Panel (in scratchpad mode) -->
+          <div class="v-ide-left-pane" id="ideLeftPane">
+            <div id="ideProblemSelectBox" style="margin-bottom:14px;">
+              <label style="font-size:11.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Select Problem Challenge / Workspace</label>
+              <select id="ideProblemSelect" onchange="loadProblem(this.value)" style="width:100%; background:#070d1e; border:1px solid rgba(56,189,248,0.25); color:#ffffff; font-weight:700; border-radius:10px; padding:10px 12px; font-size:13.5px; outline:none; cursor:pointer;">
+                <option value="1">1. Two Sum Problem (Arrays &amp; Dicts)</option>
+                <option value="2">2. Reverse a String (Two Pointers)</option>
+                <option value="3">3. Palindrome Number Check</option>
+                <option value="4">4. Factorial Calculation (Recursion)</option>
+                <option value="5">5. Fibonacci Series Generator</option>
+                <option value="6">6. Interactive Name Greeting (Inline Input Demo)</option>
+                <option value="custom">★ Custom Practice Scratchpad</option>
+              </select>
+            </div>
+
+            <!-- Standard Mode Problem Description Box -->
+            <div id="ideProblemDetails" class="v-ide-problem-panel" style="margin:0; flex:1;"></div>
+
+            <!-- Scratchpad Mode Left Slot for Editor -->
+            <div id="ideLeftEditorSlot" style="display:none; flex:1; flex-direction:column; gap:14px;"></div>
+          </div>
+
+          <!-- Right Column: Standard Mode (Editor + Terminal) OR Scratchpad Mode (Output Terminal) -->
+          <div class="v-ide-right-pane" id="ideRightPane">
+            <!-- Standard Mode Container for Editor and Terminal -->
+            <div id="ideRightStandardWrap" style="display:flex; flex-direction:column; gap:16px; flex:1;">
+              <!-- Editor Panel Component (Toolbar + Workspace) -->
+              <div class="v-ide-editor-panel" id="ideEditorPanel">
+                <!-- Compact Toolbar -->
+                <div class="v-ide-toolbar">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:11.5px; font-weight:700; color:#38bdf8; background:rgba(56,189,248,0.12); padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; border:1px solid rgba(56,189,248,0.2);">
+                      🐍 Python 3
+                    </span>
+                    <span id="ideStatusBadge" style="font-size:10.5px; font-weight:700; color:#10b981; display:inline-flex; align-items:center; gap:4px; background:rgba(16,185,129,0.12); padding:3px 8px; border-radius:6px;">
+                      ● Ready
+                    </span>
+                  </div>
+
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <button type="button" id="btnFullscreenToggle" onclick="toggleIdeFullscreen()" class="ghost" style="padding:4px 9px; font-size:11px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" title="Toggle Fullscreen Mode (Esc)">
+                      <svg id="fsIconExpand" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                      <svg id="fsIconCompress" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:none;"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+                      <span id="fsLabel" style="font-size:11px;">Expand</span>
+                    </button>
+                    <button type="button" onclick="resetEditorCode()" class="ghost" style="padding:4px 10px; font-size:11px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                      Reset
+                    </button>
+                    <button type="button" onclick="clearTerminal()" class="ghost" style="padding:4px 10px; font-size:11px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                      Clear
+                    </button>
+                    <button type="button" id="btnRunCode" onclick="runPracticeCode()" class="v-dash-btn-primary" style="padding:5px 14px; font-size:12px; font-weight:700; border-radius:7px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); display:inline-flex; align-items:center; gap:5px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      <span>Run</span>
+                      <span style="font-size:9.5px; opacity:0.8; margin-left:2px;">(Ctrl+Enter)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Code Editor Workspace -->
+                <div class="v-ide-editor-wrapper">
+                  <div class="v-ide-line-numbers" id="ideLineNums">1<br>2<br>3<br>4<br>5</div>
+                  <div class="v-ide-code-container">
+                    <pre class="v-ide-highlight-layer" id="ideHighlightCode"></pre>
+                    <textarea id="ideCodeInput" class="v-ide-textarea" spellcheck="false" placeholder="Write your Python code here..."></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Standard Mode Bottom Terminal Slot -->
+              <div id="ideStandardTermSlot">
+                <!-- Interactive Terminal Console Element -->
+                <div class="v-ide-terminal" id="ideTerminal">
+                  <div class="v-ide-term-header">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <div style="display:flex; gap:5px;">
+                        <span style="width:10px; height:10px; border-radius:50%; background:#ef4444; display:inline-block;"></span>
+                        <span style="width:10px; height:10px; border-radius:50%; background:#f59e0b; display:inline-block;"></span>
+                        <span style="width:10px; height:10px; border-radius:50%; background:#10b981; display:inline-block;"></span>
+                      </div>
+                      <span style="font-size:12px; font-weight:700; color:#94a3b8; font-family:'JetBrains Mono', monospace;">Console Output</span>
+                    </div>
+                    <div id="ideExecMeta" style="font-size:11px; color:#64748b; font-family:'JetBrains Mono', monospace;"></div>
+                  </div>
+
+                  <div class="v-ide-term-body" id="ideConsoleOut">Click "Run Code" or press Ctrl+Enter to execute program.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Scratchpad Mode Right Slot for Output Terminal -->
+            <div id="ideScratchpadTermSlot" style="display:none; flex:1; flex-direction:column;"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/highlighter.js"></script>
+  <script>
+    if (!requireAuth("student")) {}
+
+    // Problem Database
+    const PROBLEMS = {
+      "1": {
+        title: "Two Sum Problem",
+        difficulty: "Easy",
+        tags: ["Arrays", "Hash Table"],
+        desc: "Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.<br><br>You may assume that each input would have exactly one solution, and you may not use the same element twice.",
+        inputFormat: "First line: List of integers (comma separated).<br>Second line: Target integer.",
+        outputFormat: "Indices as a list e.g. <code>[0, 1]</code>",
+        starter: `def twoSum(nums, target):\n    prevMap = {}\n    for i, n in enumerate(nums):\n        diff = target - n\n        if diff in prevMap:\n            return [prevMap[diff], i]\n        prevMap[n] = i\n    return []\n\n# Test execution\nnums = [2, 7, 11, 15]\ntarget = 9\nprint("Indices:", twoSum(nums, target))`
+      },
+      "2": {
+        title: "Reverse a String",
+        difficulty: "Easy",
+        tags: ["Strings", "Two Pointers"],
+        desc: "Write a function that reverses a string. The input string is given as an array of characters <code>s</code>.",
+        inputFormat: "A string e.g. <code>\"hello\"</code>",
+        outputFormat: "Reversed string e.g. <code>\"olleh\"</code>",
+        starter: `def reverseString(s):\n    return s[::-1]\n\n# Test with sample input\nword = "placement"\nprint("Original:", word)\nprint("Reversed:", reverseString(word))`
+      },
+      "3": {
+        title: "Palindrome Number Check",
+        difficulty: "Easy",
+        tags: ["Math", "Strings"],
+        desc: "Given an integer <code>x</code>, return <code>True</code> if <code>x</code> is a palindrome, and <code>False</code> otherwise.",
+        inputFormat: "An integer <code>x</code>.",
+        outputFormat: "<code>True</code> or <code>False</code>.",
+        starter: `def isPalindrome(x):\n    s = str(x)\n    return s == s[::-1]\n\nnum = 121\nprint(f"Is {num} a palindrome?", isPalindrome(num))`
+      },
+      "4": {
+        title: "Factorial Calculation",
+        difficulty: "Easy",
+        tags: ["Recursion", "Math"],
+        desc: "Calculate the factorial of a given positive integer <code>n</code> using recursion.",
+        inputFormat: "Positive integer <code>n</code>.",
+        outputFormat: "Factorial value <code>n!</code>.",
+        starter: `def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\nn = 5\nprint(f"Factorial of {n} is:", factorial(n))`
+      },
+      "5": {
+        title: "Fibonacci Series Generator",
+        difficulty: "Medium",
+        tags: ["Dynamic Programming", "Recursion"],
+        desc: "Generate the first <code>n</code> numbers of the Fibonacci sequence where each number is the sum of the two preceding ones.",
+        inputFormat: "Integer <code>n</code>.",
+        outputFormat: "List of Fibonacci numbers.",
+        starter: `def fibonacci(n):\n    res = [0, 1]\n    while len(res) < n:\n        res.append(res[-1] + res[-2])\n    return res[:n]\n\nprint("First 8 Fibonacci terms:", fibonacci(8))`
+      },
+      "6": {
+        title: "Interactive Name Greeting",
+        difficulty: "Beginner",
+        tags: ["Standard I/O", "Interactive"],
+        desc: "Demonstration of interactive standard input on the same line. Type your name into the console prompt to see real-time output!",
+        inputFormat: "Interactive user input.",
+        outputFormat: "Greeting message.",
+        starter: `name = input("Enter your name : ")\nprint(f"Hello {name}, Welcome to VMKVEC Placement Training Portal!")\n\nroll = input("Enter your roll number : ")\nprint(f"Registered student roll: {roll}")`
+      },
+      "custom": {
+        title: "Custom Practice Scratchpad",
+        difficulty: "Flexible",
+        tags: ["Open Workspace", "Interactive I/O"],
+        desc: "Write, test, and debug any custom algorithm or code snippet. Use standard print and input functions directly inside the output console.",
+        inputFormat: "Custom interactive input.",
+        outputFormat: "Standard console output.",
+        starter: `# Custom Practice Scratchpad Workspace\nname = input("Enter your name : ")\nprint(f"Hello {name}, Welcome to VMKVEC Placement Training Portal!")\n`
+      }
+    };
+
+    let currentProblemId = "1";
+
+    function toggleVDashSidebar() {
+      const sidebar = document.getElementById("vDashSidebar");
+      if (sidebar) sidebar.classList.toggle("open");
+    }
+
+    function toggleDashboardTheme() {
+      if (typeof toggleTheme === 'function') {
+        toggleTheme();
+        updateThemeUI();
+      }
+    }
+
+    function updateThemeUI() {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      const thumb = document.querySelector(".v-dash-theme-thumb");
+      if (thumb) {
+        if (currentTheme === "light") {
+          thumb.style.transform = "translateX(20px)";
+          thumb.style.background = "#38bdf8";
+        } else {
+          thumb.style.transform = "translateX(0)";
+          thumb.style.background = "#facc15";
+        }
+      }
+    }
+
+    // Helper to find all input("...") prompts in code
+    function extractInputPrompts(code) {
+      const regex = /input\s*\(\s*(?:(['"`]{1,3})([\s\S]*?)\1)?\s*\)/g;
+      const prompts = [];
+      let match;
+      while ((match = regex.exec(code)) !== null) {
+        prompts.push(match[2] !== undefined ? match[2] : "");
+      }
+      return prompts;
+    }
+
+    function loadProblem(id) {
+      currentProblemId = id;
+      const p = PROBLEMS[id] || PROBLEMS["1"];
+      const container = document.getElementById("ideContainer");
+      const problemDetails = document.getElementById("ideProblemDetails");
+      const leftEditorSlot = document.getElementById("ideLeftEditorSlot");
+      const rightStandardWrap = document.getElementById("ideRightStandardWrap");
+      const editorPanel = document.getElementById("ideEditorPanel");
+      const terminal = document.getElementById("ideTerminal");
+      const standardTermSlot = document.getElementById("ideStandardTermSlot");
+      const scratchpadTermSlot = document.getElementById("ideScratchpadTermSlot");
+      const selectEl = document.getElementById("ideProblemSelect");
+
+      if (selectEl && selectEl.value !== id) {
+        selectEl.value = id;
+      }
+
+      if (id === "custom") {
+        // Scratchpad Mode: LEFT SIDE = Code Editor, RIGHT SIDE = Output Console
+        if (container) container.classList.add("scratchpad-layout");
+        if (problemDetails) problemDetails.style.display = "none";
+        if (leftEditorSlot && editorPanel) {
+          leftEditorSlot.style.display = "flex";
+          leftEditorSlot.appendChild(editorPanel);
+        }
+        if (rightStandardWrap) rightStandardWrap.style.display = "none";
+        if (scratchpadTermSlot && terminal) {
+          scratchpadTermSlot.style.display = "flex";
+          scratchpadTermSlot.appendChild(terminal);
+        }
+      } else {
+        // Standard Problem Mode: LEFT SIDE = Problem Description, RIGHT SIDE = Editor Top + Terminal Bottom
+        if (container) container.classList.remove("scratchpad-layout");
+        if (problemDetails) {
+          problemDetails.style.display = "block";
+          problemDetails.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h2 style="margin:0; font-size:18px; font-weight:800; color:#ffffff;">${esc(p.title)}</h2>
+              <span class="badge" style="background:${p.difficulty === 'Easy' ? 'rgba(16,185,129,0.18)' : (p.difficulty === 'Beginner' ? 'rgba(56,189,248,0.18)' : 'rgba(245,158,11,0.18)')}; color:${p.difficulty === 'Easy' ? '#10b981' : (p.difficulty === 'Beginner' ? '#38bdf8' : '#f59e0b')}; font-weight:800;">${p.difficulty}</span>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+              ${p.tags.map(t => `<span class="dash-company-tag" style="padding:2px 8px; font-size:10.5px;">${esc(t)}</span>`).join("")}
+            </div>
+            <div style="font-size:13px; color:#cbd5e1; line-height:1.6; margin-bottom:14px;">
+              ${p.desc}
+            </div>
+            <div style="background:#070d1e; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 14px; font-size:12px; margin-bottom:10px;">
+              <div style="font-weight:700; color:#38bdf8; margin-bottom:4px;">Input Format:</div>
+              <div style="color:#94a3b8;">${p.inputFormat}</div>
+            </div>
+            <div style="background:#070d1e; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 14px; font-size:12px;">
+              <div style="font-weight:700; color:#10b981; margin-bottom:4px;">Output Format:</div>
+              <div style="color:#94a3b8;">${p.outputFormat}</div>
+            </div>
+          `;
+        }
+        if (leftEditorSlot) leftEditorSlot.style.display = "none";
+        if (scratchpadTermSlot) scratchpadTermSlot.style.display = "none";
+        if (rightStandardWrap && editorPanel) {
+          rightStandardWrap.style.display = "flex";
+          rightStandardWrap.insertBefore(editorPanel, standardTermSlot);
+        }
+        if (standardTermSlot && terminal) {
+          standardTermSlot.style.display = "block";
+          standardTermSlot.appendChild(terminal);
+        }
+      }
+
+      const input = document.getElementById("ideCodeInput");
+      if (input) {
+        input.value = p.starter;
+        syncEditor();
+      }
+    }
+
+    function resetEditorCode() {
+      loadProblem(currentProblemId);
+      clearTerminal();
+    }
+
+    function clearTerminal() {
+      const out = document.getElementById("ideConsoleOut");
+      if (out) out.textContent = "Console cleared.";
+      const metaEl = document.getElementById("ideExecMeta");
+      if (metaEl) metaEl.textContent = "";
+      const statusBadge = document.getElementById("ideStatusBadge");
+      if (statusBadge) {
+        statusBadge.textContent = "● Ready";
+        statusBadge.style.color = "#10b981";
+      }
+    }
+
+    function toggleIdeFullscreen() {
+      const container = document.getElementById("ideContainer");
+      if (!container) return;
+      const isFs = container.classList.toggle("v-ide-fullscreen");
+      const expandIcon = document.getElementById("fsIconExpand");
+      const compressIcon = document.getElementById("fsIconCompress");
+      const fsLabel = document.getElementById("fsLabel");
+      const btn = document.getElementById("btnFullscreenToggle");
+
+      if (isFs) {
+        if (expandIcon) expandIcon.style.display = "none";
+        if (compressIcon) compressIcon.style.display = "inline";
+        if (fsLabel) fsLabel.textContent = "Exit";
+        if (btn) btn.title = "Exit Fullscreen Mode (Esc)";
+      } else {
+        if (expandIcon) expandIcon.style.display = "inline";
+        if (compressIcon) compressIcon.style.display = "none";
+        if (fsLabel) fsLabel.textContent = "Expand";
+        if (btn) btn.title = "Toggle Fullscreen Mode (Esc)";
+      }
+
+      setTimeout(syncEditor, 30);
+    }
+
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        const container = document.getElementById("ideContainer");
+        if (container && container.classList.contains("v-ide-fullscreen")) {
+          toggleIdeFullscreen();
+        }
+      }
+    });
+
+    window.addEventListener("resize", function() {
+      syncEditor();
+    });
+
+    // Python Built-ins and Keywords Database for Autocomplete
+    const AUTOCOMPLETE_BUILTINS = [
+      { name: "print", type: "builtin" },
+      { name: "input", type: "builtin" },
+      { name: "len", type: "builtin" },
+      { name: "range", type: "builtin" },
+      { name: "int", type: "builtin" },
+      { name: "str", type: "builtin" },
+      { name: "float", type: "builtin" },
+      { name: "list", type: "builtin" },
+      { name: "dict", type: "builtin" },
+      { name: "set", type: "builtin" },
+      { name: "tuple", type: "builtin" },
+      { name: "bool", type: "builtin" },
+      { name: "type", type: "builtin" },
+      { name: "sum", type: "builtin" },
+      { name: "min", type: "builtin" },
+      { name: "max", type: "builtin" },
+      { name: "sorted", type: "builtin" },
+      { name: "map", type: "builtin" },
+      { name: "filter", type: "builtin" },
+      { name: "zip", type: "builtin" },
+      { name: "enumerate", type: "builtin" },
+      { name: "open", type: "builtin" },
+      { name: "abs", type: "builtin" },
+      { name: "round", type: "builtin" },
+      { name: "isinstance", type: "builtin" },
+      { name: "append", type: "fn" },
+      { name: "extend", type: "fn" },
+      { name: "pop", type: "fn" },
+      { name: "insert", type: "fn" },
+      { name: "remove", type: "fn" },
+      { name: "clear", type: "fn" },
+      { name: "index", type: "fn" },
+      { name: "count", type: "fn" },
+      { name: "sort", type: "fn" },
+      { name: "reverse", type: "fn" },
+      { name: "split", type: "fn" },
+      { name: "join", type: "fn" },
+      { name: "strip", type: "fn" },
+      { name: "replace", type: "fn" },
+      { name: "find", type: "fn" },
+      { name: "startswith", type: "fn" },
+      { name: "endswith", type: "fn" },
+      { name: "lower", type: "fn" },
+      { name: "upper", type: "fn" }
+    ];
+
+    const AUTOCOMPLETE_KEYWORDS = [
+      { name: "def", type: "kw" },
+      { name: "class", type: "kw" },
+      { name: "if", type: "kw" },
+      { name: "elif", type: "kw" },
+      { name: "else", type: "kw" },
+      { name: "while", type: "kw" },
+      { name: "for", type: "kw" },
+      { name: "in", type: "kw" },
+      { name: "return", type: "kw" },
+      { name: "import", type: "kw" },
+      { name: "from", type: "kw" },
+      { name: "as", type: "kw" },
+      { name: "try", type: "kw" },
+      { name: "except", type: "kw" },
+      { name: "finally", type: "kw" },
+      { name: "with", type: "kw" },
+      { name: "lambda", type: "kw" },
+      { name: "pass", type: "kw" },
+      { name: "break", type: "kw" },
+      { name: "continue", type: "kw" },
+      { name: "yield", type: "kw" },
+      { name: "global", type: "kw" },
+      { name: "True", type: "kw" },
+      { name: "False", type: "kw" },
+      { name: "None", type: "kw" },
+      { name: "self", type: "kw" }
+    ];
+
+    function getUserDefinedSymbols(code) {
+      const symbols = new Map();
+
+      // 1. User Functions: def funcName
+      const fnRegex = /\bdef\s+([a-zA-Z_]\w*)/g;
+      let m;
+      while ((m = fnRegex.exec(code)) !== null) {
+        symbols.set(m[1], { name: m[1], type: "fn", isUser: true });
+      }
+
+      // 2. User Classes: class ClassName
+      const clsRegex = /\bclass\s+([a-zA-Z_]\w*)/g;
+      while ((m = clsRegex.exec(code)) !== null) {
+        symbols.set(m[1], { name: m[1], type: "cls", isUser: true });
+      }
+
+      // 3. User Variables: var = ... or for var in ...
+      const varRegex = /\b([a-zA-Z_]\w*)\s*(?:=|,|\s+in\b)/g;
+      const kwNames = new Set(AUTOCOMPLETE_KEYWORDS.map(k => k.name));
+      const builtinNames = new Set(AUTOCOMPLETE_BUILTINS.map(b => b.name));
+
+      while ((m = varRegex.exec(code)) !== null) {
+        const name = m[1];
+        if (!kwNames.has(name) && !builtinNames.has(name) && !symbols.has(name)) {
+          symbols.set(name, { name: name, type: "var", isUser: true });
+        }
+      }
+
+      return Array.from(symbols.values());
+    }
+
+    let activeSuggestions = [];
+    let activeSuggestIndex = 0;
+    let suggestBoxEl = null;
+
+    function getSuggestBox() {
+      if (!suggestBoxEl) {
+        suggestBoxEl = document.createElement("div");
+        suggestBoxEl.className = "v-ide-suggest-box";
+        suggestBoxEl.id = "ideSuggestBox";
+        suggestBoxEl.style.display = "none";
+        const editorWrapper = document.querySelector(".v-ide-editor-wrapper");
+        if (editorWrapper) editorWrapper.appendChild(suggestBoxEl);
+      }
+      return suggestBoxEl;
+    }
+
+    function hideSuggestions() {
+      const box = getSuggestBox();
+      if (box) box.style.display = "none";
+      activeSuggestions = [];
+      activeSuggestIndex = 0;
+    }
+
+    function checkAndShowSuggestions() {
+      const textarea = document.getElementById("ideCodeInput");
+      if (!textarea) return;
+
+      const val = textarea.value;
+      const pos = textarea.selectionStart;
+
+      // Extract the word immediately preceding the cursor
+      const textBefore = val.slice(0, pos);
+      const match = textBefore.match(/([a-zA-Z_]\w*)$/);
+
+      if (!match || match[1].length < 1) {
+        hideSuggestions();
+        return;
+      }
+
+      const query = match[1].toLowerCase();
+      const currentWord = match[1];
+
+      // Pool: User defined symbols + Builtins + Keywords
+      const userSymbols = getUserDefinedSymbols(val);
+      const allCandidates = [...userSymbols, ...AUTOCOMPLETE_BUILTINS, ...AUTOCOMPLETE_KEYWORDS];
+
+      // Match candidates
+      const seen = new Set();
+      activeSuggestions = allCandidates.filter(item => {
+        if (seen.has(item.name)) return false;
+        if (item.name === currentWord) return false;
+        seen.add(item.name);
+        return item.name.toLowerCase().startsWith(query);
+      }).slice(0, 8);
+
+      if (activeSuggestions.length === 0) {
+        hideSuggestions();
+        return;
+      }
+
+      activeSuggestIndex = 0;
+      renderSuggestions();
+    }
+
+    function renderSuggestions() {
+      const box = getSuggestBox();
+      const textarea = document.getElementById("ideCodeInput");
+      const wrapper = document.querySelector(".v-ide-editor-wrapper");
+      if (!box || !textarea || !wrapper) return;
+
+      box.innerHTML = activeSuggestions.map((item, idx) => {
+        const badgeClass = item.type;
+        const badgeLabel = item.isUser ? (item.type === 'fn' ? 'def' : 'var') : item.type;
+        const activeClass = idx === activeSuggestIndex ? 'active' : '';
+        return `
+          <div class="v-ide-suggest-item ${activeClass}" onmousedown="insertSuggestion(${idx})">
+            <span style="font-weight:600;">${item.name}</span>
+            <span class="v-ide-suggest-badge ${badgeClass}">${badgeLabel}</span>
+          </div>
+        `;
+      }).join("");
+
+      // Position directly under active cursor line
+      const pos = textarea.selectionStart;
+      const linesBefore = textarea.value.slice(0, pos).split("\n");
+      const lineIdx = linesBefore.length - 1;
+      const charIdx = linesBefore[lineIdx].length;
+
+      const lineHeight = 23.1;
+      const charWidth = 8.4;
+      const paddingTop = 14;
+      const paddingLeft = 44 + 16; // Line numbers column width + textarea padding
+
+      let top = paddingTop + (lineIdx + 1) * lineHeight - textarea.scrollTop;
+      let left = paddingLeft + (charIdx * charWidth) - textarea.scrollLeft;
+
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const maxTop = wrapperRect.height - 210;
+      const maxLeft = wrapperRect.width - 290;
+
+      // If near bottom of the editor view, place above the current line
+      if (top > maxTop && top > 210) {
+        top = top - lineHeight - 205;
+      } else {
+        top = Math.max(10, Math.min(top, maxTop));
+      }
+
+      left = Math.max(50, Math.min(left, maxLeft));
+
+      box.style.top = top + "px";
+      box.style.left = left + "px";
+      box.style.bottom = "auto";
+      box.style.right = "auto";
+      box.style.display = "flex";
+    }
+
+    function insertSuggestion(index) {
+      const item = activeSuggestions[index];
+      if (!item) return;
+
+      const textarea = document.getElementById("ideCodeInput");
+      if (!textarea) return;
+
+      const val = textarea.value;
+      const pos = textarea.selectionStart;
+      const textBefore = val.slice(0, pos);
+      const match = textBefore.match(/([a-zA-Z_]\w*)$/);
+      const replaceLen = match ? match[1].length : 0;
+
+      const insertText = item.name + (item.type === "builtin" && ["print", "input", "len", "range", "int", "str", "sum"].includes(item.name) ? "()" : "");
+      const newPos = pos - replaceLen + (insertText.endsWith("()") ? insertText.length - 1 : insertText.length);
+
+      textarea.value = val.slice(0, pos - replaceLen) + insertText + val.slice(pos);
+      textarea.selectionStart = textarea.selectionEnd = newPos;
+
+      hideSuggestions();
+      syncEditor();
+      setTimeout(() => textarea.focus(), 10);
+    }
+
+    function syncEditor() {
+      const textarea = document.getElementById("ideCodeInput");
+      const highlight = document.getElementById("ideHighlightCode");
+      const lineNums = document.getElementById("ideLineNums");
+      if (typeof syncEditorHighlight === 'function') {
+        syncEditorHighlight(textarea, highlight, lineNums);
+      }
+    }
+
+    const textarea = document.getElementById("ideCodeInput");
+    textarea.addEventListener("input", function() {
+      syncEditor();
+      checkAndShowSuggestions();
+    });
+
+    textarea.addEventListener("scroll", function() {
+      const highlight = document.getElementById("ideHighlightCode");
+      const lineNums = document.getElementById("ideLineNums");
+      if (highlight) {
+        highlight.scrollTop = this.scrollTop;
+        highlight.scrollLeft = this.scrollLeft;
+      }
+      if (lineNums) {
+        lineNums.scrollTop = this.scrollTop;
+      }
+    });
+
+    // Python Auto-Indentation on ':', Indentation Preservation & IntelliSense Navigation
+    textarea.addEventListener("keydown", function(e) {
+      const suggestBox = document.getElementById("ideSuggestBox");
+      const isSuggestOpen = suggestBox && suggestBox.style.display !== "none" && activeSuggestions.length > 0;
+
+      // 1. Suggestion popup keyboard navigation
+      if (isSuggestOpen) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          activeSuggestIndex = (activeSuggestIndex + 1) % activeSuggestions.length;
+          renderSuggestions();
+          return;
+        }
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          activeSuggestIndex = (activeSuggestIndex - 1 + activeSuggestions.length) % activeSuggestions.length;
+          renderSuggestions();
+          return;
+        }
+        if (e.key === "Tab") {
+          e.preventDefault();
+          insertSuggestion(activeSuggestIndex);
+          return;
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          hideSuggestions();
+          return;
+        }
+      }
+
+      // 2. Ctrl+Enter to Run Code
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        hideSuggestions();
+        runPracticeCode();
+        return;
+      }
+
+      // 3. Enter key: Auto-indentation after ':' or preserve indentation level
+      if (e.key === "Enter") {
+        if (isSuggestOpen) {
+          e.preventDefault();
+          insertSuggestion(activeSuggestIndex);
+          return;
+        }
+
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        const val = this.value;
+
+        // Current line text up to cursor
+        const textBefore = val.substring(0, start);
+        const textAfter = val.substring(end);
+        const lastNewline = textBefore.lastIndexOf("\n");
+        const currentLine = textBefore.substring(lastNewline + 1);
+
+        // Leading indentation of current line
+        const indentMatch = currentLine.match(/^(\s*)/);
+        let indent = indentMatch ? indentMatch[1] : "";
+
+        // Check if line ends with ':' (ignoring trailing whitespace and comments)
+        const cleanLine = currentLine.split("#")[0].trim();
+        if (cleanLine.endsWith(":")) {
+          indent += "    "; // 4 spaces Python block indent
+        }
+
+        const insertText = "\n" + indent;
+        this.value = textBefore + insertText + textAfter;
+        this.selectionStart = this.selectionEnd = start + insertText.length;
+
+        syncEditor();
+        hideSuggestions();
+        return;
+      }
+
+      // 4. Tab key: Indent 4 spaces
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 4;
+        syncEditor();
+        checkAndShowSuggestions();
+        return;
+      }
+
+      // 5. Backspace key: Unindent 4 spaces if cursor is on leading 4 spaces
+      if (e.key === "Backspace") {
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        if (start === end && start >= 4) {
+          const textBefore = this.value.substring(0, start);
+          const lastNewline = textBefore.lastIndexOf("\n");
+          const lineBeforeCursor = textBefore.substring(lastNewline + 1);
+          if (/^\s+$/.test(lineBeforeCursor) && lineBeforeCursor.endsWith("    ")) {
+            e.preventDefault();
+            this.value = this.value.substring(0, start - 4) + this.value.substring(start);
+            this.selectionStart = this.selectionEnd = start - 4;
+            syncEditor();
+            hideSuggestions();
+            return;
+          }
+        }
+      }
+    });
+
+    textarea.addEventListener("blur", function() {
+      setTimeout(hideSuggestions, 200);
+    });
+
+    async function runPracticeCode() {
+      const codeEl = document.getElementById("ideCodeInput");
+      const code = codeEl ? codeEl.value : "";
+      const lang = "python";
+      const consoleOut = document.getElementById("ideConsoleOut");
+      const statusBadge = document.getElementById("ideStatusBadge");
+      const metaEl = document.getElementById("ideExecMeta");
+      const runBtn = document.getElementById("btnRunCode");
+
+      if (!code.trim()) {
+        consoleOut.innerHTML = `<span class="term-stderr">⚠️ Please write some Python code before running.</span>`;
+        statusBadge.textContent = "● No Code";
+        statusBadge.style.color = "#ef4444";
+        return;
+      }
+
+      if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.innerHTML = `<span>⏳ Running...</span>`;
+      }
+
+      consoleOut.innerHTML = "";
+      statusBadge.textContent = "⏳ Running...";
+      statusBadge.style.color = "#38bdf8";
+
+      const prompts = extractInputPrompts(code);
+      const userInputs = [];
+
+      // If code contains input() calls, interactively prompt directly inside the console container on the same line
+      if (prompts.length > 0) {
+        statusBadge.textContent = "⌨️ Waiting Input...";
+        statusBadge.style.color = "#f59e0b";
+
+        for (let i = 0; i < prompts.length; i++) {
+          const promptText = prompts[i];
+          const displayPrompt = promptText !== "" ? promptText : "> ";
+
+          // 1. Output the prompt text
+          const promptSpan = document.createElement("span");
+          promptSpan.className = "term-stdout";
+          promptSpan.textContent = displayPrompt;
+          consoleOut.appendChild(promptSpan);
+
+          // 2. Create the inline input directly on the exact same line
+          const answer = await new Promise((resolve) => {
+            const inlineInput = document.createElement("input");
+            inlineInput.type = "text";
+            inlineInput.className = "inline-term-input";
+            inlineInput.autocomplete = "off";
+            inlineInput.spellcheck = false;
+            inlineInput.size = 1;
+
+            inlineInput.addEventListener("input", function () {
+              this.size = Math.max(1, this.value.length + 1);
+            });
+
+            inlineInput.addEventListener("keydown", function (e) {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const val = this.value;
+
+                // Replace input element with permanent user entered text on the same line
+                const enteredSpan = document.createElement("span");
+                enteredSpan.className = "term-user-input";
+                enteredSpan.textContent = val + "\n";
+                this.replaceWith(enteredSpan);
+
+                resolve(val);
+              }
+            });
+
+            consoleOut.appendChild(inlineInput);
+            consoleOut.scrollTop = consoleOut.scrollHeight;
+            setTimeout(() => inlineInput.focus(), 30);
+          });
+
+          userInputs.push(answer);
+        }
+      }
+
+      statusBadge.textContent = "⚡ Executing...";
+      statusBadge.style.color = "#38bdf8";
+
+      const startTime = performance.now();
+      const CATALYST_DIRECT_URL = "https://appsail-50045753891.development.catalystappsail.in/run";
+      const PROXY_URL = (typeof getApiBase === 'function' ? getApiBase() : '') + "/api/run-code";
+      const LOCAL_BACKEND_URL = "http://localhost:5000/api/run-code";
+
+      const finalInput = userInputs.length ? (userInputs.join("\n") + "\n") : "\n";
+      let resultData = null;
+
+      async function safeParseJson(response) {
+        try {
+          const text = await response.text();
+          if (!text || text.trim().startsWith("<")) return null;
+          return JSON.parse(text);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      try {
+        // 1. Primary: Direct Zoho Catalyst AppSail Execution
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+          const res = await fetch(CATALYST_DIRECT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: code, input: finalInput }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          resultData = await safeParseJson(res);
+        } catch (directErr) {
+          console.warn("Direct Catalyst execution attempt failed:", directErr);
+        }
+
+        // 2. Secondary: Fallback to Local Node Backend (if running locally)
+        if (!resultData && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+          try {
+            const lRes = await fetch(LOCAL_BACKEND_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: code, input: finalInput })
+            });
+            resultData = await safeParseJson(lRes);
+          } catch (localErr) {
+            console.warn("Local backend proxy attempt failed:", localErr);
+          }
+        }
+
+        // 3. Tertiary: Fallback to Server Proxy
+        if (!resultData && PROXY_URL && PROXY_URL !== LOCAL_BACKEND_URL) {
+          try {
+            const pRes = await fetch(PROXY_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: code, input: finalInput })
+            });
+            resultData = await safeParseJson(pRes);
+          } catch (proxyErr) {
+            console.warn("Server proxy attempt failed:", proxyErr);
+          }
+        }
+
+        const dur = Math.round(performance.now() - startTime);
+        if (metaEl) metaEl.textContent = `Time: ${dur}ms`;
+
+        if (resultData && typeof resultData.success !== "undefined") {
+          if (resultData.success) {
+            let fullOutput = resultData.output || "";
+
+            if (prompts.length > 0) {
+              let cleanOut = fullOutput;
+              for (const p of prompts) {
+                if (p && cleanOut.includes(p)) {
+                  cleanOut = cleanOut.replace(p, "");
+                }
+              }
+              cleanOut = cleanOut.replace(/^\n+/, "");
+              if (cleanOut.trim()) {
+                const outSpan = document.createElement("span");
+                outSpan.className = "term-stdout";
+                outSpan.textContent = cleanOut;
+                consoleOut.appendChild(outSpan);
+              }
+            } else {
+              consoleOut.innerHTML = fullOutput.trim()
+                ? `<span class="term-stdout">${esc(fullOutput)}</span>`
+                : `<span class="term-stdout" style="color:#10b981;">✓ Process finished with exit code 0 (No console output).</span>`;
+            }
+
+            statusBadge.textContent = "✓ Finished (0)";
+            statusBadge.style.color = "#10b981";
+          } else {
+            const errText = resultData.output || resultData.error || "Execution returned an error.";
+            const errSpan = document.createElement("span");
+            errSpan.className = "term-stderr";
+            errSpan.textContent = (prompts.length > 0 ? "\n" : "") + errText;
+            consoleOut.appendChild(errSpan);
+
+            statusBadge.textContent = "⚠️ Execution Error";
+            statusBadge.style.color = "#ef4444";
+          }
+        } else {
+          throw new Error("Unable to connect to code execution server. Please check your internet connection.");
+        }
+      } catch (err) {
+        const errSpan = document.createElement("span");
+        errSpan.className = "term-stderr";
+        errSpan.textContent = `\n⚠️ Execution error: ${err.message}`;
+        consoleOut.appendChild(errSpan);
+
+        statusBadge.textContent = "⚠️ Execution Failed";
+        statusBadge.style.color = "#ef4444";
+      } finally {
+        if (runBtn) {
+          runBtn.disabled = false;
+          runBtn.innerHTML = `
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Run</span>
+            <span style="font-size:9.5px; opacity:0.8; margin-left:2px;">(Ctrl+Enter)</span>
+          `;
+        }
+      }
+    }
+
+    function onLanguageChange(lang) {
+      // update syntax highlighting if applicable
+    }
+
+    function onSearchProblems(val) {
+      const q = (val || "").toLowerCase();
+      const select = document.getElementById("ideProblemSelect");
+      for (let i = 0; i < select.options.length; i++) {
+        const opt = select.options[i];
+        if (opt.text.toLowerCase().includes(q)) {
+          select.selectedIndex = i;
+          loadProblem(opt.value);
+          break;
+        }
+      }
+    }
+
+    // Init
+    const user = state.user || {};
+    const name = user.name || user.username || "Soundhareshwaran S R";
+    document.getElementById("vDashUserNameLabel").textContent = name;
+    const initials = name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "SS";
+    document.getElementById("vDashAvatarInitial").textContent = initials;
+
+    updateThemeUI();
+    loadProblem("1");
+  </script>
+</body>
+</html>

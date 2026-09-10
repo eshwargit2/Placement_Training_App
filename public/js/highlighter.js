@@ -91,23 +91,18 @@ function syncEditorHighlight(textarea, highlightCodeEl, lineNumsEl) {
 
   if (highlightCodeEl) {
     highlightCodeEl.innerHTML = highlightPythonCode(val);
+    highlightCodeEl.scrollTop = textarea.scrollTop;
+    highlightCodeEl.scrollLeft = textarea.scrollLeft;
   }
 
   if (lineNumsEl) {
-    const lineCount = Math.max(1, val.split("\n").length);
+    const lines = val.split("\n");
+    const lineCount = Math.max(1, lines.length);
     let nums = "";
     for (let i = 1; i <= lineCount; i++) {
-      nums += i + "<br>";
+      nums += `<div>${i}</div>`;
     }
     lineNumsEl.innerHTML = nums;
-  }
-
-  const highlightLayer = textarea.parentElement ? textarea.parentElement.querySelector(".code-highlight-layer") : null;
-  if (highlightLayer) {
-    highlightLayer.scrollTop = textarea.scrollTop;
-    highlightLayer.scrollLeft = textarea.scrollLeft;
-  }
-  if (lineNumsEl) {
     lineNumsEl.scrollTop = textarea.scrollTop;
   }
 }

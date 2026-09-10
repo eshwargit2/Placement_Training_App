@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Performance &amp; Skill Diagnostics · VMKVEC</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <script>
+    (function () {
+      const t = localStorage.getItem("appTheme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+
+<body class="v-dash-body">
+  <div class="v-dash-layout">
+    <!-- 1. LEFT SIDEBAR NAVIGATION -->
+    <aside class="v-dash-sidebar" id="vDashSidebar">
+      <div>
+        <a href="dashboard.html" class="v-dash-logo-block">
+          <div class="v-dash-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div class="v-dash-logo-text">
+            <div class="v-dash-logo-title">VMKVEC</div>
+            <div class="v-dash-logo-sub">Placement Training</div>
+            <div class="v-dash-logo-dept">CSE</div>
+          </div>
+        </a>
+
+        <nav class="v-dash-nav-list">
+          <a href="dashboard.html" class="v-dash-nav-link" title="Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+          </a>
+          <a href="assessments.html" class="v-dash-nav-link" title="Assessments">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Assessments</span>
+          </a>
+          <a href="practice.html" class="v-dash-nav-link" title="Practice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Practice</span>
+          </a>
+          <a href="performance.html" class="v-dash-nav-link active" title="Performance">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Performance</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Resources">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Resources</span>
+          </a>
+          <a href="company-bank.html" class="v-dash-nav-link" title="Interview Prep">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Interview Prep</span>
+          </a>
+
+          <div class="v-dash-sidebar-divider"></div>
+
+          <a href="profile.html" class="v-dash-nav-link" title="Profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </a>
+          <a href="profile.html" class="v-dash-nav-link" title="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="v-dash-sidebar-art">
+        <div class="v-dash-art-text">Build<br>Your Career<br>Step by Step</div>
+        <svg class="v-dash-art-mountains" viewBox="0 0 200 60" fill="none">
+          <polygon points="10,60 65,15 120,60" fill="#0f224a" opacity="0.6" />
+          <polygon points="50,60 110,8 170,60" fill="#1e3a8a" opacity="0.8" />
+          <polygon points="100,60 145,22 190,60" fill="#0d1b3e" opacity="0.9" />
+          <polyline points="100,16 110,8 120,16" stroke="#38bdf8" stroke-width="2" />
+          <line x1="110" y1="8" x2="110" y2="1" stroke="#38bdf8" stroke-width="1.5" />
+          <polygon points="110,1 119,4 110,7" fill="#38bdf8" />
+        </svg>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN WRAPPER -->
+    <div class="v-dash-main-wrap">
+      <header class="v-dash-topbar">
+        <div style="display:flex; align-items:center; gap:12px; flex:1; max-width:540px;">
+          <!-- Sidebar Expand/Collapse Toggle Button -->
+          <button type="button" class="v-dash-sidebar-toggle-btn" id="vDashSidebarToggleBtn" onclick="toggleSidebarCollapse()" title="Collapse Sidebar (Compact)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <path d="M15 10l-3 2 3 2"></path>
+            </svg>
+          </button>
+          <button type="button" class="v-dash-mobile-menu-btn" onclick="toggleVDashSidebar()" title="Toggle Navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="v-dash-search-container">
+            <span class="v-dash-search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" id="vDashMainSearch" class="v-dash-search-input" placeholder="Search topics or concepts...">
+            <span class="v-dash-search-badge">Ctrl + K</span>
+          </div>
+        </div>
+
+        <div class="v-dash-top-actions">
+          <div class="v-dash-theme-toggle" onclick="toggleDashboardTheme()" title="Toggle Theme">
+            <div class="v-dash-theme-thumb"></div>
+          </div>
+          <div class="v-dash-profile-pill" onclick="window.location.href='profile.html'">
+            <div class="v-dash-avatar-badge" id="vDashAvatarInitial">SS</div>
+            <div class="v-dash-user-titles">
+              <span class="v-dash-welcome-text">Welcome back,</span>
+              <span class="v-dash-user-fullname">
+                <span id="vDashUserNameLabel">Soundhareshwaran S R</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main style="padding:24px 28px 48px; max-width:1300px;">
+        <!-- Header banner -->
+        <div style="background:linear-gradient(135deg, #09132c 0%, #0d1e44 100%); border:1px solid rgba(56,189,248,0.18); border-radius:18px; padding:24px 28px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div>
+            <div class="v-dash-tag-pill">Diagnostic Analytics</div>
+            <h1 style="font-size:26px; font-weight:800; color:#fff; margin:0 0 6px;">Skill Diagnostics &amp; Topic Analysis</h1>
+            <p style="color:#94a3b8; margin:0; font-size:13.5px;">Real-time accuracy updated from your correct and incorrect question responses across daily assessments.</p>
+          </div>
+          <button onclick="exportStudentPDF(state.user ? state.user.id : '')" class="v-dash-btn-primary" style="padding:10px 20px; font-size:13.5px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Download My Performance PDF</span>
+          </button>
+        </div>
+
+        <!-- Performance Overview KPIs -->
+        <div class="perf-kpi-grid">
+          <div class="perf-kpi-card">
+            <div class="perf-kpi-icon-wrap blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div>
+              <div class="perf-kpi-val" id="kpiTotalAttempts">0</div>
+              <div class="perf-kpi-lbl">Tests Attempted</div>
+            </div>
+          </div>
+
+          <div class="perf-kpi-card">
+            <div class="perf-kpi-icon-wrap green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <div class="perf-kpi-val" id="kpiAvgScore">0%</div>
+              <div class="perf-kpi-lbl">Average Score</div>
+            </div>
+          </div>
+
+          <div class="perf-kpi-card">
+            <div class="perf-kpi-icon-wrap amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div>
+              <div class="perf-kpi-val" id="kpiMasteredCount">0</div>
+              <div class="perf-kpi-lbl">Mastered Topics</div>
+            </div>
+          </div>
+
+          <div class="perf-kpi-card">
+            <div class="perf-kpi-icon-wrap purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+            <div>
+              <div class="perf-kpi-val" id="kpiWeakCount">0</div>
+              <div class="perf-kpi-lbl">Focus Topics</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mastered vs Weak Areas Grid -->
+        <div class="dash-skill-grid">
+          <div class="dash-skill-box mastered">
+            <div class="dash-skill-box-header">
+              <div class="dash-skill-box-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Mastered &amp; Strong Topics (≥75%)</span>
+              </div>
+              <span class="dash-skill-badge green" id="countStrongPill">0 Topics</span>
+            </div>
+            <div id="strongAreasList" style="flex:1;"></div>
+          </div>
+
+          <div class="dash-skill-box focus">
+            <div class="dash-skill-box-header">
+              <div class="dash-skill-box-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                <span>Priority Focus &amp; Weak Areas (&lt;75%)</span>
+              </div>
+              <span class="dash-skill-badge amber" id="countWeakPill">0 Topics</span>
+            </div>
+            <div id="weakAreasList" style="flex:1;"></div>
+          </div>
+        </div>
+
+        <!-- Assessment History Log -->
+        <div class="v-prof-card">
+          <div class="dash-section-header">
+            <div>
+              <h2 style="margin:0 0 4px; display:flex; align-items:center; gap:8px; font-size:18px; color:var(--vdash-text-title);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Assessment History Log
+              </h2>
+              <p class="muted" style="margin:0; font-size:12.5px; color:var(--vdash-text-muted);">Complete breakdown of your assessment attempts, scores, and timestamps.</p>
+            </div>
+          </div>
+          <div id="assessmentHistoryTable"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/export.js"></script>
+  <script>
+    if (!requireAuth("student")) {}
+
+    function toggleVDashSidebar() {
+      const sidebar = document.getElementById("vDashSidebar");
+      if (sidebar) sidebar.classList.toggle("open");
+    }
+
+    function toggleDashboardTheme() {
+      if (typeof toggleTheme === 'function') {
+        toggleTheme();
+        updateThemeUI();
+      }
+    }
+
+    function updateThemeUI() {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      const thumb = document.querySelector(".v-dash-theme-thumb");
+      if (thumb) {
+        if (currentTheme === "light") {
+          thumb.style.transform = "translateX(20px)";
+          thumb.style.background = "#38bdf8";
+        } else {
+          thumb.style.transform = "translateX(0)";
+          thumb.style.background = "#facc15";
+        }
+      }
+    }
+
+    function getMyAttempts(user = state.user) {
+      if (!user) return [];
+      const userNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(user.id || user.username) : null;
+      const candidateKeys = (typeof getStudentCandidateKeys === 'function') ? getStudentCandidateKeys(user.username || user.id) : [String(user.id || '').toLowerCase(), String(user.username || '').toLowerCase()];
+
+      return (state.attempts || []).filter(a => {
+        if (!a) return false;
+        const aNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(a.studentId || a.username) : null;
+        if (typeof userNum === 'number' && typeof aNum === 'number' && userNum === aNum) return true;
+        const sId = String(a.studentId || '').toLowerCase();
+        const uName = String(a.username || '').toLowerCase();
+        return candidateKeys.includes(sId) || candidateKeys.includes(uName);
+      });
+    }
+
+    function renderPerformance() {
+      const user = state.user || {};
+      const myAttempts = getMyAttempts(user);
+
+      // KPI Calculations
+      const totalAttempts = myAttempts.length;
+      let sumPct = 0;
+      myAttempts.forEach(a => { sumPct += Number(a.percentage || 0); });
+      const avgScore = totalAttempts > 0 ? Math.round(sumPct / totalAttempts) : 0;
+
+      const topicStats = {};
+      myAttempts.forEach(a => {
+        const isCust = a.isCustomExam || a.customAssessmentId || !a.day;
+        const topicName = isCust ? (a.examTitle || a.topic || "Custom Assessment") : (a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : `Day ${a.day}`));
+        const key = isCust ? `custom_${a.customAssessmentId || a.topic || a.id}` : `day_${a.day}`;
+
+        if (!topicStats[key]) {
+          topicStats[key] = {
+            day: a.day,
+            isCustom: isCust,
+            customId: a.customAssessmentId,
+            topic: topicName,
+            attemptsCount: 0,
+            latestPercentage: Number(a.percentage || 0),
+            correctQuestions: [],
+            incorrectQuestions: []
+          };
+        }
+
+        const stat = topicStats[key];
+        stat.attemptsCount++;
+        stat.latestPercentage = Number(a.percentage || 0);
+
+        const details = (a.mcqDetails && a.mcqDetails.length) ? a.mcqDetails : (typeof getAttemptDetails === 'function' ? getAttemptDetails(a) : []);
+        details.forEach(d => {
+          const ok = (d.result === 'Correct' || d.answer === d.correct);
+          if (ok) {
+            if (!stat.correctQuestions.some(q => q.question === d.question)) {
+              stat.correctQuestions.push({ number: d.number, question: d.question, correct: d.correct });
+            }
+          } else {
+            if (!stat.incorrectQuestions.some(q => q.question === d.question)) {
+              stat.incorrectQuestions.push({ number: d.number, question: d.question, yourAnswer: d.answer, correct: d.correct });
+            }
+          }
+        });
+      });
+
+      const strongTopics = Object.values(topicStats).filter(t => t.latestPercentage >= 75);
+      const weakTopics = Object.values(topicStats).filter(t => t.latestPercentage < 75);
+
+      document.getElementById("kpiTotalAttempts").textContent = totalAttempts;
+      document.getElementById("kpiAvgScore").textContent = `${avgScore}%`;
+      document.getElementById("kpiMasteredCount").textContent = strongTopics.length;
+      document.getElementById("kpiWeakCount").textContent = weakTopics.length;
+
+      document.getElementById("countStrongPill").textContent = `${strongTopics.length} Topics`;
+      document.getElementById("countWeakPill").textContent = `${weakTopics.length} Topics`;
+
+      document.getElementById("strongAreasList").innerHTML = strongTopics.length ? `
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${strongTopics.map(t => {
+            const retakeHref = t.isCustom ? `assessment.html?customId=${encodeURIComponent(t.customId || '')}` : `assessment.html?day=${t.day}`;
+            const label = t.isCustom ? `⭐ ${esc(t.topic)}` : `Day ${t.day} — ${esc(t.topic)}`;
+            return `
+              <div class="dash-strong-topic-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
+                  <span class="dash-strong-topic-title">${label}</span>
+                  <span class="dash-score-pill high">${t.latestPercentage}% Accuracy</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                  <div style="font-size:12px; color:var(--vdash-text-muted);">✓ Mastered ${t.correctQuestions.length ? `${t.correctQuestions.length} concepts` : 'high accuracy'}</div>
+                  <a href="${retakeHref}" class="ghost" style="padding:2px 10px; font-size:11.5px; border-radius:6px; text-decoration:none;">Review</a>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      ` : `<div style="padding:20px 10px; text-align:center;"><p class='muted' style='margin:0; color:var(--vdash-text-muted);'>No mastered topics yet (≥75% score). Complete daily tests to build your mastery log!</p></div>`;
+
+      document.getElementById("weakAreasList").innerHTML = weakTopics.length ? `
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${weakTopics.map(t => {
+            const retakeHref = t.isCustom ? `assessment.html?customId=${encodeURIComponent(t.customId || '')}` : `assessment.html?day=${t.day}`;
+            const label = t.isCustom ? `⭐ ${esc(t.topic)}` : `Day ${t.day} — ${esc(t.topic)}`;
+            return `
+              <div class="dash-weak-topic-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
+                  <span class="dash-weak-topic-title">${label}</span>
+                  <span class="dash-score-pill low">${t.latestPercentage}% Accuracy</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                  <div style="font-size:12px; color:var(--vdash-text-muted);">⚠️ Needs revision &amp; practice</div>
+                  <a href="${retakeHref}" class="v-dash-btn-primary" style="padding:3px 12px; font-size:11.5px; border-radius:6px; text-decoration:none;">Revise Now</a>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      ` : `<div style="padding:20px 10px; text-align:center;"><p class='muted' style='margin:0; color:var(--vdash-text-muted);'>No weak areas identified. Great job keeping your scores high!</p></div>`;
+
+      // History table
+      const histEl = document.getElementById("assessmentHistoryTable");
+      if (myAttempts.length) {
+        histEl.innerHTML = `
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Assessment / Topic</th>
+                  <th>Score</th>
+                  <th>Percentage</th>
+                  <th>Status</th>
+                  <th>Date &amp; Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${myAttempts.slice().reverse().map((a) => {
+                  const pct = Number(a.percentage || 0);
+                  const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
+                  const isCust = a.isCustomExam || a.customAssessmentId || !a.day;
+                  const label = isCust 
+                    ? `<b>⭐ ${esc(a.examTitle || a.topic || "Custom Assessment")}</b> <span class="badge" style="font-size:10px; margin-left:4px;">Custom</span>` 
+                    : `<b>Day ${a.day || 1}</b> — ${esc(a.topic || (curriculum[a.day - 1] ? curriculum[a.day - 1][0] : ''))}`;
+                  const actionHref = isCust ? `assessment.html?customId=${encodeURIComponent(a.customAssessmentId || '')}` : `assessment.html?day=${a.day || 1}`;
+                  return `
+                    <tr>
+                      <td>${label}</td>
+                      <td><b>${a.score}/${a.total}</b></td>
+                      <td><span class="dash-score-pill ${scoreClass}">${pct}%</span></td>
+                      <td><span class="badge done">Completed</span></td>
+                      <td>${esc(a.completedAtDisplay || a.date || "-")}</td>
+                      <td><a href="${actionHref}" class="ghost" style="padding:3px 10px; font-size:11.5px; border-radius:6px; text-decoration:none;">Retake</a></td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else {
+        histEl.innerHTML = `<div style="text-align:center; padding:28px 16px;"><p class="muted" style="margin:0; color:var(--vdash-text-muted);">No assessment attempts logged yet.</p></div>`;
+      }
+    }
+
+    // User init
+    const user = state.user || {};
+    const name = user.name || user.username || "Soundhareshwaran S R";
+    document.getElementById("vDashUserNameLabel").textContent = name;
+    const initials = name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "SS";
+    document.getElementById("vDashAvatarInitial").textContent = initials;
+
+    updateThemeUI();
+    renderPerformance();
+  </script>
+</body>
+</html>

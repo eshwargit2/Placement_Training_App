@@ -78,6 +78,8 @@ function toggleTheme() {
   const next = current === "dark" ? "light" : "dark";
   applyTheme(next);
 }
+window.toggleDashboardTheme = toggleTheme;
+window.toggleTheme = toggleTheme;
 
 function updateThemeToggleButtons(theme) {
   const isDark = theme === "dark";
@@ -93,16 +95,96 @@ function updateThemeToggleButtons(theme) {
     `;
     btn.setAttribute("title", isDark ? "Switch to Light Mode" : "Switch to Dark Mode");
   });
+
+  document.querySelectorAll(".v-dash-theme-thumb").forEach(thumb => {
+    if (!isDark) {
+      thumb.style.transform = "translateX(18px)";
+      thumb.style.background = "#38bdf8";
+      thumb.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    } else {
+      thumb.style.transform = "translateX(0)";
+      thumb.style.background = "#facc15";
+      thumb.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="#0b1329" stroke="#0b1329" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>';
+    }
+  });
 }
 
-// Immediate theme execution
+// ==========================================================================
+// SIDEBAR COLLAPSE / EXPAND (MINI & FULL NAVIGATION)
+// ==========================================================================
+function isSidebarCollapsed() {
+  return localStorage.getItem("sidebarCollapsed") === "true";
+}
+
+function applySidebarState(collapsed) {
+  const sidebar = document.getElementById("vDashSidebar");
+  const layout = document.querySelector(".v-dash-layout");
+  if (sidebar) {
+    if (collapsed) {
+      sidebar.classList.add("collapsed");
+    } else {
+      sidebar.classList.remove("collapsed");
+    }
+  }
+  if (layout) {
+    if (collapsed) {
+      layout.classList.add("sidebar-collapsed");
+    } else {
+      layout.classList.remove("sidebar-collapsed");
+    }
+  }
+  if (document.body) {
+    if (collapsed) {
+      document.body.classList.add("sidebar-collapsed");
+    } else {
+      document.body.classList.remove("sidebar-collapsed");
+    }
+  }
+  try {
+    localStorage.setItem("sidebarCollapsed", String(collapsed));
+  } catch (e) {}
+  updateSidebarToggleBtn(collapsed);
+}
+
+function toggleSidebarCollapse() {
+  const next = !isSidebarCollapsed();
+  applySidebarState(next);
+}
+window.toggleSidebarCollapse = toggleSidebarCollapse;
+window.applySidebarState = applySidebarState;
+
+function updateSidebarToggleBtn(collapsed) {
+  document.querySelectorAll(".v-dash-sidebar-toggle-btn, #vDashSidebarToggleBtn").forEach(btn => {
+    btn.setAttribute("title", collapsed ? "Expand Sidebar (Normal)" : "Collapse Sidebar (Compact)");
+    btn.innerHTML = collapsed ? `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="9" y1="3" x2="9" y2="21"></line>
+        <path d="M13 10l3 2-3 2"></path>
+      </svg>
+    ` : `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="9" y1="3" x2="9" y2="21"></line>
+        <path d="M15 10l-3 2 3 2"></path>
+      </svg>
+    `;
+  });
+}
+
+// Immediate theme and sidebar execution
 (function () {
   const t = getTheme();
   document.documentElement.setAttribute("data-theme", t);
+  const isCol = isSidebarCollapsed();
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => applyTheme(t));
+    document.addEventListener("DOMContentLoaded", () => {
+      applyTheme(t);
+      applySidebarState(isCol);
+    });
   } else {
     applyTheme(t);
+    applySidebarState(isCol);
   }
 })();
 

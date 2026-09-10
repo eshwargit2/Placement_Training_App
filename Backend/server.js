@@ -12,6 +12,12 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Serve static frontend assets
+const publicPath = path.join(__dirname, '../public');
+if (fs.existsSync(publicPath)) {
+  app.use(express.static(publicPath));
+}
+
 const os = require('os');
 
 // ==========================================================================
