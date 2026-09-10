@@ -130,7 +130,7 @@
 
       <!-- Main Content -->
       <main style="padding:24px 28px 48px; max-width:1300px;">
-        <div style="background:linear-gradient(135deg, #09132c 0%, #0d1e44 100%); border:1px solid rgba(56,189,248,0.18); border-radius:18px; padding:24px 28px; margin-bottom:24px;">
+        <div class="v-prof-card" style="background:var(--vdash-hero-bg); border:1px solid var(--vdash-banner-border); border-radius:18px; padding:24px 28px; margin-bottom:24px; color:#ffffff;">
           <div class="v-dash-tag-pill">Resources &amp; Interview Question Bank</div>
           <h1 style="font-size:26px; font-weight:800; color:#fff; margin:0 0 6px;">Company Interview Question Bank</h1>
           <p style="color:#94a3b8; margin:0; font-size:13.5px;">Tier-1 placement technical, DSA, SQL, project architecture, and HR questions tailored for campus recruitment drives.</p>
@@ -179,7 +179,7 @@
 
     const companies = Object.keys(COMPANY_INTERVIEW_BANK);
     document.getElementById("companyCards").innerHTML = companies.map(c => `
-      <div class="card" style="background:#09132c; border:1px solid rgba(56,189,248,0.15); border-radius:16px; margin-bottom:20px;">
+      <div class="v-prof-card" style="margin-bottom:20px;">
         <h2 style="margin-top:0; color:#38bdf8; font-size:18px;">${c} Placement Preparation</h2>
         <div class="table-wrap">
           <table>
