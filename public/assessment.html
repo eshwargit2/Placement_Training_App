@@ -35,25 +35,54 @@
         <span><b>20-minute timer:</b> The timer starts immediately when this assessment opens. When time reaches zero, the assessment is automatically submitted and you are returned to the dashboard.</span>
       </div>
 
-      <form id="assessmentForm" onsubmit="event.preventDefault(); submitAssessment(false);">
+      <div id="assessmentFormContainer">
         <h2 id="mcqHeaderTitle" class="section-title">Topic Assessment — 5 Multiple Choice Questions</h2>
         <div id="mcqContainer"></div>
 
         <div id="codingSectionWrap">
-          <h2 class="section-title" style="margin-top:40px;">Coding Assessment — 3 Placement Programs</h2>
-          <p class="muted">Complete all 3 programs. Each program has a dedicated editor and Save button. Please save each program before submitting.</p>
+          <h2 id="codingHeaderTitle" class="section-title" style="margin-top:40px;">Coding Assessment</h2>
+          <p id="codingHeaderSubtitle" class="muted">Complete the programming challenges below. You can run test cases and click Save or Submit Assessment when finished.</p>
           <div id="codingContainer"></div>
         </div>
 
         <div class="assessment-submit-card">
-          <button type="submit" class="hero-btn-primary" style="padding:16px 44px; font-size:16px; display:inline-flex; align-items:center; gap:8px;">
-            <span>Submit Assessment</span>
+          <button type="button" id="submitAssessmentBtn" onclick="openSubmitConfirmModal();" class="hero-btn-primary" style="padding:16px 44px; font-size:16px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+            <span id="submitBtnLabel">Submit Assessment</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
-      </form>
+      </div>
     </div>
   </main>
+
+  <!-- Submit Assessment Confirmation Popup Modal -->
+  <div id="submitConfirmModal" class="modal-backdrop" style="display:none; z-index:99998;" onclick="if(event.target === this) closeSubmitConfirmModal();">
+    <div class="modal-card" style="max-width:460px; text-align:center; padding:28px 24px; border-radius:18px; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+      <div style="width:58px; height:58px; border-radius:50%; background:rgba(37,99,235,0.12); color:#2563eb; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h3 style="margin:0 0 8px; font-size:20px; font-weight:800; color:var(--text-heading);">Confirm Submission?</h3>
+      <p style="margin:0 0 16px; font-size:13.5px; color:var(--muted); line-height:1.5;">
+        Are you ready to submit your assessment? Please review your completed items before submitting.
+      </p>
+
+      <div id="submitConfirmStatsBox" style="background:var(--card-alt); border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin-bottom:20px; text-align:left; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+      </div>
+
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button type="button" class="ghost" onclick="closeSubmitConfirmModal()" style="padding:10px 20px; font-weight:600; border-radius:10px; cursor:pointer;">
+          Review / Edit
+        </button>
+        <button type="button" id="btnConfirmSubmitFinal" onclick="performFinalSubmission(false);" style="background:#2563eb; color:#fff; border:none; padding:10px 24px; font-weight:700; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(37,99,235,0.35);">
+          <span>Confirm &amp; Submit</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Stop Assessment Confirmation Popup Modal -->
   <div id="exitConfirmModal" class="modal-backdrop" style="display:none;" onclick="if(event.target === this) closeExitModal();">
@@ -80,6 +109,30 @@
     </div>
   </div>
 
+  <!-- Submission Complete Success Modal -->
+  <div id="submissionCompleteModal" class="modal-backdrop" style="display:none; z-index:99999;">
+    <div class="modal-card" style="max-width:460px; text-align:center; padding:32px 28px; border-radius:20px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+      <div style="width:64px; height:64px; border-radius:50%; background:rgba(16,185,129,0.15); color:#10b981; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; border:2px solid rgba(16,185,129,0.3);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h3 style="margin:0 0 6px; font-size:22px; font-weight:800; color:var(--text-heading);">Assessment Completed!</h3>
+      <p style="margin:0 0 16px; font-size:13.5px; color:var(--muted); line-height:1.5;">
+        Your assessment has been submitted and stored to the database.
+      </p>
+      <div id="submissionModalStats" style="background:var(--card-alt); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:20px; text-align:left; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button type="button" onclick="redirectToDashboardNow()" class="hero-btn-primary" style="width:100%; padding:14px; font-size:15px; font-weight:700; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+          <span>Return to Dashboard</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span id="autoRedirectCountdown" style="font-size:12px; color:var(--muted);">Redirecting to dashboard in <b id="countdownSec">2</b>s...</span>
+      </div>
+    </div>
+  </div>
+
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script src="js/highlighter.js"></script>
@@ -102,62 +155,86 @@
     let day = null;
     let sessionKey = "";
 
-    if (customId) {
-      isCustomMode = true;
-      let customList = (typeof state !== 'undefined' && Array.isArray(state.customAssessments)) ? state.customAssessments : [];
-      try {
-        const extra = JSON.parse(localStorage.getItem("placementPortal_customAssessments") || "[]");
-        if (Array.isArray(extra) && extra.length) {
-          const map = new Map();
-          extra.forEach(e => { if (e && e.id) map.set(String(e.id), e); });
-          customList.forEach(e => { if (e && e.id) map.set(String(e.id), e); });
-          customList = Array.from(map.values());
-        }
-      } catch (e) {}
+    let sess = null;
 
-      customExam = customList.find(e => String(e.id) === String(customId));
+    function setupAssessmentData() {
+      if (customId) {
+        isCustomMode = true;
+        let customList = (typeof state !== 'undefined' && Array.isArray(state.customAssessments)) ? state.customAssessments : [];
+        try {
+          const extra = JSON.parse(localStorage.getItem("placementPortal_customAssessments") || "[]");
+          if (Array.isArray(extra) && extra.length) {
+            const map = new Map();
+            extra.forEach(e => { if (e && e.id) map.set(String(e.id), e); });
+            customList.forEach(e => { if (e && e.id) map.set(String(e.id), e); });
+            customList = Array.from(map.values());
+          }
+        } catch (e) {}
 
-      if (!customExam || !customExam.questions || !customExam.questions.length) {
-        // Try live fetch
-        (async function fetchLiveSingleAssessment() {
-          try {
-            const apiBase = (typeof getApiBase === 'function' ? getApiBase() : 'http://localhost:5000');
-            const res = await fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(customId)}`);
-            if (res.ok) {
-              const data = await res.json();
-              if (data && data.customAssessment && Array.isArray(data.customAssessment.questions)) {
-                customExam = data.customAssessment;
-                durationMins = customExam.durationMinutes || 20;
-                topicName = customExam.topic || customExam.title;
-                qs = (customExam.questions || []).map(q => [
-                  q.question,
-                  (q.options && q.options[0]) || "Option A",
-                  (q.options && q.options[1]) || "Option B",
-                  (q.options && q.options[2]) || "Option C",
-                  (q.options && q.options[3]) || "Option D",
-                  q.answer || "A"
-                ]);
-                document.getElementById("assessmentTitle").textContent = customExam.title;
-                document.getElementById("assessmentDesc").textContent = `${topicName} · Custom Examination`;
-                document.getElementById("mcqHeaderTitle").textContent = `Assessment Questions — ${qs.length} Multiple Choice Questions`;
-                renderMCQQuestionsList();
+        customExam = customList.find(e => String(e.id) === String(customId));
+
+        if (!customExam || (!customExam.questions?.length && !customExam.codingQuestions?.length && !customExam.codingPrograms?.length)) {
+          // Try live fetch
+          (async function fetchLiveSingleAssessment() {
+            try {
+              const apiBase = (typeof getApiBase === 'function' ? getApiBase() : 'http://localhost:5000');
+              const res = await fetch(`${apiBase}/api/custom-assessments/${encodeURIComponent(customId)}`);
+              if (res.ok) {
+                const data = await res.json();
+                if (data && data.customAssessment) {
+                  customExam = data.customAssessment;
+                  applyLoadedAssessment();
+                }
               }
-            }
-          } catch (e) {}
-        })();
+            } catch (e) {}
+          })();
+        }
+
+        if (!customExam) {
+          customExam = {
+            id: customId,
+            title: "Custom Assessment",
+            topic: "Placement Mock Test",
+            durationMinutes: 30,
+            questions: [],
+            codingQuestions: []
+          };
+        }
+
+        sessionKey = "customAssessmentSession_" + (state.user ? state.user.id : "guest") + "_" + customId;
+        applyLoadedAssessment();
+      } else {
+        day = parseInt(params.get("day") || "1", 10);
+        if (isNaN(day) || day < 1 || day > 33) day = 1;
+
+        const topicData = curriculum[day - 1] || ["Python Basics", ""];
+        topicName = topicData[0];
+        qs = QUESTION_BANK[day] || [];
+        const rawCs = CODING_BANK[day] || [];
+        cs = rawCs.map((p, idx) => ({
+          number: idx + 1,
+          title: `Challenge ${idx + 1}`,
+          prompt: p,
+          description: p
+        }));
+
+        document.getElementById("assessmentTitle").textContent = `Day ${day} — ${topicData[0]}`;
+        document.getElementById("assessmentDesc").textContent = topicData[1];
+        document.getElementById("mcqHeaderTitle").textContent = `Topic Assessment — ${qs.length} Multiple Choice Questions`;
+
+        sessionKey = "assessmentSession_" + (state.user ? state.user.id : "guest") + "_" + day;
+        renderAllAssessmentSections();
       }
 
-      if (!customExam) {
-        customExam = {
-          id: customId,
-          title: "Custom Assessment",
-          topic: "Placement Mock Test",
-          durationMinutes: 20,
-          questions: []
-        };
+      sess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
+      if (!sess) {
+        sess = { startedAt: Date.now(), saved: {}, problem: 1 };
+        sessionStorage.setItem(sessionKey, JSON.stringify(sess));
       }
+    }
 
-      durationMins = customExam.durationMinutes || 20;
+    function applyLoadedAssessment() {
+      durationMins = customExam.durationMinutes || 30;
       topicName = customExam.topic || customExam.title;
 
       document.getElementById("assessmentTitle").textContent = customExam.title;
@@ -176,29 +253,98 @@
         q.answer || "A"
       ]);
 
-      cs = customExam.codingPrograms || [];
-      document.getElementById("mcqHeaderTitle").textContent = `Assessment Questions — ${qs.length} Multiple Choice Questions`;
+      if (Array.isArray(customExam.codingQuestions) && customExam.codingQuestions.length > 0) {
+        cs = customExam.codingQuestions.map((c, idx) => {
+          const isDebugging = customExam.examType === 'debugging' || !!c.isDebugging || !!c.buggyCode;
+          const buggyCode = c.buggyCode || (isDebugging ? (c.description || c.code || '') : (c.code || ''));
+          const defaultPrompt = isDebugging
+            ? "Debug and fix the Python code in the editor below so that it resolves all bugs, handles edge cases, and produces the expected output."
+            : (c.description || c.statement || c.title || `Problem ${idx + 1}`);
 
+          return {
+            number: c.number || idx + 1,
+            title: c.title || (isDebugging ? `Debugging Challenge ${idx + 1}` : `Coding Challenge ${idx + 1}`),
+            prompt: defaultPrompt,
+            description: defaultPrompt,
+            buggyCode: buggyCode,
+            initialCode: buggyCode,
+            sampleInput: c.sampleInput || '',
+            sampleOutput: c.sampleOutput || '',
+            constraints: c.constraints || '',
+            difficulty: c.difficulty || 'Medium',
+            isDebugging: isDebugging
+          };
+        });
+      } else if (Array.isArray(customExam.codingPrograms) && customExam.codingPrograms.length > 0) {
+        cs = customExam.codingPrograms.map((p, idx) => {
+          if (typeof p === 'object' && p !== null) {
+            const isDebugging = customExam.examType === 'debugging' || !!p.isDebugging || !!p.buggyCode;
+            const buggyCode = p.buggyCode || (isDebugging ? (p.description || p.code || '') : (p.code || ''));
+            const defaultPrompt = isDebugging
+              ? "Debug and fix the Python code in the editor below so that it resolves all bugs, handles edge cases, and produces the expected output."
+              : (p.description || p.prompt || p.title || `Program ${idx + 1}`);
+
+            return {
+              number: p.number || idx + 1,
+              title: p.title || (isDebugging ? `Debugging Challenge ${idx + 1}` : `Coding Problem ${idx + 1}`),
+              prompt: defaultPrompt,
+              description: defaultPrompt,
+              buggyCode: buggyCode,
+              initialCode: buggyCode,
+              sampleInput: p.sampleInput || '',
+              sampleOutput: p.sampleOutput || '',
+              constraints: p.constraints || '',
+              difficulty: p.difficulty || 'Medium',
+              isDebugging: isDebugging
+            };
+          }
+          return {
+            number: idx + 1,
+            title: `Program ${idx + 1}`,
+            prompt: String(p),
+            description: String(p),
+            buggyCode: '',
+            initialCode: '',
+            isDebugging: false
+          };
+        });
+      } else {
+        cs = [];
+      }
+
+      renderAllAssessmentSections();
+    }
+
+    function renderAllAssessmentSections() {
+      const mcqTitleEl = document.getElementById("mcqHeaderTitle");
+      const mcqContainerEl = document.getElementById("mcqContainer");
       const codingWrap = document.getElementById("codingSectionWrap");
+
+      // 1. MCQ Section
+      if (qs.length > 0) {
+        if (mcqTitleEl) {
+          mcqTitleEl.style.display = "block";
+          mcqTitleEl.textContent = `Multiple Choice Questions — ${qs.length} Questions`;
+        }
+        if (mcqContainerEl) {
+          mcqContainerEl.style.display = "block";
+          renderMCQQuestionsList();
+        }
+      } else {
+        if (mcqTitleEl) mcqTitleEl.style.display = "none";
+        if (mcqContainerEl) mcqContainerEl.style.display = "none";
+      }
+
+      // 2. Coding Section
       if (codingWrap) {
         codingWrap.style.display = cs.length ? "block" : "none";
       }
 
-      sessionKey = "customAssessmentSession_" + (state.user ? state.user.id : "guest") + "_" + customId;
-    } else {
-      day = parseInt(params.get("day") || "1", 10);
-      if (isNaN(day) || day < 1 || day > 33) day = 1;
+      if (cs.length > 0) {
+        renderCodingQuestionsList();
+      }
 
-      const topicData = curriculum[day - 1] || ["Python Basics", ""];
-      topicName = topicData[0];
-      qs = QUESTION_BANK[day] || [];
-      cs = CODING_BANK[day] || [];
-
-      document.getElementById("assessmentTitle").textContent = `Day ${day} — ${topicData[0]}`;
-      document.getElementById("assessmentDesc").textContent = topicData[1];
-      document.getElementById("mcqHeaderTitle").textContent = `Topic Assessment — ${qs.length} Multiple Choice Questions`;
-
-      sessionKey = "assessmentSession_" + (state.user ? state.user.id : "guest") + "_" + day;
+      restoreSessionCode();
     }
 
     // Render MCQs Helper
@@ -224,18 +370,24 @@
       `).join("");
     }
 
-    renderMCQQuestionsList();
+    // Render Coding Programs Dynamically (handles 1, 2, 3, 5, or N questions)
+    function renderCodingQuestionsList() {
+      const codingContainer = document.getElementById("codingContainer");
+      if (!codingContainer) return;
 
-    // Render Coding Programs if any
-    if (cs.length) {
-      document.getElementById("codingContainer").innerHTML = cs.map((promptText, idx) => {
-        const n = idx + 1;
+      codingContainer.innerHTML = cs.map((item, idx) => {
+        const n = item.number || idx + 1;
+        const problemTitle = item.title || (item.isDebugging ? `Debug Challenge ${n}` : `Program ${n}`);
+        const promptText = item.description || item.prompt || problemTitle;
+        const initCode = item.initialCode || item.buggyCode || '';
+
         return `
-          <div class="coding-card">
+          <div class="coding-card" id="codingCard${n}" style="margin-bottom:28px;">
             <div class="coding-card-header">
-              <div class="q-title" style="margin-bottom:0;">
-                <span class="q-num" style="background:#0284c7;">Program ${n}</span>
-                <span>Problem Statement</span>
+              <div class="q-title" style="margin-bottom:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span class="q-num" style="background:${item.isDebugging ? '#e11d48' : '#0284c7'};">${item.isDebugging ? `Debug Program ${n}` : `Program ${n}`}</span>
+                <span style="font-weight:800; font-size:16px;">${esc(problemTitle)}</span>
+                ${item.difficulty ? `<span class="badge" style="background:${item.isDebugging ? 'rgba(225,29,72,0.15)' : 'rgba(2,132,199,0.15)'}; color:${item.isDebugging ? '#e11d48' : '#0284c7'}; font-size:11px; font-weight:800;">${esc(item.difficulty)}</span>` : ''}
               </div>
               <div class="coding-card-actions">
                 <button type="button" id="btnRun${n}" onclick="runProgramCode(${n})" class="btn-run-code" title="Execute Python solution live via Zoho Catalyst">
@@ -249,12 +401,23 @@
               </div>
             </div>
 
-            <div class="coding-prompt">${esc(promptText || "")}</div>
+            <div class="coding-prompt" style="font-size:13.5px; line-height:1.5; color:var(--text); background:var(--card-alt); padding:14px 16px; border-radius:10px; border:1px solid var(--line); margin-bottom:14px;">
+              <b>${item.isDebugging ? '🐞 Debugging Task:' : 'Problem Statement:'}</b>
+              <div style="margin-top:6px; white-space:pre-line;">${esc(promptText)}</div>
+
+              ${(item.sampleInput || item.sampleOutput || item.constraints) ? `
+                <div style="margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:12px;">
+                  ${item.sampleInput ? `<div style="background:var(--card); padding:8px 12px; border-radius:8px; border:1px solid var(--line);"><b>Sample Input / Test Case:</b><pre style="margin:4px 0 0; font-family:monospace; font-size:11.5px;">${esc(item.sampleInput)}</pre></div>` : ''}
+                  ${item.sampleOutput ? `<div style="background:var(--card); padding:8px 12px; border-radius:8px; border:1px solid var(--line);"><b>Expected Output:</b><pre style="margin:4px 0 0; font-family:monospace; font-size:11.5px;">${esc(item.sampleOutput)}</pre></div>` : ''}
+                  ${item.constraints ? `<div style="background:var(--card); padding:8px 12px; border-radius:8px; border:1px solid var(--line);"><b>Constraints / Hints:</b><div style="margin-top:4px; font-family:monospace; font-size:11.5px;">${esc(item.constraints)}</div></div>` : ''}
+                </div>
+              ` : ''}
+            </div>
 
             <div class="coding-editor-topbar">
               <span class="coding-lang-badge">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                Python 3.x Solution Editor
+                ${item.isDebugging ? 'Python 3.x Debugging Editor (Fix the code below)' : 'Python 3.x Solution Editor'}
               </span>
               <span class="coding-hint-text">💡 Press <b>Tab</b> to indent · <b>Ctrl+Enter</b> to Run</span>
             </div>
@@ -263,7 +426,7 @@
               <div class="code-editor-line-numbers" id="lineNums${n}">1</div>
               <div class="code-editor-wrapper">
                 <pre class="code-highlight-layer" id="highlightLayer${n}" aria-hidden="true"><code id="highlightCode${n}"></code></pre>
-                <textarea id="code${n}" class="code-editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="# Write your Python code for Program ${n} here...&#10;# Example:&#10;def solution():&#10;    print('Hello World')&#10;&#10;solution()"></textarea>
+                <textarea id="code${n}" class="code-editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${item.isDebugging ? '# Buggy code will appear here for debugging...' : '# Write your Python code for Program ' + n + ' here...&#10;# Example:&#10;def solution():&#10;    # Write your logic here&#10;    pass&#10;&#10;solution()'}">${esc(initCode)}</textarea>
               </div>
             </div>
 
@@ -298,8 +461,8 @@
 
       setupCodeEditorKeyHandlers();
 
-      cs.forEach((_, idx) => {
-        const n = idx + 1;
+      cs.forEach((item, idx) => {
+        const n = item.number || idx + 1;
         const textarea = document.getElementById("code" + n);
         const hlCode = document.getElementById("highlightCode" + n);
         const lineNums = document.getElementById("lineNums" + n);
@@ -309,26 +472,32 @@
       });
     }
 
-    // Session Timer & Autosave Setup
-    let sess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
-    if (!sess) {
-      sess = { startedAt: Date.now(), saved: {}, problem: 1 };
-      sessionStorage.setItem(sessionKey, JSON.stringify(sess));
+    function restoreSessionCode() {
+      let currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
+      if (!currentSess) {
+        currentSess = { startedAt: Date.now(), saved: {}, problem: 1 };
+        sessionStorage.setItem(sessionKey, JSON.stringify(currentSess));
+      }
+
+      if (cs.length) {
+        cs.forEach((item, idx) => {
+          const n = item.number || idx + 1;
+          const el = document.getElementById("save" + n);
+          if (el) el.textContent = currentSess.saved && currentSess.saved[n] ? "Saved ✓" : "";
+          const code = document.getElementById("code" + n);
+          if (code) {
+            if (currentSess.saved && currentSess.saved[n]) {
+              code.value = currentSess.saved[n];
+            } else if (item.initialCode || item.buggyCode) {
+              code.value = item.initialCode || item.buggyCode;
+            }
+            code.dispatchEvent(new Event("input"));
+          }
+        });
+      }
     }
 
-    // Populate saved code if any
-    if (cs.length) {
-      cs.forEach((_, idx) => {
-        const n = idx + 1;
-        const el = document.getElementById("save" + n);
-        if (el) el.textContent = sess.saved && sess.saved[n] ? "Saved ✓" : "";
-        const code = document.getElementById("code" + n);
-        if (code) {
-          code.value = (sess.saved && sess.saved[n]) || "";
-          code.dispatchEvent(new Event("input"));
-        }
-      });
-    }
+    setupAssessmentData();
 
     // Start Timer
     const end = sess.startedAt + durationMins * 60 * 1000;
@@ -681,10 +850,26 @@
       }
     }
 
+    function redirectToDashboardNow() {
+      isSubmitting = true;
+      window.onbeforeunload = null;
+      window.onpopstate = null;
+      if (window.assessmentInterval) clearInterval(window.assessmentInterval);
+      try {
+        sessionStorage.removeItem(sessionKey);
+      } catch (e) {}
+      window.location.href = "dashboard.html";
+    }
+    window.redirectToDashboardNow = redirectToDashboardNow;
+
     function confirmExitToUrl() {
       isSubmitting = true;
+      window.onbeforeunload = null;
+      window.onpopstate = null;
       if (window.assessmentInterval) clearInterval(window.assessmentInterval);
-      sessionStorage.removeItem(sessionKey);
+      try {
+        sessionStorage.removeItem(sessionKey);
+      } catch (e) {}
       window.location.href = pendingRedirectUrl || "dashboard.html";
     }
 
@@ -700,22 +885,11 @@
       }
     });
 
-    // Intercept browser back button / history navigation
-    try {
-      history.pushState({ inAssessment: true }, "");
-      window.addEventListener("popstate", function(e) {
-        if (!isSubmitting) {
-          history.pushState({ inAssessment: true }, "");
-          showExitModal("dashboard.html");
-        }
-      });
-    } catch (err) {}
-
     // When navigating away or unloading without completing submission, clear session timer
     window.addEventListener("pagehide", function() {
       if (!isSubmitting) {
         if (window.assessmentInterval) clearInterval(window.assessmentInterval);
-        sessionStorage.removeItem(sessionKey);
+        try { sessionStorage.removeItem(sessionKey); } catch (e) {}
       }
     });
 
@@ -723,71 +897,195 @@
     window.addEventListener("beforeunload", function(e) {
       if (!isSubmitting) {
         if (window.assessmentInterval) clearInterval(window.assessmentInterval);
-        sessionStorage.removeItem(sessionKey);
+        try { sessionStorage.removeItem(sessionKey); } catch (e) {}
         e.preventDefault();
         e.returnValue = "Assessment in progress. If you leave now, your assessment will be stopped and your timer will reset.";
         return e.returnValue;
       }
     });
 
-    function submitAssessment(timedOut) {
-      isSubmitting = true;
-      const currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "null");
-      if (!currentSess) return;
+    function openSubmitConfirmModal() {
+      if (isSubmitting) return;
 
-      let score = 0;
-      let mcqDetails = [];
-      for (let i = 0; i < qs.length; i++) {
-        const v = document.querySelector(`input[name="q${i}"]:checked`);
-        const answer = v ? v.value : "Not Answered";
-        const correct = qs[i][5];
-        const ok = answer === correct;
-        if (ok) score++;
-        mcqDetails.push({
-          number: i + 1,
-          question: qs[i][0],
-          options: qs[i].slice(1, 5),
-          answer,
-          correct,
-          result: ok ? "Correct" : "Incorrect"
+      let currentSess = {};
+      try {
+        currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "null") || sess || {};
+      } catch (e) {
+        currentSess = sess || {};
+      }
+      const saved = currentSess.saved || {};
+
+      // Auto-capture code from textareas
+      if (Array.isArray(cs) && cs.length > 0) {
+        cs.forEach((item, idx) => {
+          const n = item.number || idx + 1;
+          const txtEl = document.getElementById("code" + n);
+          const liveVal = txtEl ? txtEl.value.trim() : "";
+          if (liveVal) {
+            saved[n] = liveVal;
+          }
         });
       }
 
-      const saved = currentSess.saved || {};
-      if (cs.length > 0) {
-        if (!saved[1] || !saved[2] || !saved[3]) {
-          if (!timedOut) {
-            alert(`Please save all ${cs.length} coding programs before submitting.`);
-            isSubmitting = false;
-            return;
-          }
+      // Count answered MCQs
+      let answeredMcqs = 0;
+      if (Array.isArray(qs) && qs.length > 0) {
+        for (let i = 0; i < qs.length; i++) {
+          const v = document.querySelector(`input[name="q${i}"]:checked`);
+          if (v && v.value) answeredMcqs++;
         }
       }
 
-      const total = qs.length;
-      const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+      // Count answered Programs
+      let answeredProgs = 0;
+      if (Array.isArray(cs) && cs.length > 0) {
+        cs.forEach((item, idx) => {
+          const n = item.number || idx + 1;
+          if (saved[n] && saved[n].trim()) answeredProgs++;
+        });
+      }
+
+      const statsBox = document.getElementById("submitConfirmStatsBox");
+      if (statsBox) {
+        let statsHtml = `<div style="font-weight:700; color:var(--text-heading); margin-bottom:2px;">${esc(topicName || "Assessment")}</div>`;
+        if (qs.length > 0) {
+          statsHtml += `<div style="display:flex; justify-content:space-between;"><span>Multiple Choice:</span> <b>${answeredMcqs} of ${qs.length} answered</b></div>`;
+        }
+        if (cs.length > 0) {
+          statsHtml += `<div style="display:flex; justify-content:space-between;"><span>Coding/Debugging:</span> <b>${answeredProgs} of ${cs.length} attempted</b></div>`;
+        }
+        statsBox.innerHTML = statsHtml;
+      }
+
+      const modal = document.getElementById("submitConfirmModal");
+      if (modal) {
+        modal.style.display = "flex";
+      }
+    }
+    window.openSubmitConfirmModal = openSubmitConfirmModal;
+
+    function closeSubmitConfirmModal() {
+      const modal = document.getElementById("submitConfirmModal");
+      if (modal) {
+        modal.style.display = "none";
+      }
+    }
+    window.closeSubmitConfirmModal = closeSubmitConfirmModal;
+
+    function performFinalSubmission(timedOut) {
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      // Prevent any navigation blocking
+      window.onbeforeunload = null;
+      window.onpagehide = null;
+      window.onpopstate = null;
+      if (window.assessmentInterval) {
+        clearInterval(window.assessmentInterval);
+        window.assessmentInterval = null;
+      }
+
+      const confirmBtn = document.getElementById("btnConfirmSubmitFinal");
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = `<span>⏳ Submitting...</span>`;
+      }
+      const submitBtn = document.getElementById("submitAssessmentBtn");
+      const btnLabel = document.getElementById("submitBtnLabel");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = "0.7";
+      }
+      if (btnLabel) btnLabel.textContent = "Submitting Assessment...";
+
+      let currentSess = {};
+      try {
+        currentSess = JSON.parse(sessionStorage.getItem(sessionKey) || "null") || sess || {};
+      } catch (e) {
+        currentSess = sess || {};
+      }
+      const saved = currentSess.saved || {};
+
+      if (Array.isArray(cs) && cs.length > 0) {
+        // Auto-capture unsaved code directly from editor textareas
+        cs.forEach((item, idx) => {
+          const n = item.number || idx + 1;
+          const txtEl = document.getElementById("code" + n);
+          const liveVal = txtEl ? txtEl.value.trim() : "";
+          if (liveVal) {
+            saved[n] = liveVal;
+          }
+        });
+      }
+
+      let score = 0;
+      let mcqDetails = [];
+      if (Array.isArray(qs) && qs.length > 0) {
+        for (let i = 0; i < qs.length; i++) {
+          const v = document.querySelector(`input[name="q${i}"]:checked`);
+          const answer = v ? v.value : "Not Answered";
+          const correct = qs[i] ? qs[i][5] : "A";
+          const ok = answer === correct;
+          if (ok) score++;
+          mcqDetails.push({
+            number: i + 1,
+            question: (qs[i] && qs[i][0]) || `Question ${i + 1}`,
+            options: (qs[i] && qs[i].slice(1, 5)) || [],
+            answer,
+            correct,
+            result: ok ? "Correct" : "Incorrect"
+          });
+        }
+      }
+
+      const total = Array.isArray(qs) ? qs.length : 0;
+      const percentage = total > 0 ? Math.round((score / total) * 100) : 100;
       const topic = topicName || "Assessment";
       const strong = percentage >= 80 ? [topic] : [];
       const weak = percentage < 60 ? [topic] : [];
-      const used = Math.min(durationMins * 60, Math.max(0, Math.round((Date.now() - currentSess.startedAt) / 1000)));
+      const startedAtTime = currentSess.startedAt || Date.now();
+      const used = Math.min(durationMins * 60, Math.max(0, Math.round((Date.now() - startedAtTime) / 1000)));
       const now = new Date();
       const display = now.toLocaleString();
+
+      const uUser = (typeof state !== 'undefined' && state.user) ? state.user : {};
+      const sUsername = uUser.username || (typeof uUser.id === 'number' ? `student${String(uUser.id).padStart(3, '0')}` : String(uUser.id || 'student'));
+      const sNum = (typeof parseStudentNumericId === 'function') ? parseStudentNumericId(uUser.id || sUsername) : uUser.id;
+      const sId = uUser.id !== undefined ? uUser.id : (sNum !== null ? sNum : sUsername);
+      const studentName = (typeof getStudentDisplayName === 'function') ? getStudentDisplayName(uUser) : (uUser.name || sUsername);
+
+      const allAttempts = (typeof state !== 'undefined' && Array.isArray(state.attempts)) ? state.attempts : [];
       const prior = isCustomMode
-        ? state.attempts.filter(a => a.studentId === state.user.id && (a.customAssessmentId === customId || a.topic === topicName)).length + 1
-        : state.attempts.filter(a => a.studentId === state.user.id && a.day === day).length + 1;
+        ? allAttempts.filter(a => a && (String(a.studentId) === String(sId) || String(a.username) === String(sUsername)) && (String(a.customAssessmentId) === String(customId) || a.topic === topicName || a.examTitle === topicName)).length + 1
+        : allAttempts.filter(a => a && (String(a.studentId) === String(sId) || String(a.username) === String(sUsername)) && Number(a.day) === Number(day)).length + 1;
       const attemptId = "A" + Date.now();
 
-      const sUsername = state.user.username || (typeof state.user.id === 'number' ? `student${String(state.user.id).padStart(3, '0')}` : String(state.user.id || ''));
-      const sId = state.user.id !== undefined ? state.user.id : parseStudentNumericId(sUsername);
+      const codingSubmissions = (Array.isArray(cs) ? cs : []).map((item, idx) => {
+        const n = item.number || idx + 1;
+        const pCode = saved[n] || "";
+        const title = (typeof item === 'object' && item.title) ? item.title : `Program ${n}`;
+        const desc = (typeof item === 'object') ? (item.description || item.prompt || title) : String(item);
+        const sampleIn = (typeof item === 'object' && item.sampleInput) ? item.sampleInput : "";
+        const sampleOut = (typeof item === 'object' && item.sampleOutput) ? item.sampleOutput : "";
+        return {
+          number: n,
+          title: title,
+          prompt: desc,
+          description: desc,
+          code: pCode,
+          sampleInput: sampleIn,
+          sampleOutput: sampleOut
+        };
+      });
 
       const assessmentRecord = {
         id: attemptId,
         studentId: sId,
-        studentName: state.user.name || "Student " + (sUsername || sId),
+        studentName: studentName,
         username: sUsername,
-        department: state.user.department || "CSE",
-        year: state.user.year || "4th Year",
-        rollNumber: state.user.rollNumber || "",
+        department: uUser.department || "Computer Science and Engineering (CSE)",
+        year: uUser.year || "4th Year",
+        rollNumber: uUser.rollNumber || "",
         day: isCustomMode ? null : day,
         topic: topic,
         isCustomExam: isCustomMode,
@@ -805,17 +1103,45 @@
         completionSeconds: used,
         strongAreas: strong,
         weakAreas: weak,
-        program1: cs[0] ? (saved[1] || "") : "",
-        program2: cs[1] ? (saved[2] || "") : "",
-        program3: cs[2] ? (saved[3] || "") : "",
-        program1Prompt: cs[0] || "",
-        program2Prompt: cs[1] || "",
-        program3Prompt: cs[2] || "",
+        codingSubmissions: codingSubmissions,
+        program1: codingSubmissions[0] ? codingSubmissions[0].code : "",
+        program2: codingSubmissions[1] ? codingSubmissions[1].code : "",
+        program3: codingSubmissions[2] ? codingSubmissions[2].code : "",
+        program1Prompt: codingSubmissions[0] ? (codingSubmissions[0].description || codingSubmissions[0].prompt) : "",
+        program2Prompt: codingSubmissions[1] ? (codingSubmissions[1].description || codingSubmissions[1].prompt) : "",
+        program3Prompt: codingSubmissions[2] ? (codingSubmissions[2].description || codingSubmissions[2].prompt) : "",
         mcqDetails
       };
 
-      state.attempts.push(assessmentRecord);
-      save();
+      if (typeof state !== 'undefined') {
+        if (!Array.isArray(state.attempts)) state.attempts = [];
+        state.attempts.push(assessmentRecord);
+
+        if (!Array.isArray(state.submissions)) state.submissions = [];
+        if (codingSubmissions.length > 0) {
+          codingSubmissions.forEach((cSub, pIdx) => {
+            state.submissions.push({
+              id: Date.now() + pIdx,
+              attemptId,
+              studentId: sId,
+              username: sUsername,
+              studentName: studentName,
+              day: isCustomMode ? null : day,
+              topic,
+              problem: cSub.number,
+              title: cSub.title,
+              prompt: cSub.prompt,
+              code: cSub.code,
+              score: null,
+              status: "Submitted",
+              feedback: "",
+              submittedAt: display,
+              attemptNumber: prior
+            });
+          });
+        }
+        if (typeof save === 'function') save();
+      }
 
       // Broadcast real-time event to Admin Panel and other active tabs immediately
       if (typeof notifyDataSync === 'function') {
@@ -831,39 +1157,35 @@
         }).then(r => r.json()).then(res => {
           if (res && res.success) {
             assessmentRecord.synced = true;
-            save();
+            if (typeof save === 'function') save();
           }
         }).catch(() => {});
       }
 
-      if (cs.length > 0) {
-        cs.forEach((promptText, pIdx) => {
-          const pNum = pIdx + 1;
-          state.submissions.push({
-            id: Date.now() + pIdx,
-            attemptId,
-            studentId: state.user.id,
-            day: isCustomMode ? null : day,
-            topic,
-            problem: pNum,
-            prompt: promptText || "",
-            code: saved[pNum] || "",
-            score: null,
-            status: "Submitted",
-            feedback: "",
-            submittedAt: display,
-            attemptNumber: prior
-          });
-        });
+      try {
+        sessionStorage.removeItem(sessionKey);
+      } catch (e) {}
+
+      closeSubmitConfirmModal();
+
+      // Immediate guaranteed redirect to dashboard.html
+      const redirectTarget = `dashboard.html?submitted=1&topic=${encodeURIComponent(topic)}`;
+      try {
+        window.location.replace(redirectTarget);
+      } catch (e) {
+        window.location.href = redirectTarget;
       }
-
-      save();
-      sessionStorage.removeItem(sessionKey);
-      if (window.assessmentInterval) clearInterval(window.assessmentInterval);
-
-      alert(`Assessment ${timedOut ? "time expired and was closed" : "submitted"}. Score: ${score}/${total} (${percentage}%).\n\nAssessment data stored in database!`);
-      window.location.href = "dashboard.html";
     }
+    window.performFinalSubmission = performFinalSubmission;
+
+    function submitAssessment(timedOut) {
+      if (timedOut) {
+        performFinalSubmission(true);
+      } else {
+        openSubmitConfirmModal();
+      }
+    }
+    window.submitAssessment = submitAssessment;
   </script>
 </body>
 </html>

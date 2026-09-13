@@ -67,10 +67,6 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span>Profile</span>
           </a>
-          <a href="profile.html" class="v-dash-nav-link" title="Settings">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Settings</span>
-          </a>
         </nav>
       </div>
 
@@ -109,11 +105,11 @@
             <div class="v-dash-theme-thumb"></div>
           </div>
           <div class="v-dash-profile-pill" onclick="window.location.href='profile.html'">
-            <div class="v-dash-avatar-badge" id="vDashAvatarInitial">SS</div>
+            <div class="v-dash-avatar-badge" id="vDashAvatarInitial">ST</div>
             <div class="v-dash-user-titles">
               <span class="v-dash-welcome-text">Welcome back,</span>
               <span class="v-dash-user-fullname">
-                <span id="vDashUserNameLabel">Soundhareshwaran S R</span>
+                <span id="vDashUserNameLabel">Student</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </span>
             </div>
@@ -314,7 +310,7 @@
             const pct = latest ? Number(latest.percentage || 0) : 0;
             const scoreClass = pct >= 75 ? 'high' : (pct >= 50 ? 'mid' : 'low');
             const qCount = (exam.questions || []).length;
-            const codeCount = (exam.codingPrograms || []).length;
+            const codeCount = (exam.codingQuestions || exam.codingPrograms || []).length;
 
             return `
               <div class="dash-roadmap-card ${isDone ? 'completed' : 'pending'}" style="margin-bottom:0;">
@@ -332,8 +328,9 @@
                   <div style="flex:1;">
                     <div class="dash-topic-title" style="font-size:16px; font-weight:800;">${esc(exam.title)}</div>
                     <div class="dash-topic-sub" style="margin-top:2px;">
-                      <span>📝 ${qCount} MCQs</span>
-                      ${codeCount ? `<span style="margin-left:8px;">💻 ${codeCount} Coding Programs</span>` : ''}
+                      ${codeCount ? `<span>${exam.examType === 'debugging' ? `🐞 ${codeCount} Debugging ${codeCount === 1 ? 'Problem' : 'Problems'}` : `💻 ${codeCount} Coding ${codeCount === 1 ? 'Problem' : 'Problems'}`}</span>` : ''}
+                      ${qCount ? `<span style="${codeCount ? 'margin-left:8px;' : ''}">📝 ${qCount} MCQs</span>` : ''}
+                      ${!codeCount && !qCount ? `<span>📝 0 Questions</span>` : ''}
                     </div>
                     ${latest ? `
                       <div style="margin-top:6px;">
@@ -512,10 +509,23 @@
 
     // User init
     const user = state.user || {};
-    const name = user.name || user.username || "Soundhareshwaran S R";
+    const name = (typeof getStudentDisplayName === 'function') ? getStudentDisplayName(user) : (user.name || user.username || "Student");
     document.getElementById("vDashUserNameLabel").textContent = name;
-    const initials = name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "SS";
-    document.getElementById("vDashAvatarInitial").textContent = initials;
+    const initials = name.includes(" ")
+      ? name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()
+      : (name.length >= 2 ? name.slice(0, 2).toUpperCase() : "ST");
+    document.getElementById("vDashAvatarInitial").textContent = initials || "ST";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("submitted") === "1" || urlParams.get("submitted") === "true") {
+      const submittedTopic = urlParams.get("topic") || "Assessment";
+      setTimeout(() => {
+        showToast(`🎉 ${submittedTopic} submitted successfully!`, true);
+      }, 400);
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
 
     updateThemeUI();
     renderRoadmap();

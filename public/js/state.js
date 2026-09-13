@@ -17,6 +17,72 @@ function save() {
   localStorage.setItem("placementPortal", JSON.stringify(state));
 }
 
+const KNOWN_STUDENT_PROFILES = {
+  "student010": { name: "Sivamurugan", department: "Computer Science and Engineering (CSE)", year: "Final Year (4th)", rollNumber: "10" },
+  "10": { name: "Sivamurugan", department: "Computer Science and Engineering (CSE)", year: "Final Year (4th)", rollNumber: "10" },
+  "student10": { name: "Sivamurugan", department: "Computer Science and Engineering (CSE)", year: "Final Year (4th)", rollNumber: "10" },
+  "student009": { name: "Soundhareshwaran S R", department: "Computer Science and Engineering (CSE)", year: "4th Year", rollNumber: "3502310086" },
+  "9": { name: "Soundhareshwaran S R", department: "Computer Science and Engineering (CSE)", year: "4th Year", rollNumber: "3502310086" },
+  "student001": { name: "Mekala J", department: "Information Technology (IT)", year: "4th Year", rollNumber: "15" },
+  "1": { name: "Mekala J", department: "Information Technology (IT)", year: "4th Year", rollNumber: "15" },
+  "student002": { name: "Varnika M", department: "Computer Science and Engineering (CSE)", year: "4th Year", rollNumber: "97" },
+  "2": { name: "Varnika M", department: "Computer Science and Engineering (CSE)", year: "4th Year", rollNumber: "97" },
+  "student005": { name: "sunmathi M", department: "Computer Science and Engineering (CSE)", year: "4th Year", rollNumber: "92" },
+  "5": { name: "sunmathi M", department: "Computer Science and Engineering (CSE)", year: "4th Year", rollNumber: "92" },
+  "student025": { name: "SIBIRAJ S", department: "Information Technology (IT)", year: "4th Year", rollNumber: "3512310025" },
+  "25": { name: "SIBIRAJ S", department: "Information Technology (IT)", year: "4th Year", rollNumber: "3512310025" },
+  "student026": { name: "Sharvesh", department: "Information Technology (IT)", year: "4th Year", rollNumber: "24" },
+  "26": { name: "Sharvesh", department: "Information Technology (IT)", year: "4th Year", rollNumber: "24" }
+};
+
+window.KNOWN_STUDENT_PROFILES = KNOWN_STUDENT_PROFILES;
+
+function getStudentDisplayName(u) {
+  if (!u) return "Student";
+  if (typeof u === "string") {
+    const key = u.toLowerCase().trim();
+    if (KNOWN_STUDENT_PROFILES[key] && KNOWN_STUDENT_PROFILES[key].name) {
+      return KNOWN_STUDENT_PROFILES[key].name;
+    }
+    const match = key.match(/^student0*(\d+)$/i);
+    if (match && KNOWN_STUDENT_PROFILES[match[1]] && KNOWN_STUDENT_PROFILES[match[1]].name) {
+      return KNOWN_STUDENT_PROFILES[match[1]].name;
+    }
+    return u;
+  }
+
+  // If u is an object
+  const uName = String(u.name || "").replace(/\s*\(Test\)/gi, '').trim();
+  const uUsername = String(u.username || "").toLowerCase().trim();
+  const uId = String(u.id || '').trim();
+
+  // If name is valid, non-empty, and not just "student010" or "Student"
+  if (uName && uName !== "Student" && !uName.match(/^student\s*\d+$/i)) {
+    return uName;
+  }
+
+  // Lookup in known profiles
+  if (uUsername && KNOWN_STUDENT_PROFILES[uUsername] && KNOWN_STUDENT_PROFILES[uUsername].name) {
+    return KNOWN_STUDENT_PROFILES[uUsername].name;
+  }
+  if (uId && KNOWN_STUDENT_PROFILES[uId] && KNOWN_STUDENT_PROFILES[uId].name) {
+    return KNOWN_STUDENT_PROFILES[uId].name;
+  }
+
+  // Lookup in state.students array
+  if (Array.isArray(state.students)) {
+    const found = state.students.find(s => (s.username && s.username.toLowerCase() === uUsername) || String(s.id) === uId);
+    if (found && found.name && found.name.trim() && !found.name.match(/^student\s*\d+$/i)) {
+      return found.name.replace(/\s*\(Test\)/gi, '').trim();
+    }
+  }
+
+  if (uName && uName !== "Student") return uName;
+  return u.username || "Student";
+}
+
+window.getStudentDisplayName = getStudentDisplayName;
+
 function normalizeStudents() {
   const old = Array.isArray(state.students) ? state.students : [];
   const byUser = {};
@@ -27,17 +93,24 @@ function normalizeStudents() {
     if (deleted.has(i)) continue;
     const u = "student" + String(i).padStart(3, "0");
     const oldS = byUser[u] || {};
+    let cleanName = (oldS.name || "").replace(/\s*\(Test\)/gi, '').trim();
+    const known = KNOWN_STUDENT_PROFILES[u] || KNOWN_STUDENT_PROFILES[String(i)] || {};
+
+    if (!cleanName || cleanName.match(/^student\s*\d+$/i)) {
+      if (known.name) cleanName = known.name;
+    }
+
     arr.push({
       id: i,
-      name: oldS.name || "",
-      department: oldS.department || "",
-      year: oldS.year || "",
-      rollNumber: oldS.rollNumber || "",
-      reg: oldS.reg || "",
-      batch: oldS.batch || "",
+      name: cleanName,
+      department: oldS.department || known.department || "Computer Science and Engineering (CSE)",
+      year: oldS.year || known.year || "3rd Year",
+      rollNumber: oldS.rollNumber || known.rollNumber || "",
+      reg: oldS.reg || `REG${String(i).padStart(3, "0")}`,
+      batch: oldS.batch || "BATCH-A",
       username: u,
       password: (oldS.password && oldS.password !== "student123" ? oldS.password : u),
-      profileCompleted: !!oldS.profileCompleted
+      profileCompleted: !!(oldS.profileCompleted || cleanName)
     });
   }
   state.students = arr;
@@ -45,6 +118,21 @@ function normalizeStudents() {
   state.attempts = Array.isArray(state.attempts) ? state.attempts : [];
   state.submissions = Array.isArray(state.submissions) ? state.submissions : [];
   state.customAssessments = Array.isArray(state.customAssessments) ? state.customAssessments : [];
+  if (state.user) {
+    const uKey = String(state.user.username || state.user.id || '').toLowerCase();
+    const known = KNOWN_STUDENT_PROFILES[uKey] || (state.user.id && KNOWN_STUDENT_PROFILES[String(state.user.id)]);
+    if (known) {
+      if (!state.user.name || state.user.name.includes('(Test)') || state.user.name.match(/^student\s*\d+$/i)) {
+        state.user.name = known.name;
+      }
+      if (known.department && !state.user.department) state.user.department = known.department;
+      if (known.year && !state.user.year) state.user.year = known.year;
+      if (known.rollNumber && !state.user.rollNumber) state.user.rollNumber = known.rollNumber;
+      state.user.profileCompleted = true;
+    } else if (state.user.name && state.user.name.includes('(Test)')) {
+      state.user.name = state.user.name.replace(/\s*\(Test\)/gi, '').trim() || state.user.username;
+    }
+  }
   save();
 }
 
@@ -362,14 +450,29 @@ async function serverLogin(username, password, role) {
     }
 
     state.role = data.role;
-    state.user = data.user;
     if (data.role === 'student' && data.user) {
+      const uKey = String(data.user.username || data.user.id || '').toLowerCase();
+      const known = (typeof KNOWN_STUDENT_PROFILES !== 'undefined') ? (KNOWN_STUDENT_PROFILES[uKey] || (data.user.id && KNOWN_STUDENT_PROFILES[String(data.user.id)])) : null;
+      if (known) {
+        if (!data.user.name || data.user.name.includes('(Test)') || data.user.name.match(/^student\s*\d+$/i)) {
+          data.user.name = known.name;
+        }
+        if (known.department && !data.user.department) data.user.department = known.department;
+        if (known.year && !data.user.year) data.user.year = known.year;
+        if (known.rollNumber && !data.user.rollNumber) data.user.rollNumber = known.rollNumber;
+        data.user.profileCompleted = true;
+      } else if (data.user.name && data.user.name.includes('(Test)')) {
+        data.user.name = data.user.name.replace(/\s*\(Test\)/gi, '').trim() || data.user.username;
+      }
+      state.user = data.user;
       let sIdx = state.students.findIndex(s => s.username === data.user.username || s.id === data.user.id);
       if (sIdx >= 0) {
         state.students[sIdx] = Object.assign(state.students[sIdx], data.user);
       } else {
         state.students.push(data.user);
       }
+    } else {
+      state.user = data.user;
     }
     save();
     return data;
@@ -447,6 +550,19 @@ async function fetchStudentDashboardOnline(studentIdOrUsername) {
     const data = await safeFetchJson(res);
     if (data.success) {
       if (data.student) {
+        const uKey = String(data.student.username || data.student.id || '').toLowerCase();
+        const known = (typeof KNOWN_STUDENT_PROFILES !== 'undefined') ? (KNOWN_STUDENT_PROFILES[uKey] || (data.student.id && KNOWN_STUDENT_PROFILES[String(data.student.id)])) : null;
+        if (known) {
+          if (!data.student.name || data.student.name.includes('(Test)') || data.student.name.match(/^student\s*\d+$/i)) {
+            data.student.name = known.name;
+          }
+          if (known.department && !data.student.department) data.student.department = known.department;
+          if (known.year && !data.student.year) data.student.year = known.year;
+          if (known.rollNumber && !data.student.rollNumber) data.student.rollNumber = known.rollNumber;
+          data.student.profileCompleted = true;
+        } else if (data.student.name && data.student.name.includes('(Test)')) {
+          data.student.name = data.student.name.replace(/\s*\(Test\)/gi, '').trim() || data.student.username;
+        }
         state.user = Object.assign(state.user || {}, data.student);
         let sIdx = state.students.findIndex(s => s.username === data.student.username || s.id === data.student.id);
         if (sIdx >= 0) state.students[sIdx] = Object.assign(state.students[sIdx], data.student);

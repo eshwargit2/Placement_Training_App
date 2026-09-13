@@ -385,10 +385,11 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // 1.2 Save / Update Student Profile in Firebase Firestore
-app.post('/api/student/profile', async (req, res) => {
+async function handleSaveStudentProfile(req, res) {
   try {
     const payload = req.body || {};
-    const username = String(payload.username || payload.studentId || '').trim().toLowerCase();
+    const rawUser = payload.username || payload.studentId || req.params?.studentId || '';
+    const username = String(rawUser).trim().toLowerCase();
 
     if (!username) {
       return res.status(400).json({ success: false, error: 'Missing student identifier (username/studentId).' });
@@ -398,6 +399,7 @@ app.post('/api/student/profile', async (req, res) => {
 
     const profileData = {
       id: numericId,
+      studentId: numericId,
       username,
       name: String(payload.name || '').trim(),
       department: String(payload.department || 'Computer Science and Engineering (CSE)').trim(),
@@ -419,6 +421,23 @@ app.post('/api/student/profile', async (req, res) => {
       try {
         await firestoreDb.collection('students').doc(username).set(profileData, { merge: true });
         console.log(`[Firebase Firestore] Student profile saved successfully for ${username}`);
+
+        // Update student details across existing assessments in Firestore
+        const assessSnap = await firestoreDb.collection('assessments').where('username', '==', username).get();
+        if (!assessSnap.empty) {
+          const batch = firestoreDb.batch();
+          assessSnap.forEach(doc => {
+            batch.update(doc.ref, {
+              studentName: profileData.name,
+              name: profileData.name,
+              department: profileData.department,
+              year: profileData.year,
+              rollNumber: profileData.rollNumber
+            });
+          });
+          await batch.commit();
+          console.log(`[Firebase Firestore] Synced updated details to ${assessSnap.size} assessments for ${username}`);
+        }
       } catch (fbErr) {
         console.error('Firestore save student profile error:', fbErr.message);
       }
@@ -429,17 +448,39 @@ app.post('/api/student/profile', async (req, res) => {
     localStudents[username] = Object.assign(localStudents[username] || {}, profileData);
     saveLocalStudents(localStudents);
 
+    // Sync to local assessments
+    const localAssessments = getLocalAssessments();
+    let localModified = false;
+    localAssessments.forEach(a => {
+      if (String(a.username || '').toLowerCase() === username || String(a.studentId) === String(numericId)) {
+        a.studentName = profileData.name;
+        a.name = profileData.name;
+        a.department = profileData.department;
+        a.year = profileData.year;
+        a.rollNumber = profileData.rollNumber;
+        localModified = true;
+      }
+    });
+    if (localModified) {
+      saveLocalAssessments(localAssessments);
+    }
+
     return res.json({
       success: true,
       databaseMode,
-      message: 'Student profile saved successfully in database.',
+      message: 'Student profile and assessment records updated successfully in database.',
       user: profileData
     });
   } catch (error) {
     console.error('Error saving student profile:', error);
     return res.status(500).json({ success: false, error: error.message });
   }
-});
+}
+
+app.post('/api/student/profile', handleSaveStudentProfile);
+app.put('/api/student/profile', handleSaveStudentProfile);
+app.post('/api/students/:studentId/profile', handleSaveStudentProfile);
+app.put('/api/students/:studentId/profile', handleSaveStudentProfile);
 
 // 1.3 Fetch Student Profile by ID / Username
 app.get('/api/student/profile/:studentId', async (req, res) => {
@@ -608,13 +649,15 @@ app.post('/api/assessments', async (req, res) => {
       weakAreas: payload.weakAreas || [],
       // Full MCQ Question Breakdown
       mcqDetails: payload.mcqDetails || [],
-      // Full 3 Coding Challenges Details
-      program1: payload.program1 || '',
-      program2: payload.program2 || '',
-      program3: payload.program3 || '',
-      program1Prompt: payload.program1Prompt || '',
-      program2Prompt: payload.program2Prompt || '',
-      program3Prompt: payload.program3Prompt || '',
+      // Full Dynamic Coding Challenges Submissions Array (e.g. 5 coding questions)
+      codingSubmissions: Array.isArray(payload.codingSubmissions) ? payload.codingSubmissions : [],
+      // Backwards Compatibility 3 Coding Challenges Details
+      program1: payload.program1 || (payload.codingSubmissions && payload.codingSubmissions[0] ? payload.codingSubmissions[0].code : ''),
+      program2: payload.program2 || (payload.codingSubmissions && payload.codingSubmissions[1] ? payload.codingSubmissions[1].code : ''),
+      program3: payload.program3 || (payload.codingSubmissions && payload.codingSubmissions[2] ? payload.codingSubmissions[2].code : ''),
+      program1Prompt: payload.program1Prompt || (payload.codingSubmissions && payload.codingSubmissions[0] ? (payload.codingSubmissions[0].title || payload.codingSubmissions[0].prompt || '') : ''),
+      program2Prompt: payload.program2Prompt || (payload.codingSubmissions && payload.codingSubmissions[1] ? (payload.codingSubmissions[1].title || payload.codingSubmissions[1].prompt || '') : ''),
+      program3Prompt: payload.program3Prompt || (payload.codingSubmissions && payload.codingSubmissions[2] ? (payload.codingSubmissions[2].title || payload.codingSubmissions[2].prompt || '') : ''),
       receivedAt: new Date().toISOString()
     };
 
@@ -687,6 +730,12 @@ app.post('/api/assessments', async (req, res) => {
     console.error('Error submitting assessment:', error);
     return res.status(500).json({ success: false, error: error.message });
   }
+});
+
+// 2.1 Get All Assessments alias
+app.get('/api/assessments', (req, res, next) => {
+  req.url = '/api/admin/assessments' + (req.url.includes('?') ? '?' + req.url.split('?')[1] : '');
+  return app._router.handle(req, res, next);
 });
 
 // 3. Admin API - Get All Assessments (Ultra-fast cached with sub-millisecond response)
@@ -1251,24 +1300,36 @@ app.get('/api/custom-assessments/:id', async (req, res) => {
   }
 });
 
-// 6.2 Create / Publish new Custom Assessment
+// 6.2 Create / Publish new Custom Assessment (MCQs, Coding, or Both)
 app.post('/api/custom-assessments', async (req, res) => {
   try {
     const payload = req.body;
-    if (!payload || !payload.title || !Array.isArray(payload.questions) || !payload.questions.length) {
-      return res.status(400).json({ success: false, error: 'Exam Title and at least one Question are required.' });
+    const hasMcqs = Array.isArray(payload.questions) && payload.questions.length > 0;
+    const hasCoding = Array.isArray(payload.codingQuestions) && payload.codingQuestions.length > 0;
+
+    if (!payload || !payload.title || (!hasMcqs && !hasCoding)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Exam Title and at least one MCQ or Coding Question are required.'
+      });
     }
 
     const examId = payload.id || 'CUST_EXAM_' + Date.now();
+    const examType = payload.examType || (hasMcqs && hasCoding ? 'both' : (hasCoding ? 'coding' : 'mcq'));
+    const codingList = hasCoding ? payload.codingQuestions : (Array.isArray(payload.codingPrograms) ? payload.codingPrograms : []);
+
     const customExam = {
       id: examId,
       title: String(payload.title).trim(),
       topic: String(payload.topic || payload.title).trim(),
       description: String(payload.description || '').trim(),
+      examType: examType, // 'mcq' | 'coding' | 'both'
       durationMinutes: Number(payload.durationMinutes || 20),
-      totalQuestions: payload.questions.length,
-      questions: payload.questions, // array of { question, options: [A, B, C, D], answer: "A", explanation: "" }
-      codingPrograms: Array.isArray(payload.codingPrograms) ? payload.codingPrograms : [],
+      totalQuestions: (payload.questions || []).length,
+      totalCodingQuestions: codingList.length,
+      questions: Array.isArray(payload.questions) ? payload.questions : [], // array of { number, question, options: [A, B, C, D], answer: "A" }
+      codingQuestions: codingList, // array of { number, title, description, sampleInput, sampleOutput, constraints, difficulty }
+      codingPrograms: codingList.map(c => typeof c === 'string' ? c : (c.title ? `${c.title}: ${c.description || ''}` : (c.description || 'Program'))),
       status: payload.status || 'active',
       createdAt: payload.createdAt || new Date().toISOString(),
       createdAtDisplay: payload.createdAtDisplay || new Date().toLocaleString(),
@@ -1307,13 +1368,13 @@ app.post('/api/custom-assessments', async (req, res) => {
   }
 });
 
-// 6.3 Add a new question to an existing assessment
+// 6.3 Add a new question to an existing assessment (MCQ or Coding)
 app.post('/api/custom-assessments/:id/questions', async (req, res) => {
   try {
     const rawParam = decodeURIComponent(String(req.params.id || '').trim());
     const newQ = req.body;
-    if (!newQ || !newQ.question || !Array.isArray(newQ.options) || newQ.options.length < 2) {
-      return res.status(400).json({ success: false, error: 'Question text and at least 2 options are required.' });
+    if (!newQ) {
+      return res.status(400).json({ success: false, error: 'Question data is required.' });
     }
 
     let found = null;
@@ -1340,15 +1401,37 @@ app.post('/api/custom-assessments/:id/questions', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Assessment not found.' });
     }
 
-    if (!Array.isArray(found.questions)) found.questions = [];
-    found.questions.push({
-      number: found.questions.length + 1,
-      question: String(newQ.question).trim(),
-      options: newQ.options.map(o => String(o || '').trim()),
-      answer: String(newQ.answer || 'A').toUpperCase().trim(),
-      explanation: String(newQ.explanation || '').trim()
-    });
-    found.totalQuestions = found.questions.length;
+    const isCoding = newQ.type === 'coding' || newQ.type === 'debugging' || newQ.isCoding || newQ.isDebugging || !!newQ.sampleInput || !!newQ.sampleOutput;
+
+    if (isCoding) {
+      if (!Array.isArray(found.codingQuestions)) found.codingQuestions = [];
+      const isDebug = newQ.type === 'debugging' || !!newQ.isDebugging || found.examType === 'debugging';
+      const cQ = {
+        number: found.codingQuestions.length + 1,
+        title: String(newQ.title || newQ.question || (isDebug ? `Debug Problem ${found.codingQuestions.length + 1}` : `Coding Problem ${found.codingQuestions.length + 1}`)).trim(),
+        description: String(newQ.description || newQ.statement || newQ.question || '').trim(),
+        buggyCode: String(newQ.buggyCode || (isDebug ? (newQ.description || newQ.code || '') : (newQ.code || ''))).trim(),
+        sampleInput: String(newQ.sampleInput || '').trim(),
+        sampleOutput: String(newQ.sampleOutput || '').trim(),
+        constraints: String(newQ.constraints || '').trim(),
+        difficulty: String(newQ.difficulty || 'Medium').trim(),
+        isDebugging: isDebug
+      };
+      found.codingQuestions.push(cQ);
+      found.totalCodingQuestions = found.codingQuestions.length;
+      if (!Array.isArray(found.codingPrograms)) found.codingPrograms = [];
+      found.codingPrograms.push(cQ.title ? `${cQ.title}: ${cQ.description}` : cQ.description);
+    } else {
+      if (!Array.isArray(found.questions)) found.questions = [];
+      found.questions.push({
+        number: found.questions.length + 1,
+        question: String(newQ.question).trim(),
+        options: (newQ.options || []).map(o => String(o || '').trim()),
+        answer: String(newQ.answer || 'A').toUpperCase().trim(),
+        explanation: String(newQ.explanation || '').trim()
+      });
+      found.totalQuestions = found.questions.length;
+    }
 
     // Update in Firestore
     if (firestoreDb) {
@@ -1370,8 +1453,7 @@ app.post('/api/custom-assessments/:id/questions', async (req, res) => {
     return res.json({
       success: true,
       message: 'Question added successfully.',
-      customAssessment: found,
-      newQuestionIndex: found.questions.length - 1
+      customAssessment: found
     });
   } catch (error) {
     console.error('Error adding question to assessment:', error);
@@ -1379,11 +1461,12 @@ app.post('/api/custom-assessments/:id/questions', async (req, res) => {
   }
 });
 
-// 6.4 Delete an individual question from an assessment
+// 6.4 Delete an individual question from an assessment (MCQ, Coding, or Debugging)
 app.delete('/api/custom-assessments/:id/questions/:qIndex', async (req, res) => {
   try {
     const rawParam = decodeURIComponent(String(req.params.id || '').trim());
     const qIndex = parseInt(req.params.qIndex, 10);
+    const type = String(req.query.type || 'mcq').toLowerCase();
 
     if (isNaN(qIndex) || qIndex < 0) {
       return res.status(400).json({ success: false, error: 'Valid question index is required.' });
@@ -1412,15 +1495,24 @@ app.delete('/api/custom-assessments/:id/questions/:qIndex', async (req, res) => 
       return res.status(404).json({ success: false, error: 'Assessment not found.' });
     }
 
-    if (!Array.isArray(found.questions) || qIndex >= found.questions.length) {
-      return res.status(400).json({ success: false, error: 'Question index out of bounds.' });
+    if (type === 'coding' || type === 'debugging') {
+      if (!Array.isArray(found.codingQuestions) || qIndex >= found.codingQuestions.length) {
+        return res.status(400).json({ success: false, error: 'Coding question index out of bounds.' });
+      }
+      found.codingQuestions.splice(qIndex, 1);
+      found.codingQuestions.forEach((q, i) => { q.number = i + 1; });
+      found.totalCodingQuestions = found.codingQuestions.length;
+      if (Array.isArray(found.codingPrograms) && qIndex < found.codingPrograms.length) {
+        found.codingPrograms.splice(qIndex, 1);
+      }
+    } else {
+      if (!Array.isArray(found.questions) || qIndex >= found.questions.length) {
+        return res.status(400).json({ success: false, error: 'Question index out of bounds.' });
+      }
+      found.questions.splice(qIndex, 1);
+      found.questions.forEach((q, i) => { q.number = i + 1; });
+      found.totalQuestions = found.questions.length;
     }
-
-    // Remove the question
-    const removed = found.questions.splice(qIndex, 1);
-    // Renumber remaining questions
-    found.questions.forEach((q, i) => { q.number = i + 1; });
-    found.totalQuestions = found.questions.length;
 
     // Update in Firestore
     if (firestoreDb) {
@@ -1440,7 +1532,6 @@ app.delete('/api/custom-assessments/:id/questions/:qIndex', async (req, res) => 
     return res.json({
       success: true,
       message: `Question #${qIndex + 1} deleted successfully.`,
-      removedQuestion: removed[0],
       customAssessment: found
     });
   } catch (error) {

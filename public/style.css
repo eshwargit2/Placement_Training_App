@@ -4154,6 +4154,49 @@ body.dark-theme .custom-exams-filter-btn {
   border-color: #38bdf8;
 }
 
+.v-prof-logout-btn,
+.v-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1.5px solid rgba(239, 68, 68, 0.45);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.18);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.v-prof-logout-btn:hover,
+.v-logout-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .v-prof-logout-btn,
+[data-theme="light"] .v-logout-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1.5px solid #f87171;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
+}
+
+[data-theme="light"] .v-prof-logout-btn:hover,
+[data-theme="light"] .v-logout-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+}
+
 .v-dash-bell-dot {
   position: absolute;
   top: 8px;
